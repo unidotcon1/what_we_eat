@@ -11,6 +11,7 @@
   --accent-text: var(--cotton);
   --surface: #ffffff;
   --muted: #d8d4c2;
+  --icon: var(--cherry);
   --radius-control: 8px;
 }
 
@@ -22,10 +23,12 @@
     --accent-text: var(--cotton);
     --surface: #2a2222;
     --muted: var(--maroon);
+    --icon: var(--cotton);
   }
 }
 
 :root[data-theme='dark'] {
+  --icon: var(--cotton);
   --bg: var(--noir);
   --text: var(--cotton);
   --accent: var(--cherry);

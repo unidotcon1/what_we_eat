@@ -1,0 +1,198 @@
+h1 {
+  font-size: 22px;
+  margin: 0 0 12px;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.filterbar .search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: var(--surface);
+  border-radius: 10px;
+}
+
+.filterbar .search input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.fbtn,
+.chip,
+.seg button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-size: 12px;
+}
+
+.fbtn,
+.chip.on,
+.seg button.on {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.clear {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  text-decoration: underline;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: var(--surface);
+  border-radius: 12px;
+}
+
+.card-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  font-size: 26px;
+  border-radius: 10px;
+  background: var(--muted);
+}
+
+.card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.card h3 {
+  margin: 0 0 2px;
+  font-size: 15px;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.tag {
+  padding: 2px 7px;
+  font-size: 10.5px;
+  border-radius: 6px;
+  background: var(--muted);
+}
+
+.card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.card-actions button {
+  padding: 4px;
+  border: 0;
+  background: none;
+  color: var(--icon);
+}
+
+.empty {
+  text-align: center;
+  padding: 32px 0;
+}
+
+.sheet {
+  position: fixed;
+  inset: 0 0 0 0;
+  z-index: 10;
+  overflow-y: auto;
+  padding: 16px 16px 24px;
+  background: var(--bg);
+}
+
+.sheet header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sheet h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.sheet header button {
+  border: 0;
+  background: none;
+}
+
+.sheet h4 {
+  margin: 18px 0 8px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.seg {
+  display: flex;
+  gap: 6px;
+}
+
+.seg button {
+  flex: 1;
+  justify-content: center;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.apply {
+  display: block;
+  width: 100%;
+  margin-top: 24px;
+  padding: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-text);
+}
