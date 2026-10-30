@@ -33,5 +33,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    // tests must never reach the real database, whatever is in .env.local
+    env: { VITE_SUPABASE_URL: '', VITE_SUPABASE_ANON_KEY: '', VITE_SUGGEST_FORM_URL: '' },
   },
 })

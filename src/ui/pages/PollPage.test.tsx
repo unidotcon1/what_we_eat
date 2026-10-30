@@ -73,6 +73,43 @@ test('only the creator sees the Close voting button', async () => {
   expect(await screen.findByRole('button', { name: 'Close voting' })).toBeInTheDocument()
 })
 
+async function open_as_member(role: 'created' | 'joined') {
+  const code = await localPolls().create('Friday dinner', ['kopi-kin', 'long-table-hotpot'], 'someone-else')
+  localStorage.setItem('wwe.mypolls', JSON.stringify([{ code, title: 'Friday dinner', role }]))
+  render(
+    <MemoryRouter initialEntries={[`/p/${code}`]}>
+      <Routes>
+        <Route path="/p/:code" element={<PollPage />} />
+        <Route path="/vote" element={<h1>Vote tab</h1>} />
+      </Routes>
+    </MemoryRouter>,
+  )
+}
+
+test('a poll you created or joined shows a Back button and the tab bar', async () => {
+  await open_as_member('created')
+  expect(await screen.findByRole('button', { name: 'Back' })).toBeInTheDocument()
+  expect(screen.getByRole('navigation', { name: 'Main' })).toBeInTheDocument()
+})
+
+test('a joined poll also shows the tab bar', async () => {
+  await open_as_member('joined')
+  expect(await screen.findByRole('navigation', { name: 'Main' })).toBeInTheDocument()
+})
+
+test('Back goes to the Vote tab when the poll was opened directly', async () => {
+  await open_as_member('created')
+  await userEvent.click(await screen.findByRole('button', { name: 'Back' }))
+  expect(await screen.findByText('Vote tab')).toBeInTheDocument()
+})
+
+test('a stranger opening the shared link sees neither Back nor the tab bar', async () => {
+  await open()
+  await screen.findByText('Friday dinner')
+  expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+})
+
 test('an unknown poll code shows a not-found message', async () => {
   render(
     <MemoryRouter initialEntries={['/p/zzzzzz']}>

@@ -384,3 +384,14 @@ textarea {
   background: var(--cotton);
   border: 2px solid var(--cherry);
 }
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  font-size: 14px;
+}

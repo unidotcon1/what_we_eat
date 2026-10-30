@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { getPollApi, rememberPoll, type PollView } from '../../data/polls'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
+import { getPollApi, listMyPolls, rememberPoll, type PollView } from '../../data/polls'
+import { TabBar } from '../TabBar'
 import { fetchRestaurants } from '../../data/restaurants'
 import type { Restaurant } from '../../domain/types'
 import { tally } from '../../domain/poll'
@@ -9,6 +11,8 @@ import { cuisineIcon } from '../cuisineIcons'
 
 export default function PollPage() {
   const { code = '' } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
   const api = useMemo(() => getPollApi(), [])
   const token = useMemo(() => getVoterToken(), [])
   const [poll, setPoll] = useState<PollView | null | undefined>(undefined)
@@ -51,8 +55,21 @@ export default function PollPage() {
     }
   }
 
+  // people who created or joined this poll see the app chrome; a friend opening the shared link sees just the vote
+  const is_member = listMyPolls().some((p) => p.code === code)
+
+  function go_back() {
+    if (location.key !== 'default') navigate(-1)
+    else navigate('/vote')
+  }
+
   return (
     <main className="app pollpage">
+      {is_member && (
+        <button type="button" className="back" onClick={go_back}>
+          <ArrowLeft size={16} aria-hidden="true" /> Back
+        </button>
+      )}
       <h1>{poll.title}</h1>
       <p className="sub">
         {poll.closed ? 'Voting closed' : 'Tap a place to vote. You can change your vote until voting closes.'}
@@ -96,6 +113,7 @@ export default function PollPage() {
           Close voting
         </button>
       )}
+      {is_member && <TabBar />}
     </main>
   )
 }
