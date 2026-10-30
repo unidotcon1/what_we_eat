@@ -73,11 +73,14 @@ npx tsx scripts/import-approved.ts approved.csv
 Connect the repo with build command `npm run build` and deploy command `npx wrangler deploy`, root directory `/`, and add the same `VITE_` variables as build variables, plus `NODE_VERSION=22`. `wrangler.jsonc` serves `dist/` and sends unknown paths to `index.html`, which is what makes poll links like `/p/abc123` work.
 Add the repository secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY` so `.github/workflows/keepalive.yml` keeps the free Supabase project from pausing.
 
-## Tests
+## Tests and health check
 
 ```bash
-npm test
+npm test               # unit tests
+npm run check:live     # 28 checks against the live site and database (needs .env and .env.local)
 ```
+
+Open tasks and how to resume work: `docs/NEXT_STEPS.md` and `CLAUDE.md`.
 
 ## License
 
