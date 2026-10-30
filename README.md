@@ -78,3 +78,7 @@ Add the repository secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY` so `.github/wo
 ```bash
 npm test
 ```
+
+## License
+
+[MIT](LICENSE). The sample restaurants in `data/sample-restaurants.csv` are made-up entries for demonstration.
