@@ -406,6 +406,19 @@ textarea {
   color: var(--text);
 }
 
+/* keep each section title close to its text, with the space between sections */
+.legal h2 {
+  margin: 22px 0 4px;
+}
+
+.legal p {
+  margin: 0 0 10px;
+}
+
+.legal .sub {
+  margin-bottom: 4px;
+}
+
 .legal-links a {
   color: inherit;
 }
