@@ -108,9 +108,17 @@ begin
   if not exists (select 1 from poll_options where id = p_option and poll_code = p_code) then
     raise exception 'unknown option';
   end if;
-  insert into votes (poll_code, voter_token, option_id) values (p_code, p_token, p_option)
+  -- voter_token stores a sha256 hash, so reading votes never reveals a token others could reuse
+  insert into votes (poll_code, voter_token, option_id)
+  values (p_code, encode(sha256(convert_to(p_token, 'utf8')), 'hex'), p_option)
   on conflict (poll_code, voter_token) do update set option_id = excluded.option_id;
 end $$;
+
+create function my_vote(p_code text, p_token text) returns uuid
+language sql security definer set search_path = public as $$
+  select option_id from votes
+  where poll_code = p_code and voter_token = encode(sha256(convert_to(p_token, 'utf8')), 'hex');
+$$;
 
 create function close_poll(p_code text, p_token text) returns void
 language plpgsql security definer set search_path = public as $$
@@ -127,6 +135,11 @@ create policy "own pending reviews" on reviews for insert
 create policy "own ledger readable" on points_ledger for select using (auth.uid() = user_id);
 -- ledger rows are written only by award_points (see 002_points.sql)
 
+-- live results on the vote page
+alter publication supabase_realtime add table votes;
+alter publication supabase_realtime add table polls;
+
 grant execute on function create_poll(text, text[], text) to anon, authenticated;
 grant execute on function cast_vote(text, uuid, text) to anon, authenticated;
 grant execute on function close_poll(text, text) to anon, authenticated;
+grant execute on function my_vote(text, text) to anon, authenticated;
