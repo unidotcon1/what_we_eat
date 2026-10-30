@@ -34,7 +34,8 @@ const LOCAL_KEY = 'wwe.localpolls'
 
 function readLocal(): Record<string, LocalPoll> {
   try {
-    return JSON.parse(localStorage.getItem(LOCAL_KEY) ?? '{}')
+    const parsed: unknown = JSON.parse(localStorage.getItem(LOCAL_KEY) ?? '{}')
+    return parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed) ? (parsed as Record<string, LocalPoll>) : {}
   } catch {
     return {}
   }
@@ -129,21 +130,22 @@ export function supabasePolls(client: SupabaseClient): PollApi {
       check(error)
     },
     async get(code) {
-      const { data: poll, error } = await client.from('polls').select('code,title,closed').eq('code', code).maybeSingle()
+      const { data, error } = await client.rpc('get_poll', { p_code: code })
       check(error)
-      if (!poll) return null
-      const [options, votes] = await Promise.all([
-        client.from('poll_options').select('id,restaurant_id').eq('poll_code', code).order('id'),
-        client.from('votes').select('option_id').eq('poll_code', code),
-      ])
-      check(options.error)
-      check(votes.error)
+      if (!data) return null
+      const poll = data as {
+        code: string
+        title: string
+        closed: boolean
+        options: { id: string; restaurant_id: string }[]
+        votes: { option_id: string }[]
+      }
       return {
         code: poll.code,
         title: poll.title,
         closed: poll.closed,
-        options: (options.data ?? []).map((o) => ({ id: o.id as string, restaurantId: o.restaurant_id as string })),
-        votes: (votes.data ?? []).map((v) => ({ optionId: v.option_id as string })),
+        options: poll.options.map((o) => ({ id: o.id, restaurantId: o.restaurant_id })),
+        votes: poll.votes.map((v) => ({ optionId: v.option_id })),
       }
     },
     async myVote(code, token) {
@@ -156,13 +158,10 @@ export function supabasePolls(client: SupabaseClient): PollApi {
       check(error)
       return data === true
     },
-    subscribe(code, cb) {
-      const channel = client
-        .channel(`votes-${code}`)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'votes', filter: `poll_code=eq.${code}` }, cb)
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'polls', filter: `code=eq.${code}` }, cb)
-        .subscribe()
-      return () => void client.removeChannel(channel)
+    // polls are private (no public table reads), so results refresh by asking again every few seconds
+    subscribe(_code, cb) {
+      const id = setInterval(cb, 3000)
+      return () => clearInterval(id)
     },
   }
 }
@@ -179,7 +178,16 @@ const MINE_KEY = 'wwe.mypolls'
 
 export function listMyPolls(): MyPoll[] {
   try {
-    return JSON.parse(localStorage.getItem(MINE_KEY) ?? '[]')
+    const parsed: unknown = JSON.parse(localStorage.getItem(MINE_KEY) ?? '[]')
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter(
+      (p): p is MyPoll =>
+        p !== null &&
+        typeof p === 'object' &&
+        typeof p.code === 'string' &&
+        typeof p.title === 'string' &&
+        (p.role === 'created' || p.role === 'joined'),
+    )
   } catch {
     return []
   }

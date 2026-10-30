@@ -1,5 +1,6 @@
 import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { TabBar } from './ui/TabBar'
+import { ErrorBoundary } from './ui/ErrorBoundary'
 import Explore from './ui/pages/Explore'
 import Saved from './ui/pages/Saved'
 import Vote from './ui/pages/Vote'
@@ -22,6 +23,7 @@ function WithTabs() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ErrorBoundary>
       <Routes>
         <Route element={<WithTabs />}>
           <Route path="/" element={<Explore />} />
@@ -34,6 +36,7 @@ export default function App() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
       </Routes>
+      </ErrorBoundary>
     </BrowserRouter>
   )
 }

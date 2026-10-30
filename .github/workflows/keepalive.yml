@@ -7,6 +7,9 @@ on:
     - cron: '0 3 * * 1,4'
   workflow_dispatch:
 
+# this job only makes one read request, so it needs no repository permissions
+permissions: {}
+
 jobs:
   ping:
     runs-on: ubuntu-latest

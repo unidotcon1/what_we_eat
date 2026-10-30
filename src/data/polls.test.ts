@@ -83,6 +83,70 @@ test('supabasePolls calls the matching rpc functions with the token', async () =
   expect(calls[1]).toEqual(['cast_vote', { p_code: 'abc123', p_option: 'opt', p_token: 'tok' }])
 })
 
+test('supabasePolls.get reads the poll through the get_poll function and maps its fields', async () => {
+  const calls: [string, unknown][] = []
+  const client = {
+    rpc: async (fn: string, args: unknown) => {
+      calls.push([fn, args])
+      return {
+        data: {
+          code: 'abc1234567',
+          title: 'Friday dinner',
+          closed: false,
+          options: [{ id: 'o1', restaurant_id: 'kopi-kin' }],
+          votes: [{ option_id: 'o1' }],
+        },
+        error: null,
+      }
+    },
+  }
+  const view = await supabasePolls(client as never).get('abc1234567')
+  expect(calls).toEqual([['get_poll', { p_code: 'abc1234567' }]])
+  expect(view).toEqual({
+    code: 'abc1234567',
+    title: 'Friday dinner',
+    closed: false,
+    options: [{ id: 'o1', restaurantId: 'kopi-kin' }],
+    votes: [{ optionId: 'o1' }],
+  })
+})
+
+test('supabasePolls.get returns null for an unknown poll', async () => {
+  const client = { rpc: async () => ({ data: null, error: null }) }
+  expect(await supabasePolls(client as never).get('nope')).toBeNull()
+})
+
+test('supabasePolls.subscribe refreshes every few seconds and stops when unsubscribed', () => {
+  vi.useFakeTimers()
+  const cb = vi.fn()
+  const stop = supabasePolls({} as never).subscribe('abc', cb)
+  vi.advanceTimersByTime(3100)
+  expect(cb).toHaveBeenCalledTimes(1)
+  stop()
+  vi.advanceTimersByTime(10000)
+  expect(cb).toHaveBeenCalledTimes(1)
+  vi.useRealTimers()
+})
+
+test('corrupt device-poll storage is ignored instead of crashing', async () => {
+  for (const bad of ['[]', '"text"', '42', 'null', '{not json']) {
+    localStorage.setItem('wwe.localpolls', bad)
+    expect(await localPolls().get('anything')).toBeNull()
+  }
+})
+
+test('corrupt my-polls storage yields an empty list, and invalid entries are dropped', () => {
+  for (const bad of ['{"a":1}', '"x"', '42', 'null', '{not json']) {
+    localStorage.setItem('wwe.mypolls', bad)
+    expect(listMyPolls()).toEqual([])
+  }
+  localStorage.setItem(
+    'wwe.mypolls',
+    JSON.stringify([1, 'x', { code: 'a' }, { code: 'b', title: 'Good', role: 'created' }, { code: 'c', title: 'Bad role', role: 'admin' }]),
+  )
+  expect(listMyPolls()).toEqual([{ code: 'b', title: 'Good', role: 'created' }])
+})
+
 test('my polls lists the most recently used first and never duplicates a poll', () => {
   rememberPoll('a1', 'Friday dinner', 'created')
   rememberPoll('b2', 'Date night', 'joined')

@@ -20,6 +20,11 @@ test('the privacy policy says location stays in the browser and nothing is sold'
   expect(text).toMatch(/do not sell/i)
 })
 
+test('the privacy policy says anyone with a poll link can see that poll', () => {
+  in_router(<PrivacyPage />)
+  expect(document.body.textContent).toMatch(/anyone with (a|the) (poll )?link can see/i)
+})
+
 test('the privacy policy tells people how to ask for their data to be deleted', () => {
   in_router(<PrivacyPage />)
   const link = screen.getByRole('link', { name: /open an issue/i })

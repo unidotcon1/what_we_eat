@@ -2,7 +2,12 @@ import { MAX_REVIEW_CHARS, validateReview } from './reviews'
 
 test('a rating of 1 to 5 with short text is valid', () => {
   expect(validateReview(1, 'ok')).toBeNull()
-  expect(validateReview(5, '')).toBeNull()
+  expect(validateReview(5, 'Great kopi')).toBeNull()
+})
+
+test('a review needs some text, and spaces alone do not count', () => {
+  expect(validateReview(5, '')).toBe('Write a few words about it')
+  expect(validateReview(5, '   ')).toBe('Write a few words about it')
 })
 
 test('ratings 0, 6 and 3.5 are rejected', () => {

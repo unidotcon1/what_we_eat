@@ -33,7 +33,8 @@ export function PrivacyPage() {
       <p>
         We also store what you create: the places you save, your reviews (a rating and up to 280 characters of text), your
         points, and the polls you make and vote in. Reviews appear to other people only after approval, with the rating
-        and text but not your name or email address.
+        and text but not your name or email address. Anyone with a poll link can see its title, options and vote counts,
+        so do not put private details in a poll title.
       </p>
 
       <h2>On your device</h2>

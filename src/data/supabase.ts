@@ -7,6 +7,7 @@ export function getClient(): SupabaseClient | null {
   if (client !== undefined) return client
   const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
   const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
-  client = url && key ? createClient(url, key) : null
+  // PKCE keeps the sign-in token out of the page address
+  client = url && key ? createClient(url, key, { auth: { flowType: 'pkce' } }) : null
   return client
 }
