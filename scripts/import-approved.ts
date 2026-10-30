@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 import type { Restaurant } from '../src/domain/types'
-import { parseCsv, parseRestaurantRow } from './seed'
+import { load_env_file, parseCsv, parseRestaurantRow } from './seed'
 
 export type ImportDeps = {
   upsertRestaurant(r: Restaurant): Promise<void>
@@ -38,6 +38,7 @@ export async function importApproved(
 }
 
 async function main() {
+  load_env_file()
   const file = process.argv[2]
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_KEY

@@ -70,6 +70,15 @@ export function parseCsv(text: string): Record<string, string>[] {
   })
 }
 
+/** Reads SUPABASE_URL and SUPABASE_SERVICE_KEY from a local .env file when there is one. */
+export function load_env_file() {
+  try {
+    process.loadEnvFile('.env')
+  } catch {
+    // no .env file: values must already be in the environment
+  }
+}
+
 async function main() {
   const rows = parseCsv(readFileSync('data/sample-restaurants.csv', 'utf8'))
   const ok: Restaurant[] = []
@@ -81,6 +90,7 @@ async function main() {
   writeFileSync('src/data/sample-restaurants.json', JSON.stringify(ok, null, 2))
   console.log(`wrote ${ok.length} restaurants to src/data/sample-restaurants.json`)
 
+  load_env_file()
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_KEY
   if (url && key) {

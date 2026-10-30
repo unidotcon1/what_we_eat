@@ -1,0 +1,56 @@
+<h2>Vote and Me screens, dark and light</h2>
+<p class="subtitle">Top row: the shared vote link (no login for friends). Bottom row: your profile with points and the theme toggle.</p>
+
+<style>
+.ph{width:250px;border-radius:26px;padding:14px 12px 10px;font-family:system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25);min-height:430px;font-size:12px}
+.ph h1{font-size:18px;margin:0 0 2px}
+.ph .sub{font-size:11px;opacity:.7;margin-bottom:10px}
+.ph .opt{border-radius:10px;padding:9px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.ph .opt b{font-size:13px;display:block}
+.ph .opt span{font-size:10px;opacity:.75}
+.ph .bar{height:6px;border-radius:3px;margin-top:5px}
+.ph .votes{font-size:15px;font-weight:700}
+.ph .btn{display:block;text-align:center;padding:8px;border-radius:10px;margin-top:6px;background:#810100;color:#EDEBDD}
+.ph .lvl{border-radius:10px;padding:10px;margin-bottom:8px}
+.ph .track{height:8px;border-radius:4px;margin:6px 0}
+.ph .fill{height:8px;border-radius:4px;background:#810100;width:62%}
+.ph .tg{display:flex;justify-content:space-between;align-items:center;padding:9px 4px}
+.ph .sw{width:34px;height:18px;border-radius:9px;background:#810100;position:relative}
+.ph .sw:after{content:"";position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:#EDEBDD}
+.D{background:#1B1717;color:#EDEBDD}.D .opt,.D .lvl{background:#2a2222}.D .bar,.D .track{background:#630000}.D .bar i{display:block;height:6px;border-radius:3px;background:#EDEBDD}
+.L{background:#EDEBDD;color:#1B1717}.L .opt,.L .lvl{background:#fff}.L .bar,.L .track{background:#d8d4c2}.L .bar i{display:block;height:6px;border-radius:3px;background:#810100}
+.row2{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+</style>
+
+<div class="row2">
+  <div class="ph D">
+    <h1>Friday dinner</h1><div class="sub">6 friends invited · 4 voted · no login needed</div>
+    <div class="opt"><div><b>Long Table Hotpot</b><span>Bugis · $$</span><div class="bar" style="width:120px"><i style="width:75%"></i></div></div><span class="votes">3</span></div>
+    <div class="opt"><div><b>Kopi &amp; Kin</b><span>Tiong Bahru · $</span><div class="bar" style="width:120px"><i style="width:25%"></i></div></div><span class="votes">1</span></div>
+    <div class="opt"><div><b>Candlelight Bistro</b><span>Tanjong Pagar · $$$</span><div class="bar" style="width:120px"><i style="width:0%"></i></div></div><span class="votes">0</span></div>
+    <span class="btn">Vote for Long Table Hotpot</span>
+  </div>
+  <div class="ph L">
+    <h1>Friday dinner</h1><div class="sub">6 friends invited · 4 voted · no login needed</div>
+    <div class="opt"><div><b>Long Table Hotpot</b><span>Bugis · $$</span><div class="bar" style="width:120px"><i style="width:75%"></i></div></div><span class="votes">3</span></div>
+    <div class="opt"><div><b>Kopi &amp; Kin</b><span>Tiong Bahru · $</span><div class="bar" style="width:120px"><i style="width:25%"></i></div></div><span class="votes">1</span></div>
+    <div class="opt"><div><b>Candlelight Bistro</b><span>Tanjong Pagar · $$$</span><div class="bar" style="width:120px"><i style="width:0%"></i></div></div><span class="votes">0</span></div>
+    <span class="btn">Vote for Long Table Hotpot</span>
+  </div>
+</div>
+
+<div class="row2">
+  <div class="ph D">
+    <h1>Me</h1><div class="sub">Level 2 · Food Explorer</div>
+    <div class="lvl"><b>92 / 150 points</b><div class="track"><div class="fill"></div></div><span style="font-size:10px;opacity:.75">+5 review · +5 submission · +5 first save · 30/day cap</span></div>
+    <div class="lvl"><b>Saved places</b> · 14<br><b>Reviews</b> · 6</div>
+    <div class="tg"><span>Dark mode</span><div class="sw"></div></div>
+  </div>
+  <div class="ph L">
+    <h1>Me</h1><div class="sub">Level 2 · Food Explorer</div>
+    <div class="lvl"><b>92 / 150 points</b><div class="track"><div class="fill"></div></div><span style="font-size:10px;opacity:.75">+5 review · +5 submission · +5 first save · 30/day cap</span></div>
+    <div class="lvl"><b>Saved places</b> · 14<br><b>Reviews</b> · 6</div>
+    <div class="tg"><span>Dark mode</span><div class="sw" style="background:#d8d4c2"></div></div>
+  </div>
+</div>
+<p class="subtitle">Names, counts and level titles are placeholders. Anything you'd change on these two screens?</p>

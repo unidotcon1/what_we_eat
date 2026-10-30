@@ -1,0 +1,105 @@
+<h2>Explore with rounded-rectangle filters and icons</h2>
+<p class="subtitle">Filters are now rounded rectangles instead of pills. Icons are from Lucide (free, open source, lucide.dev). Left: Explore. Right: Filters sheet.</p>
+
+<style>
+.ph{width:272px;border-radius:26px;padding:14px 12px 8px;font-family:system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25);min-height:600px;font-size:12px;display:flex;flex-direction:column}
+.ph h1{font-size:18px;margin:0 0 8px;display:flex;align-items:center;gap:6px}
+.ph h4{margin:12px 0 6px;font-size:10px;letter-spacing:1px;text-transform:uppercase;opacity:.7;display:flex;align-items:center;gap:5px}
+.ph svg{width:14px;height:14px;stroke-width:2;flex:none}
+.ph .search{border-radius:10px;padding:9px 10px;margin-bottom:8px;display:flex;align-items:center;gap:7px;opacity:.95}
+.ph .bar{display:flex;gap:6px;margin-bottom:6px;align-items:center;flex-wrap:wrap}
+.ph .fbtn{padding:6px 10px;border-radius:8px;background:#810100;color:#EDEBDD;font-size:11px;display:inline-flex;align-items:center;gap:5px}
+.ph .chip{font-size:10.5px;padding:6px 9px;border-radius:8px;display:inline-flex;align-items:center;gap:5px;margin:0 4px 5px 0}
+.ph .clear{font-size:10px;text-decoration:underline;opacity:.8;margin-left:auto}
+.ph .rc{border-radius:12px;padding:10px;margin-bottom:8px;position:relative}
+.ph .rc{display:flex;gap:10px;align-items:center}
+.ph .rcb{flex:1;padding-right:44px;min-width:0}
+.ph .ico{flex:none;width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1}
+.D .ico{background:#630000}.L .ico{background:#EDEBDD;border:1px solid #810100}
+.ph .rc b{font-size:13px;display:block;margin-bottom:2px}
+.ph .rc .m{font-size:10px;opacity:.75;display:flex;align-items:center;gap:4px}
+.ph .rc .m svg{width:11px;height:11px}
+.ph .acts{position:absolute;top:10px;right:10px;display:flex;gap:8px}
+.ph .acts svg{width:17px;height:17px}
+.ph .tag{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;padding:3px 6px;border-radius:6px;margin:5px 4px 0 0}
+.ph .tag svg{width:10px;height:10px}
+.ph .seg{display:flex;gap:5px}
+.ph .seg span{flex:1;text-align:center;padding:7px 0;border-radius:8px}
+.ph .slider{height:6px;border-radius:3px;margin:8px 4px;position:relative}
+.ph .slider i{position:absolute;left:0;width:55%;height:6px;border-radius:3px;background:#810100}
+.ph .apply{text-align:center;padding:10px;border-radius:10px;background:#810100;color:#EDEBDD;margin-top:auto}
+.ph .nav{display:flex;justify-content:space-around;margin-top:auto;padding:8px 0 2px;font-size:10px}
+.ph .nav div{display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.65}
+.ph .nav div.on{opacity:1;font-weight:600}
+.ph .nav svg{width:20px;height:20px}
+.D{background:#1B1717;color:#EDEBDD}
+.D .search,.D .rc{background:#2a2222}.D .chip,.D .seg span,.D .tag{background:#630000}
+.D .chip.on,.D .seg .on,.D .act{background:#810100}.D .slider{background:#630000}.D .nav{border-top:1px solid #630000}
+.D .nav div.on{color:#EDEBDD}.D .acts{color:#EDEBDD}
+.L{background:#EDEBDD;color:#1B1717}
+.L .search,.L .rc{background:#fff}.L .chip,.L .seg span{background:#fff;border:1px solid #630000;color:#630000}
+.L .tag{background:#EDEBDD;border:1px solid #810100;color:#810100}
+.L .chip.on,.L .seg .on,.L .act{background:#810100;color:#EDEBDD;border-color:#810100}.L .slider{background:#d8d4c2}.L .nav{border-top:1px solid #810100}
+.L .nav div.on{color:#810100}.L .acts{color:#810100}
+.act{padding:5px 8px;border-radius:8px;font-size:10.5px;display:inline-flex;align-items:center;gap:4px}
+.row2{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+</style>
+
+<div id="out"></div>
+
+<script>
+const P={
+search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+'plus-circle':'<circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/>',
+plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
+'map-pin':'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+compass:'<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+bookmark:'<path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+'check-square':'<path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+'sliders-horizontal':'<path d="M21 4h-7"/><path d="M10 4H3"/><path d="M21 12h-9"/><path d="M8 12H3"/><path d="M21 20h-5"/><path d="M12 20H3"/><path d="M14 2v4"/><path d="M8 10v4"/><path d="M16 18v4"/>',
+x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+utensils:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+wallet:'<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+coffee:'<path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M6 2v2"/><path d="M10 2v2"/><path d="M14 2v2"/>',
+leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+wine:'<path d="M8 22h8"/><path d="M7 10h10"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"/>',
+moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+map:'<polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><path d="M9 3v15"/><path d="M15 6v15"/>',
+'arrow-up-down':'<path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/>'
+};
+const alias={'heart-handshake':'wine','volume-1':'moon','locate-fixed':'map-pin','salad':'leaf'};
+const ic=(n)=>{const k=alias[n]||n;return P[k]?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${P[k]}</svg>`:''};
+const nav=`<div class="nav"><div class="on">${ic('compass')}Explore</div><div>${ic('bookmark')}Saved</div><div>${ic('check-square')}Vote</div><div>${ic('user')}Me</div></div>`;
+const explore=`
+<h1>${ic('utensils')} What We Eat</h1>
+<div class="search">${ic('search')}Search restaurant, cuisine, area…</div>
+<div class="bar"><span class="fbtn">${ic('sliders-horizontal')}Filters (3)</span><span class="chip" style="margin:0">${ic('arrow-up-down')}Nearest</span><span class="chip" style="margin:0">${ic('map')}Map</span></div>
+<div class="bar"><span class="act chip on">${ic('wallet')}$$ ${ic('x')}</span><span class="act chip on">${ic('map-pin')}2 km ${ic('x')}</span><span class="act chip on">${ic('users')}6+ ${ic('x')}</span><span class="clear">Clear</span></div>
+<div class="rc"><span class="ico">🍲</span><div class="rcb"><span class="acts">${ic('heart')}${ic('plus-circle')}</span><b>Long Table Hotpot</b><span class="m">${ic('map-pin')}Bugis · $$ · 1.2 km</span><span class="tag">${ic('users')}Big groups</span><span class="tag">${ic('clock')}Open late</span></div></div>
+<div class="rc"><span class="ico">🍝</span><div class="rcb"><span class="acts">${ic('heart')}${ic('plus-circle')}</span><b>Candlelight Bistro</b><span class="m">${ic('map-pin')}Tanjong Pagar · $$$ · 0.8 km</span><span class="tag">${ic('heart-handshake')}Date night</span><span class="tag">${ic('volume-1')}Quiet</span></div></div>
+<div class="rc"><span class="ico">🥐</span><div class="rcb"><span class="acts">${ic('heart')}${ic('plus-circle')}</span><b>Kopi &amp; Kin</b><span class="m">${ic('map-pin')}Tiong Bahru · $ · 2.0 km</span><span class="tag">${ic('coffee')}Casual</span><span class="tag">${ic('leaf')}Halal</span></div></div>
+<div class="rc"><span class="ico">🍣</span><div class="rcb"><span class="acts">${ic('heart')}${ic('plus-circle')}</span><b>Sakura Counter</b><span class="m">${ic('map-pin')}Orchard · $$$ · 1.6 km</span><span class="tag">${ic('heart-handshake')}Date night</span></div></div>
+${nav}`;
+const sheet=`
+<h1>${ic('sliders-horizontal')} Filters <span style="margin-left:auto;font-size:11px;opacity:.7">Reset</span></h1>
+<h4>${ic('wallet')}Price per person</h4>
+<div class="seg"><span>$</span><span class="on">$$</span><span>$$$</span><span>$$$$</span></div>
+<h4>${ic('map-pin')}Location</h4>
+<span class="chip on">${ic('locate-fixed')}Near me</span><span class="chip">${ic('map')}Pick an area</span>
+<div style="font-size:10px;opacity:.75">Within 2 km</div><div class="slider"><i></i></div>
+<h4>${ic('users')}Who's eating</h4>
+<span class="chip on">${ic('users')}Big group 6+</span><span class="chip">${ic('heart-handshake')}Date night</span><span class="chip">${ic('user')}Solo / small</span>
+<h4>${ic('utensils')}Cuisine</h4>
+<span class="chip">🥟 Chinese</span><span class="chip">🍣 Japanese</span><span class="chip">🍝 Western</span><span class="chip">🍛 Indian</span><span class="chip">${ic('plus')}More</span>
+<h4>${ic('leaf')}Dietary &amp; hours</h4>
+<span class="chip">${ic('leaf')}Halal</span><span class="chip">${ic('salad')}Vegetarian</span><span class="chip">${ic('clock')}Open now</span>
+<div class="apply">Show 18 places</div>`;
+document.getElementById('out').innerHTML=
+ `<div class="row2"><div class="ph D">${explore}</div><div class="ph D">${sheet}</div></div>`+
+ `<div class="row2"><div class="ph L">${explore}</div><div class="ph L">${sheet}</div></div>`;
+</script>
+<p class="subtitle">Heart saves (+5 points first time), plus-circle adds to the shortlist. Any icons you'd swap? Lucide has about 1,500 to pick from.</p>

@@ -8,7 +8,7 @@
 
 **Tech Stack:** Vite, React 18, TypeScript, React Router, Vitest + Testing Library, `@supabase/supabase-js`, `lucide-react`, Leaflet + OpenStreetMap tiles, `vite-plugin-pwa`, Cloudflare Pages (free).
 
-**Spec:** `docs/superpowers/specs/2026-10-30-what-we-eat-design.md` (mockups in `.superpowers/brainstorm/1173-1793325040/content/`).
+**Spec:** `docs/superpowers/specs/2026-10-30-what-we-eat-design.md` (mockups in `docs/mockups/`).
 
 ## Global Constraints
 

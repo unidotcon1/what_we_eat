@@ -1,0 +1,52 @@
+<h2>What We Eat: home screen direction</h2>
+<p class="subtitle">Same screen, two ways to use your palette. Which feels more like the app? Click one.</p>
+
+<style>
+.ph{width:300px;border-radius:28px;padding:16px 14px 12px;font-family:system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25);min-height:560px}
+.ph h1{font-size:22px;margin:0 0 2px;letter-spacing:.5px}
+.ph .sub{font-size:12px;opacity:.7;margin-bottom:12px}
+.ph .row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.ph .chip{font-size:11px;padding:5px 10px;border-radius:14px}
+.ph .rc{border-radius:12px;padding:10px;margin-bottom:10px}
+.ph .rc b{font-size:14px;display:block}
+.ph .rc span{font-size:11px;opacity:.75}
+.ph .img{height:70px;border-radius:8px;margin-bottom:8px}
+.ph .tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:8px;margin:4px 4px 0 0}
+.ph .nav{display:flex;justify-content:space-around;font-size:11px;margin-top:6px;padding-top:8px}
+.A{background:#1B1717;color:#EDEBDD}
+.A .chip{background:#630000;color:#EDEBDD}.A .chip.on{background:#810100}
+.A .rc{background:#2a2222}.A .img{background:linear-gradient(135deg,#810100,#630000)}
+.A .tag{background:#630000}.A .nav{border-top:1px solid #630000}
+.B{background:#EDEBDD;color:#1B1717}
+.B .chip{background:#fff;border:1px solid #630000;color:#630000}.B .chip.on{background:#810100;color:#EDEBDD;border-color:#810100}
+.B .rc{background:#fff}.B .img{background:linear-gradient(135deg,#810100,#1B1717)}
+.B .tag{background:#EDEBDD;border:1px solid #810100;color:#810100}.B .nav{border-top:1px solid #810100}
+.btn{display:block;text-align:center;padding:9px;border-radius:10px;font-size:12px;margin-top:6px;background:#810100;color:#EDEBDD}
+</style>
+
+<div class="cards" style="display:flex;gap:24px;flex-wrap:wrap">
+  <div class="card" data-choice="A-dark" onclick="toggleSelect(this)" style="padding:12px">
+    <div class="ph A">
+      <h1>What We Eat</h1><div class="sub">Where to, tonight?</div>
+      <div class="row"><span class="chip on">$$</span><span class="chip">Under $20</span><span class="chip">Near me</span><span class="chip">Group of 6+</span></div>
+      <div class="rc"><div class="img"></div><b>Candlelight Bistro</b><span>Tanjong Pagar · $$$ · 0.8 km</span><br><span class="tag">Date night</span><span class="tag">Quiet</span></div>
+      <div class="rc"><div class="img"></div><b>Long Table Hotpot</b><span>Bugis · $$ · 1.2 km</span><br><span class="tag">Big groups</span><span class="tag">Open late</span></div>
+      <span class="btn">Start a group vote</span>
+      <div class="nav"><span>Explore</span><span>Saved</span><span>Vote</span><span>Me</span></div>
+    </div>
+    <div class="card-body"><h3>A · Dark (Noir)</h3><p>Moody and romantic, great for date spots. Cherry Red as accent.</p></div>
+  </div>
+
+  <div class="card" data-choice="B-light" onclick="toggleSelect(this)" style="padding:12px">
+    <div class="ph B">
+      <h1>What We Eat</h1><div class="sub">Where to, tonight?</div>
+      <div class="row"><span class="chip on">$$</span><span class="chip">Under $20</span><span class="chip">Near me</span><span class="chip">Group of 6+</span></div>
+      <div class="rc"><div class="img"></div><b>Candlelight Bistro</b><span>Tanjong Pagar · $$$ · 0.8 km</span><br><span class="tag">Date night</span><span class="tag">Quiet</span></div>
+      <div class="rc"><div class="img"></div><b>Long Table Hotpot</b><span>Bugis · $$ · 1.2 km</span><br><span class="tag">Big groups</span><span class="tag">Open late</span></div>
+      <span class="btn">Start a group vote</span>
+      <div class="nav"><span>Explore</span><span>Saved</span><span>Vote</span><span>Me</span></div>
+    </div>
+    <div class="card-body"><h3>B · Light (Cotton)</h3><p>Brighter and easier to read outdoors, friendlier for groups. Dark Maroon text and Cherry Red buttons.</p></div>
+  </div>
+</div>
+<p class="subtitle">Sample restaurant names and distances are made up. The tags show the "date night / big groups" idea.</p>

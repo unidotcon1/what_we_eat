@@ -67,7 +67,7 @@ The user chose A.
 - Filter controls are rounded rectangles (about 8px corners), not pills.
 - UI icons from Lucide (lucide-react, free, ISC licence).
 - Each restaurant has one main cuisine (extra column in the Sheet) that picks a food icon shown in a rounded tile at the left of its card; cuisine filter chips use the same icons. Mockups use emoji; the build should use a free set (Twemoji or Noto Emoji) so icons look the same on every phone.
-- Mockup: `.superpowers/brainstorm/1173-1793325040/content/explore-icons-rounded-filters.html`.
+- Mockup: `docs/mockups/explore-icons-rounded-filters.html`.
 
 ## Validation plan (from UX Researcher agent, to run alongside the build)
 Test the shared vote link first: target at least 60% of invitees voting within 24h; below 30% means rethink the core. Recruit 10+ non-friends, not only the 20 friends. Retention target: 30% of testers return in week 2.
