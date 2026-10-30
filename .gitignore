@@ -1,6 +1,21 @@
+# dependencies and build output
 node_modules
 dist
-.env*
-.superpowers/
-.claude/
 dev-dist
+coverage
+*.tsbuildinfo
+
+# secrets: .env is for scripts (service key), .env.local is for the app
+.env*
+!.env.example
+
+# local tooling and scratch files
+.claude/
+.superpowers/
+
+# editor and OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
