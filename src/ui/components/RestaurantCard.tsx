@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Heart, PlusCircle, MinusCircle, MapPin } from 'lucide-react'
 import type { Restaurant } from '../../domain/types'
 import { cuisineIcon } from '../cuisineIcons'
@@ -29,7 +30,9 @@ export function RestaurantCard({ r, saved, inShortlist, onSave, onToggleShortlis
         {cuisineIcon(r.cuisine)}
       </span>
       <div className="card-body">
-        <h3>{r.name}</h3>
+        <h3>
+          <Link to={`/r/${r.id}`}>{r.name}</Link>
+        </h3>
         <p className="card-meta">
           <MapPin size={11} aria-hidden="true" /> {r.area} · {'$'.repeat(r.priceBand)}
         </p>

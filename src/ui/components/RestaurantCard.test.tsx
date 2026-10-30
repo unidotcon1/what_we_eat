@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { RestaurantCard } from './RestaurantCard'
 import type { Restaurant } from '../../domain/types'
 
@@ -17,9 +18,18 @@ const r: Restaurant = {
 
 function setup(over: Partial<Parameters<typeof RestaurantCard>[0]> = {}) {
   const props = { r, saved: false, inShortlist: false, onSave: vi.fn(), onToggleShortlist: vi.fn(), ...over }
-  render(<RestaurantCard {...props} />)
+  render(
+    <MemoryRouter>
+      <RestaurantCard {...props} />
+    </MemoryRouter>,
+  )
   return props
 }
+
+test('the restaurant name links to its page', () => {
+  setup()
+  expect(screen.getByRole('link', { name: 'Kopi & Kin' })).toHaveAttribute('href', '/r/kopi-kin')
+})
 
 test('shows the name, area, price band, cuisine icon and tag labels', () => {
   setup()

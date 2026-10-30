@@ -6,6 +6,7 @@ import { useSaves, useShortlist } from '../../local/store'
 import { FilterBar } from '../components/FilterBar'
 import { FilterSheet } from '../components/FilterSheet'
 import { RestaurantCard } from '../components/RestaurantCard'
+import { SuggestLink } from '../components/SuggestLink'
 import { emptyFilters } from '../components/filterTags'
 
 export default function Explore() {
@@ -60,6 +61,7 @@ export default function Explore() {
           />
         ))
       )}
+      <SuggestLink url={import.meta.env.VITE_SUGGEST_FORM_URL as string | undefined} />
       {sheetOpen && (
         <FilterSheet
           filters={filters}
