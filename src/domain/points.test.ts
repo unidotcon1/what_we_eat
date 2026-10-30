@@ -23,6 +23,11 @@ test('a first save, a submission and a review are each worth 5', () => {
   expect(awardPoints(0, 'review', false)).toBe(5)
 })
 
+test('a first save that does not fully fit under the cap earns nothing, so it can be claimed in full another day', () => {
+  expect(awardPoints(29, 'first_save', false)).toBe(0)
+  expect(awardPoints(25, 'first_save', false)).toBe(5)
+})
+
 test('levelFor uses thresholds 50, 150 and 400', () => {
   expect(levelFor(0)).toMatchObject({ level: 1, nextAt: 50 })
   expect(levelFor(49).level).toBe(1)

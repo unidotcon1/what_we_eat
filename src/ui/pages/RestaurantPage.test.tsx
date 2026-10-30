@@ -8,6 +8,7 @@ vi.mock('../../data/reviews')
 vi.mock('../../data/auth')
 
 beforeEach(() => {
+  vi.mocked(auth.accountsAvailable).mockReturnValue(true)
   vi.mocked(auth.useUser).mockReturnValue({ user: null, ready: true })
   vi.mocked(reviews.fetchApprovedReviews).mockResolvedValue([{ id: '1', rating: 5, body: 'Lovely kopi' }])
 })

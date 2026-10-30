@@ -31,7 +31,7 @@ function deps(users: Record<string, string> = { 'sam@example.com': 'user-1' }) {
 test('an approved row is imported and the submitter gets submission points', async () => {
   const { d, upserted, granted } = deps()
   const out = await importApproved([row], d)
-  expect(out).toEqual({ imported: 1, skipped: [] })
+  expect(out).toMatchObject({ imported: 1, skipped: [] })
   expect(upserted).toEqual(['nasi-corner-2'])
   expect(granted).toEqual([['user-1', 'submission', 'nasi-corner-2']])
 })
@@ -55,6 +55,33 @@ test('a row without a name is skipped with a reason and the rest still import', 
   expect(out.imported).toBe(1)
   expect(out.skipped).toEqual(['row 1: missing name'])
   expect(upserted).toEqual(['nasi-corner-2'])
+})
+
+test('the Google Form "Email Address" column is understood', async () => {
+  const { d, granted } = deps()
+  const { email, ...rest } = row
+  await importApproved([{ ...rest, 'Email Address': email }], d)
+  expect(granted).toHaveLength(1)
+})
+
+test('a row whose email matches no account is reported as a warning', async () => {
+  const { d } = deps({})
+  const out = await importApproved([row], d)
+  expect(out.warnings).toEqual(['row 1: no account for sam@example.com, so no points were granted'])
+})
+
+test('a database error on one row is reported and the remaining rows still import', async () => {
+  const { d, upserted } = deps()
+  const failing: ImportDeps = {
+    ...d,
+    upsertRestaurant: async (r) => {
+      if (r.name === 'Boom') throw new Error('db down')
+      upserted.push(r.id)
+    },
+  }
+  const out = await importApproved([{ ...row, name: 'Boom' }, row], failing)
+  expect(out.imported).toBe(1)
+  expect(out.skipped).toEqual(['row 1: db down'])
 })
 
 test('a row with a blank price is skipped, not imported', async () => {

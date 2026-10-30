@@ -23,12 +23,13 @@ export async function mergeLocalSaves(client: SupabaseClient, userId: string, id
   }
 }
 
-export async function signInWithGoogle(): Promise<void> {
+/** redirectPath is where the user lands after signing in (default: the Me page). */
+export async function signInWithGoogle(redirectPath = '/me'): Promise<void> {
   const client = getClient()
   if (!client) return
   const { error } = await client.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${window.location.origin}/me` },
+    options: { redirectTo: `${window.location.origin}${redirectPath}` },
   })
   if (error) throw new Error(error.message)
 }
@@ -69,10 +70,17 @@ export function useUser(): { user: User | null; ready: boolean } {
 export async function fetchMyStats(): Promise<MyStats> {
   const client = getClient()
   if (!client) return { points: 0, saves: 0, reviews: 0 }
+  return fetchMyStatsFrom(client)
+}
+
+export async function fetchMyStatsFrom(client: SupabaseClient): Promise<MyStats> {
+  const { data } = await client.auth.getUser()
+  if (!data.user) return { points: 0, saves: 0, reviews: 0 }
   const [points, saves, reviews] = await Promise.all([
     client.rpc('my_points'),
     client.from('saves').select('*', { count: 'exact', head: true }),
-    client.from('reviews').select('*', { count: 'exact', head: true }),
+    // approved reviews by everyone are readable, so count only this user's own
+    client.from('reviews').select('*', { count: 'exact', head: true }).eq('user_id', data.user.id),
   ])
   return { points: (points.data as number | null) ?? 0, saves: saves.count ?? 0, reviews: reviews.count ?? 0 }
 }

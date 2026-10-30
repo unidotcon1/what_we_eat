@@ -12,14 +12,15 @@ export function parseHours(text: string): Hours | undefined {
   if (!src) return undefined
   const hours: Hours = { mon: [], tue: [], wed: [], thu: [], fri: [], sat: [], sun: [] }
   for (const part of src.split(';')) {
-    const [days, range] = part.trim().split(/\s+/)
-    const [open, close] = range.split('-')
+    const m = /^(daily|[a-z]{3}(?:-[a-z]{3})?)\s+(\d{1,2}:\d{2})-(\d{1,2}:\d{2})$/i.exec(part.trim())
+    if (!m) throw new Error(`bad hours "${src}"`)
+    const [, days, open, close] = m
+    const names = days.toLowerCase().split('-') as (Day | 'daily')[]
+    if (names.some((n) => n !== 'daily' && !DAYS.includes(n))) throw new Error(`bad hours "${src}"`)
     let covered: Day[]
-    if (days === 'daily') covered = DAYS
-    else if (days.includes('-')) {
-      const [a, b] = days.split('-') as Day[]
-      covered = DAYS.slice(DAYS.indexOf(a), DAYS.indexOf(b) + 1)
-    } else covered = [days as Day]
+    if (names[0] === 'daily') covered = DAYS
+    else if (names.length === 2) covered = DAYS.slice(DAYS.indexOf(names[0] as Day), DAYS.indexOf(names[1] as Day) + 1)
+    else covered = [names[0] as Day]
     for (const d of covered) hours[d].push([open, close])
   }
   return hours
@@ -39,6 +40,12 @@ export function parseRestaurantRow(row: Record<string, string>): Restaurant | Sk
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || row.lat === '' || row.lng === '') {
     return { skip: 'bad coordinates' }
   }
+  let hours: Hours | undefined
+  try {
+    hours = parseHours(row.hours ?? '')
+  } catch (e) {
+    return { skip: (e as Error).message }
+  }
   return {
     id: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
     name,
@@ -48,7 +55,7 @@ export function parseRestaurantRow(row: Record<string, string>): Restaurant | Sk
     priceBand: band as PriceBand,
     cuisine,
     tags: (row.tags ?? '').split('|').map((t) => t.trim()).filter(Boolean),
-    hours: parseHours(row.hours ?? ''),
+    hours,
     closed: (row.closed ?? '').trim().toLowerCase() === 'yes',
   }
 }

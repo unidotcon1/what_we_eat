@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Star } from 'lucide-react'
-import { useUser } from '../../data/auth'
+import { accountsAvailable, signInWithGoogle, useUser } from '../../data/auth'
 import { submitReviewForCurrentClient } from '../../data/reviews'
 import { MAX_REVIEW_CHARS, validateReview } from '../../domain/reviews'
 
@@ -11,7 +11,22 @@ export function ReviewForm({ restaurantId }: { restaurantId: string }) {
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
 
-  if (!user) return <p className="sub">Sign in to write a review</p>
+  if (!user) {
+    if (!accountsAvailable()) return <p className="sub">Reviews need the online database, which is not set up yet.</p>
+    return (
+      <div>
+        <p className="sub">Sign in to write a review</p>
+        <button
+          type="button"
+          className="apply"
+          onClick={() => void signInWithGoogle(window.location.pathname).catch((e: Error) => setError(e.message))}
+        >
+          Sign in with Google
+        </button>
+        {error && <p role="alert">{error}</p>}
+      </div>
+    )
+  }
   if (done) return <p className="sub">Thanks! Your review is waiting for approval.</p>
 
   async function submit() {

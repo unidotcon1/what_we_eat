@@ -13,21 +13,28 @@ export type ImportDeps = {
 export async function importApproved(
   rows: Record<string, string>[],
   deps: ImportDeps,
-): Promise<{ imported: number; skipped: string[] }> {
+): Promise<{ imported: number; skipped: string[]; warnings: string[] }> {
   let imported = 0
   const skipped: string[] = []
+  const warnings: string[] = []
   for (const [i, row] of rows.entries()) {
     const parsed = parseRestaurantRow(row)
     if ('skip' in parsed) {
       skipped.push(`row ${i + 1}: ${parsed.skip}`)
       continue
     }
-    await deps.upsertRestaurant(parsed)
-    imported++
-    const userId = await deps.findUserIdByEmail((row.email ?? '').trim().toLowerCase())
-    if (userId) await deps.grantSubmissionPoints(userId, parsed.id)
+    try {
+      await deps.upsertRestaurant(parsed)
+      imported++
+      const email = (row.email ?? row['Email Address'] ?? '').trim().toLowerCase()
+      const userId = email ? await deps.findUserIdByEmail(email) : null
+      if (userId) await deps.grantSubmissionPoints(userId, parsed.id)
+      else warnings.push(`row ${i + 1}: no account for ${email || '(no email)'}, so no points were granted`)
+    } catch (e) {
+      skipped.push(`row ${i + 1}: ${(e as Error).message}`)
+    }
   }
-  return { imported, skipped }
+  return { imported, skipped, warnings }
 }
 
 async function main() {
@@ -68,6 +75,7 @@ async function main() {
   })
   console.log(`imported ${result.imported}`)
   result.skipped.forEach((s) => console.warn(`skipped ${s}`))
+  result.warnings.forEach((w) => console.warn(`warning ${w}`))
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

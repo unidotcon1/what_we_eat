@@ -56,6 +56,19 @@ test('parseHours expands day ranges and daily', () => {
   expect(parseHours('daily 10:00-20:00')!.sun).toEqual([['10:00', '20:00']])
 })
 
+test('hours that are not in day HH:MM-HH:MM form are skipped with a reason instead of crashing', () => {
+  for (const hours of ['Monday 11:00-22:00', 'daily', '11am-10pm', 'daily 9-5']) {
+    expect(parseRestaurantRow({ ...row, hours })).toEqual({ skip: `bad hours "${hours}"` })
+  }
+})
+
+test('day names are case-insensitive, so "Mon-Fri 11:00-22:00" really opens Monday to Friday', () => {
+  const out = parseRestaurantRow({ ...row, hours: 'Mon-Fri 11:00-22:00' }) as { hours: Record<string, string[][]> }
+  expect(out.hours.mon).toEqual([['11:00', '22:00']])
+  expect(out.hours.fri).toEqual([['11:00', '22:00']])
+  expect(out.hours.sat).toEqual([])
+})
+
 test('blank hours means unknown (undefined), not closed', () => {
   expect(parseHours('')).toBeUndefined()
 })

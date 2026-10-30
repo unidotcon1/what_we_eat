@@ -57,6 +57,17 @@ test('with a location, the distance slider limits results to places within range
   expect(screen.queryByText('Kopi & Kin')).not.toBeInTheDocument()
 })
 
+test('Clear keeps the Near me position, so Nearest still sorts by distance', async () => {
+  const hollandVillage = { lat: 1.3112, lng: 103.796 }
+  vi.mocked(loc.useLocation).mockReturnValue({ status: 'granted', coords: hollandVillage, request })
+  setup()
+  await screen.findByText('Oven & Ember')
+  await userEvent.type(screen.getByPlaceholderText(/Search restaurant/), 'zzzz')
+  await userEvent.click(await screen.findByRole('button', { name: 'Clear' }))
+  const cards = await screen.findAllByRole('article')
+  expect(within(cards[0]).getByText('Oven & Ember')).toBeInTheDocument()
+})
+
 test('the Map toggle shows a pin per result and List switches back', async () => {
   setup()
   await screen.findByText('Long Table Hotpot')

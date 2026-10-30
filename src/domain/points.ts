@@ -5,7 +5,10 @@ const VALUE: Record<PointKind, number> = { review: 5, submission: 5, first_save:
 
 /** Points granted for one action, after the daily cap; a repeated first save earns nothing. */
 export function awardPoints(todayTotal: number, kind: PointKind, alreadyHadFirstSave: boolean): number {
-  if (kind === 'first_save' && alreadyHadFirstSave) return 0
+  if (kind === 'first_save') {
+    // all or nothing: a partial first save would use up the once-per-restaurant bonus for good
+    return alreadyHadFirstSave || DAILY_CAP - todayTotal < VALUE.first_save ? 0 : VALUE.first_save
+  }
   return Math.max(0, Math.min(VALUE[kind], DAILY_CAP - todayTotal))
 }
 

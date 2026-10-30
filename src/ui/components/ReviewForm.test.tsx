@@ -8,6 +8,8 @@ vi.mock('../../data/auth')
 vi.mock('../../data/reviews')
 
 beforeEach(() => {
+  vi.mocked(auth.accountsAvailable).mockReturnValue(true)
+  vi.mocked(auth.signInWithGoogle).mockResolvedValue(undefined)
   vi.mocked(auth.useUser).mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
   vi.mocked(reviews.submitReviewForCurrentClient).mockResolvedValue(undefined)
 })
@@ -17,6 +19,21 @@ test('signed out: asks the user to sign in instead of showing the form', () => {
   render(<ReviewForm restaurantId="kopi-kin" />)
   expect(screen.getByText('Sign in to write a review')).toBeInTheDocument()
   expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+})
+
+test('signed out: the Sign in button returns the user to this page afterwards', async () => {
+  vi.mocked(auth.useUser).mockReturnValue({ user: null, ready: true })
+  render(<ReviewForm restaurantId="kopi-kin" />)
+  await userEvent.click(screen.getByRole('button', { name: 'Sign in with Google' }))
+  expect(auth.signInWithGoogle).toHaveBeenCalledWith(window.location.pathname)
+})
+
+test('without a database it says reviews are unavailable instead of offering sign-in', () => {
+  vi.mocked(auth.accountsAvailable).mockReturnValue(false)
+  vi.mocked(auth.useUser).mockReturnValue({ user: null, ready: true })
+  render(<ReviewForm restaurantId="kopi-kin" />)
+  expect(screen.getByText(/Reviews need the online database/)).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Sign in with Google' })).not.toBeInTheDocument()
 })
 
 test('submitting a 5 star review sends it and says it awaits approval', async () => {

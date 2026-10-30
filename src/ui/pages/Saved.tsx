@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import type { Restaurant } from '../../domain/types'
 import { fetchRestaurants } from '../../data/restaurants'
-import { useSaves, useShortlist } from '../../local/store'
+import { useShortlist } from '../../local/store'
+import { useSaveActions } from '../useSaveActions'
 import { RestaurantCard } from '../components/RestaurantCard'
 
 export default function Saved() {
   const [all, setAll] = useState<Restaurant[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const { saved, toggle } = useSaves()
+  const { saved, toggle } = useSaveActions()
   const shortlist = useShortlist()
 
   useEffect(() => {

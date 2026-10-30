@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { applyFilters, sortRestaurants } from '../../domain/filters'
 import type { Filters, Restaurant } from '../../domain/types'
 import { fetchRestaurants } from '../../data/restaurants'
-import { useSaves, useShortlist } from '../../local/store'
+import { useShortlist } from '../../local/store'
+import { useSaveActions } from '../useSaveActions'
 import { FilterBar } from '../components/FilterBar'
 import { FilterSheet } from '../components/FilterSheet'
 import { RestaurantCard } from '../components/RestaurantCard'
@@ -19,20 +20,18 @@ export default function Explore() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [view, setView] = useState<'list' | 'map'>('list')
   const location = useLocation()
-  const { saved, toggle: toggleSave } = useSaves()
+  const { saved, toggle: toggleSave } = useSaveActions()
   const shortlist = useShortlist()
 
   useEffect(() => {
     fetchRestaurants().then(setAll, (e: Error) => setError(e.message))
   }, [])
 
-  useEffect(() => {
-    if (location.coords) setFilters((f) => ({ ...f, origin: location.coords }))
-  }, [location.coords])
-
+  // the device position lives outside the filters, so Clear never drops it
+  const origin = location.coords
   const results = useMemo(
-    () => (all ? sortRestaurants(applyFilters(all, filters, new Date()), sort, filters.origin) : []),
-    [all, filters, sort],
+    () => (all ? sortRestaurants(applyFilters(all, { ...filters, origin }, new Date()), sort, origin) : []),
+    [all, filters, sort, origin],
   )
   const areas = useMemo(() => [...new Set((all ?? []).map((r) => r.area))].sort(), [all])
   const cuisines = useMemo(() => [...new Set((all ?? []).map((r) => r.cuisine))].sort(), [all])
