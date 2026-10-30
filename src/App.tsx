@@ -4,10 +4,7 @@ import Explore from './ui/pages/Explore'
 import Saved from './ui/pages/Saved'
 import Vote from './ui/pages/Vote'
 import PollPage from './ui/pages/PollPage'
-
-function Placeholder({ title }: { title: string }) {
-  return <h1>{title}</h1>
-}
+import Me from './ui/pages/Me'
 
 function WithTabs() {
   return (
@@ -28,7 +25,7 @@ export default function App() {
           <Route path="/" element={<Explore />} />
           <Route path="/saved" element={<Saved />} />
           <Route path="/vote" element={<Vote />} />
-          <Route path="/me" element={<Placeholder title="Me" />} />
+          <Route path="/me" element={<Me />} />
         </Route>
         <Route path="/p/:code" element={<PollPage />} />
       </Routes>
