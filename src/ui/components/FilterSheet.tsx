@@ -7,6 +7,7 @@ type Props = {
   areas: string[]
   cuisines: string[]
   count: number
+  location: { status: 'idle' | 'granted' | 'denied'; onRequest(): void }
   onChange(f: Filters): void
   onClose(): void
 }
@@ -23,7 +24,7 @@ function toggle<T>(list: T[], v: T): T[] {
   return list.includes(v) ? list.filter((x) => x !== v) : [...list, v]
 }
 
-export function FilterSheet({ filters: f, areas, cuisines, count, onChange, onClose }: Props) {
+export function FilterSheet({ filters: f, areas, cuisines, count, location, onChange, onClose }: Props) {
   return (
     <div className="sheet" role="dialog" aria-label="Filters">
       <header>
@@ -49,6 +50,31 @@ export function FilterSheet({ filters: f, areas, cuisines, count, onChange, onCl
       </div>
 
       <h4>Location</h4>
+      <div className="chips">
+        <button
+          type="button"
+          className={location.status === 'granted' ? 'chip on' : 'chip'}
+          onClick={location.onRequest}
+        >
+          Near me
+        </button>
+      </div>
+      {location.status === 'denied' && (
+        <p className="sub">Location is off. Pick an area below instead.</p>
+      )}
+      {location.status === 'granted' && (
+        <label className="field">
+          Distance (km)
+          <input
+            type="range"
+            min={1}
+            max={10}
+            step={1}
+            value={f.maxKm ?? 10}
+            onChange={(e) => onChange({ ...f, maxKm: Number(e.target.value) })}
+          />
+        </label>
+      )}
       <div className="chips">
         {areas.map((a) => (
           <button

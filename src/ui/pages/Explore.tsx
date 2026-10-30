@@ -7,6 +7,8 @@ import { FilterBar } from '../components/FilterBar'
 import { FilterSheet } from '../components/FilterSheet'
 import { RestaurantCard } from '../components/RestaurantCard'
 import { SuggestLink } from '../components/SuggestLink'
+import { MapView } from '../components/MapView'
+import { useLocation } from '../useLocation'
 import { emptyFilters } from '../components/filterTags'
 
 export default function Explore() {
@@ -15,12 +17,18 @@ export default function Explore() {
   const [filters, setFilters] = useState<Filters>(emptyFilters)
   const [sort, setSort] = useState<'nearest' | 'price'>('nearest')
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [view, setView] = useState<'list' | 'map'>('list')
+  const location = useLocation()
   const { saved, toggle: toggleSave } = useSaves()
   const shortlist = useShortlist()
 
   useEffect(() => {
     fetchRestaurants().then(setAll, (e: Error) => setError(e.message))
   }, [])
+
+  useEffect(() => {
+    if (location.coords) setFilters((f) => ({ ...f, origin: location.coords }))
+  }, [location.coords])
 
   const results = useMemo(
     () => (all ? sortRestaurants(applyFilters(all, filters, new Date()), sort, filters.origin) : []),
@@ -42,7 +50,17 @@ export default function Explore() {
         onSort={setSort}
         onOpenSheet={() => setSheetOpen(true)}
       />
-      {results.length === 0 ? (
+      <div className="bar">
+        <button type="button" className={view === 'list' ? 'chip on' : 'chip'} aria-pressed={view === 'list'} onClick={() => setView('list')}>
+          List
+        </button>
+        <button type="button" className={view === 'map' ? 'chip on' : 'chip'} aria-pressed={view === 'map'} onClick={() => setView('map')}>
+          Map
+        </button>
+      </div>
+      {view === 'map' ? (
+        <MapView items={results} />
+      ) : results.length === 0 ? (
         <div className="empty">
           <p>No places match</p>
           <button type="button" className="clear" onClick={() => setFilters(emptyFilters)}>
@@ -68,6 +86,7 @@ export default function Explore() {
           areas={areas}
           cuisines={cuisines}
           count={results.length}
+          location={{ status: location.status, onRequest: location.request }}
           onChange={setFilters}
           onClose={() => setSheetOpen(false)}
         />
