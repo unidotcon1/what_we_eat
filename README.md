@@ -49,5 +49,5 @@ npm test
 
 ## Not verified against a live Supabase project yet
 
-Checked against a real project: both migrations, the seed script, and the poll functions (create, vote, change vote, close, closed-poll rejection, hashed tokens, points functions locked down from the app).
-Not yet checked: Google sign-in, realtime vote updates between two phones, the points cap in SQL (see the manual check at the bottom of `002_points.sql`), and the import script.
+Checked against a real project: both migrations, the seed script, Google sign-in, the poll functions (create, vote, change vote, close, closed-poll rejection, hashed tokens), and the points rules (30-a-day cap, once-only first save, once-only submission, review approval trigger, points functions locked down from the app).
+Not yet checked: realtime vote updates between two phones, and `scripts/import-approved.ts` against a real Google Form export.
