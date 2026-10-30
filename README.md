@@ -1,6 +1,38 @@
 # What We Eat
 
-Find a place to eat in Singapore, build a shortlist, and send a no-login vote link to your group chat.
+A Singapore restaurant finder for two moments: a group of friends picking a place last-minute, and a couple looking for a date spot. A side project that started from the group-chat question "where do we eat?".
+
+Pick places with filters (price band, area, distance, group size, date night, cuisine, halal, open now), shortlist a few, and send the group a vote link. Friends vote without an account or an install.
+
+## Built with Claude Code
+
+This project was built together with [Claude Code](https://claude.com/claude-code), Anthropic's coding assistant. I made the product decisions: the audience, the features, what to cut (video and a Telegram bot), the design and colours, and the free-tier tech approach. Claude Code wrote the code and tests from a design spec and an implementation plan, and a separate Claude review pass checked the finished branch before release. The spec and plan are in `docs/superpowers/`, and the design mockups are in `docs/mockups/`.
+
+## How it works
+
+- **No-login polls.** "Send to friends" creates a poll and opens WhatsApp or Telegram with a prefilled message and a link. Voting uses a per-device token. Tokens are stored as SHA-256 hashes, so reading the votes table never reveals a token someone could reuse to change another person's vote.
+- **Rules live in the database, not the browser.** Poll creation, voting and closing go through `security definer` Postgres functions. Row-level security covers every table. The function that grants points is not callable from the app.
+- **Points with real constraints.** A 30-a-day cap in Singapore time and once-only first-save and submission bonuses are enforced in SQL with partial unique indexes. Approving a review in the dashboard fires a trigger that awards the points.
+- **Runs without a backend too.** Without Supabase configured, the app uses bundled sample data and device-only polls.
+
+## Stack
+
+React 18, TypeScript, Vite, React Router, Supabase (Postgres, Google OAuth, Realtime), Leaflet with OpenStreetMap tiles, Lucide icons, vite-plugin-pwa (app shell cache only), Vitest and Testing Library.
+
+## Cost
+
+Designed to run for $0: Cloudflare Pages and Supabase free tiers, plus a scheduled GitHub Action that keeps the free database from pausing.
+
+## Quality
+
+149 tests across 30 files, written test-first. The schema, poll functions and points rules were also checked against a real Supabase project. See `supabase/migrations/`.
+
+### Known gaps
+
+- Live vote updates between two phones have not been tested yet.
+- `scripts/import-approved.ts` has not been run against a real Google Form export.
+- Saves made on another device are pushed to the account but not pulled back.
+
 Design: `docs/superpowers/specs/2026-10-30-what-we-eat-design.md`. Plan: `docs/superpowers/plans/2026-10-30-what-we-eat-v1.md`.
 
 ## Run it now (no accounts needed)
@@ -46,8 +78,3 @@ Add the repository secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY` so `.github/wo
 ```bash
 npm test
 ```
-
-## Not verified against a live Supabase project yet
-
-Checked against a real project: both migrations, the seed script, Google sign-in, the poll functions (create, vote, change vote, close, closed-poll rejection, hashed tokens), and the points rules (30-a-day cap, once-only first save, once-only submission, review approval trigger, points functions locked down from the app).
-Not yet checked: realtime vote updates between two phones, and `scripts/import-approved.ts` against a real Google Form export.
