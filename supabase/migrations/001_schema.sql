@@ -135,6 +135,14 @@ create policy "own pending reviews" on reviews for insert
 create policy "own ledger readable" on points_ledger for select using (auth.uid() = user_id);
 -- ledger rows are written only by award_points (see 002_points.sql)
 
+create function is_poll_creator(p_code text, p_token text) returns boolean
+language sql security definer set search_path = public as $$
+  select exists (
+    select 1 from polls
+    where code = p_code and creator_token = encode(sha256(convert_to(p_token, 'utf8')), 'hex')
+  );
+$$;
+
 -- live results on the vote page
 alter publication supabase_realtime add table votes;
 alter publication supabase_realtime add table polls;
@@ -143,3 +151,4 @@ grant execute on function create_poll(text, text[], text) to anon, authenticated
 grant execute on function cast_vote(text, uuid, text) to anon, authenticated;
 grant execute on function close_poll(text, text) to anon, authenticated;
 grant execute on function my_vote(text, text) to anon, authenticated;
+grant execute on function is_poll_creator(text, text) to anon, authenticated;

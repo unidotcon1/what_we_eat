@@ -15,6 +15,7 @@ export interface PollApi {
   close(code: string, token: string): Promise<void>
   get(code: string): Promise<PollView | null>
   myVote(code: string, token: string): Promise<string | null>
+  isCreator(code: string, token: string): Promise<boolean>
   /** Calls cb whenever the poll may have changed; returns an unsubscribe function. */
   subscribe(code: string, cb: () => void): () => void
 }
@@ -92,6 +93,9 @@ export function localPolls(): PollApi {
     async myVote(code, token) {
       return readLocal()[code]?.votes[token] ?? null
     },
+    async isCreator(code, token) {
+      return readLocal()[code]?.creator === token
+    },
     subscribe(_code, cb) {
       const id = setInterval(cb, 1500)
       return () => clearInterval(id)
@@ -147,6 +151,11 @@ export function supabasePolls(client: SupabaseClient): PollApi {
       check(error)
       return (data as string | null) ?? null
     },
+    async isCreator(code, token) {
+      const { data, error } = await client.rpc('is_poll_creator', { p_code: code, p_token: token })
+      check(error)
+      return data === true
+    },
     subscribe(code, cb) {
       const channel = client
         .channel(`votes-${code}`)
@@ -177,9 +186,11 @@ export function listMyPolls(): MyPoll[] {
 }
 
 export function rememberPoll(code: string, title: string, role: MyPoll['role']) {
+  const existing = listMyPolls().find((p) => p.code === code)
   const rest = listMyPolls().filter((p) => p.code !== code)
+  const kept = existing?.role === 'created' ? 'created' : role
   try {
-    localStorage.setItem(MINE_KEY, JSON.stringify([{ code, title, role }, ...rest]))
+    localStorage.setItem(MINE_KEY, JSON.stringify([{ code, title, role: kept }, ...rest]))
   } catch {
     // ignore: the Vote tab list is a convenience only
   }

@@ -49,6 +49,18 @@ test('only the creator token can close a poll', async () => {
   expect((await api.get(code))!.closed).toBe(true)
 })
 
+test('isCreator is true only for the token that created the poll', async () => {
+  const { api, code } = await newPoll()
+  expect(await api.isCreator(code, 'creator')).toBe(true)
+  expect(await api.isCreator(code, 'someone-else')).toBe(false)
+})
+
+test('joining a poll you created keeps its role as created', () => {
+  rememberPoll('a1', 'Friday dinner', 'created')
+  rememberPoll('a1', 'Friday dinner', 'joined')
+  expect(listMyPolls()[0].role).toBe('created')
+})
+
 test('voting for an option that is not in the poll is rejected', async () => {
   const { api, code } = await newPoll()
   await expect(api.vote(code, 'not-an-option', 'x')).rejects.toThrow('unknown option')
