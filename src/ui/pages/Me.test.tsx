@@ -63,6 +63,12 @@ test('toggling dark mode sets data-theme on the page and remembers it', async ()
   expect(document.documentElement.dataset.theme).toBe('light')
 })
 
+test('links to the privacy policy and terms', () => {
+  setup()
+  expect(screen.getByRole('link', { name: 'Privacy policy' })).toHaveAttribute('href', '/privacy')
+  expect(screen.getByRole('link', { name: 'Terms of service' })).toHaveAttribute('href', '/terms')
+})
+
 test('without a database the page explains that accounts are unavailable', () => {
   mocked.accountsAvailable.mockReturnValue(false)
   setup()

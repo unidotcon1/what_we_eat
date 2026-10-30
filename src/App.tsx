@@ -6,6 +6,7 @@ import Vote from './ui/pages/Vote'
 import PollPage from './ui/pages/PollPage'
 import Me from './ui/pages/Me'
 import RestaurantPage from './ui/pages/RestaurantPage'
+import { PrivacyPage, TermsPage } from './ui/pages/LegalPages'
 
 function WithTabs() {
   return (
@@ -30,6 +31,8 @@ export default function App() {
           <Route path="/r/:id" element={<RestaurantPage />} />
         </Route>
         <Route path="/p/:code" element={<PollPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
       </Routes>
     </BrowserRouter>
   )

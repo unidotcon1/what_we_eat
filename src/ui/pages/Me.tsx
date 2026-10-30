@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { accountsAvailable, fetchMyStats, signInWithGoogle, signOut, useUser, type MyStats } from '../../data/auth'
 import { levelFor } from '../../domain/points'
 import { currentTheme, setTheme, type Theme } from '../theme'
@@ -72,6 +73,9 @@ export default function Me() {
         Dark mode: {theme === 'dark' ? 'on' : 'off'}
       </button>
       {error && <p role="alert">{error}</p>}
+      <p className="sub legal-links">
+        <Link to="/privacy">Privacy policy</Link> · <Link to="/terms">Terms of service</Link>
+      </p>
     </>
   )
 }
