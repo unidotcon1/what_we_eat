@@ -22,6 +22,7 @@ export default function ImportSpots() {
   const { commit_spots } = use_spot_actions()
   const [report, set_report] = useState<MatchReport | null>(null)
   const [error, set_error] = useState<string | null>(null)
+  const [warning, set_warning] = useState<string | null>(null)
   const [state_choice, set_state_choice] = useState<SpotState>('targeted')
   const [include_unmatched, set_include_unmatched] = useState(true)
   const [done, set_done] = useState<ImportCounts | null>(null)
@@ -29,6 +30,7 @@ export default function ImportSpots() {
   async function on_file(file: File | undefined) {
     set_report(null)
     set_error(null)
+    set_warning(null)
     set_done(null)
     if (!file) return
     if (file.size > MAX_BYTES) {
@@ -41,6 +43,7 @@ export default function ImportSpots() {
         set_error(parsed.errors[0])
         return
       }
+      set_warning(parsed.warnings[0] ?? null)
       set_report(match_rows(parsed.rows, await get_catalog()))
     } catch {
       set_error('Could not read that file. Try another one.')
@@ -61,7 +64,7 @@ export default function ImportSpots() {
   return (
     <>
       <h1>Import from Google Maps</h1>
-      <p className="sub">Bring in a list you already saved in Google Maps. Your file is read on this device and never uploaded.</p>
+      <p className="sub">Bring in a list you already saved in Google Maps. The file itself is not uploaded: it is read on this device. The places you import are saved like any other Spot, and saved to your account if you are signed in.</p>
 
       <ol className="steps">
         <li>
@@ -82,6 +85,11 @@ export default function ImportSpots() {
       </label>
 
       {error && <p role="alert">{error}</p>}
+      {warning && (
+        <p role="status" aria-label="Notice">
+          {warning}
+        </p>
+      )}
 
       {report && !done && (
         <section aria-label="Preview">

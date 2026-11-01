@@ -1,9 +1,10 @@
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { use_spot_actions } from './use_spot_actions'
 import * as auth from '../data/auth'
 import * as remote from '../data/spots'
 import * as supabase from '../data/supabase'
 import { reset_spots_store_for_test } from '../local/spots_store'
+import { clear_sync_problem, use_sync_problem } from '../local/sync_status'
 import type { Restaurant } from '../domain/types'
 
 vi.mock('../data/auth')
@@ -137,4 +138,23 @@ test('remove_place deletes the spot for a place, and does nothing for a place th
   act(() => result.current.set_state(kopi, 'conquered'))
   act(() => result.current.remove_place(kopi))
   expect(result.current.spots).toHaveLength(0)
+})
+
+test('when saving to the account fails, the person is told instead of it failing silently', async () => {
+  vi.mocked(auth.useUser).mockReturnValue({ user: { id: 'u1' } as never, ready: true })
+  vi.mocked(remote.push_changes).mockRejectedValue(new Error('Could not save 1 of 1 spots: nope'))
+  const { result } = renderHook(() => ({ actions: use_spot_actions(), problem: use_sync_problem() }))
+  act(() => result.current.actions.toggle_target(kopi))
+  await waitFor(() => expect(result.current.problem).toMatch(/could not be saved to your account/i))
+  expect(result.current.actions.state_of('kopi-kin')).toBe('targeted') // the device copy is untouched
+})
+
+test('a later successful save clears the problem', async () => {
+  vi.mocked(auth.useUser).mockReturnValue({ user: { id: 'u1' } as never, ready: true })
+  vi.mocked(remote.push_changes).mockRejectedValueOnce(new Error('x')).mockResolvedValue(undefined)
+  const { result } = renderHook(() => ({ actions: use_spot_actions(), problem: use_sync_problem() }))
+  act(() => result.current.actions.toggle_target(kopi))
+  await waitFor(() => expect(result.current.problem).not.toBeNull())
+  act(() => result.current.actions.toggle_target(kopi))
+  await waitFor(() => expect(result.current.problem).toBeNull())
 })

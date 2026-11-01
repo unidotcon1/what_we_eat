@@ -30,21 +30,40 @@ export async function fetch_remote_spots(client: SupabaseClient, user_id: string
   return (data ?? []).map((row) => to_spot(row as Record<string, unknown>)).filter(is_spot)
 }
 
+const CHUNK = 200
+
+type Row = Spot & { user_id: string }
+
+/**
+ * Writes spots in chunks. If a chunk is refused, each row is tried alone (and once more without its catalogue link),
+ * so one bad row cannot stop the rest from reaching the account. Throws at the end if any row still failed.
+ */
 export async function push_changes(
   client: SupabaseClient,
   user_id: string,
   diff: { upserts: Spot[]; deletes: string[] },
 ): Promise<void> {
-  if (diff.upserts.length) {
-    const { error } = await client
-      .from('spots')
-      .upsert(diff.upserts.map((s) => ({ ...s, user_id })), { onConflict: 'user_id,id' })
-    if (error) throw new Error(`Could not save your spots: ${error.message}`)
+  const upsert = (rows: Row[]) => client.from('spots').upsert(rows, { onConflict: 'user_id,id' })
+  const rows: Row[] = diff.upserts.map((s) => ({ ...s, user_id }))
+  let failed = 0
+  let first_message = ''
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    const chunk = rows.slice(i, i + CHUNK)
+    if (!(await upsert(chunk)).error) continue
+    for (const row of chunk) {
+      let { error } = await upsert([row])
+      if (error && row.place_id) ({ error } = await upsert([{ ...row, place_id: null }])) // the place may have left our list
+      if (error) {
+        failed++
+        first_message ||= error.message
+      }
+    }
   }
   for (const id of diff.deletes) {
     const { error } = await client.from('spots').delete().eq('user_id', user_id).eq('id', id)
     if (error) throw new Error(`Could not delete a spot: ${error.message}`)
   }
+  if (failed) throw new Error(`Could not save ${failed} of ${rows.length} spots: ${first_message}`)
 }
 
 /** Joins the device copy with the account copy, writes up what the account is missing or has older, returns the union. */

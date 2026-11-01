@@ -1,5 +1,5 @@
 import { distanceKm } from './filters'
-import { name_similarity } from './text'
+import { clean_text, name_similarity } from './text'
 import { set_spot_state, spot_input_from_restaurant, type NewSpot, type SetOutcome, type Spot, type SpotState } from './spots'
 import type { Restaurant } from './types'
 
@@ -14,7 +14,14 @@ export type TakeoutRow = {
   note: string
 }
 
-export type ParseResult = { rows: TakeoutRow[]; format: 'json' | 'csv' | 'unknown'; errors: string[] }
+/** errors stop the import; warnings are shown but the import goes ahead. */
+export type ParseResult = { rows: TakeoutRow[]; format: 'json' | 'csv' | 'unknown'; errors: string[]; warnings: string[] }
+
+/** Same ceilings as the database (migration 004), so a saved spot is never refused later. */
+export const MAX_NAME = 120
+export const MAX_ADDRESS = 200
+export const MAX_NOTE = 500
+export const MAX_ROWS = 5000
 
 const in_range = (lat: number, lng: number) => Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180
 
@@ -110,26 +117,41 @@ function read_csv(text: string): string[][] {
   return rows
 }
 
+function cleaned(row: TakeoutRow): TakeoutRow {
+  return {
+    ...row,
+    title: clean_text(row.title, MAX_NAME),
+    address: clean_text(row.address, MAX_ADDRESS),
+    note: clean_text(row.note, MAX_NOTE),
+  }
+}
+
+/** Cleans every row, keeps at most MAX_ROWS, and says so when it had to cut. */
+function finish(rows: TakeoutRow[], format: 'json' | 'csv'): ParseResult {
+  const warnings = rows.length > MAX_ROWS ? [`This file has ${rows.length} places. Only the first ${MAX_ROWS} were read.`] : []
+  return { rows: rows.slice(0, MAX_ROWS).map(cleaned), format, errors: [], warnings }
+}
+
 export function parse_takeout(raw: string): ParseResult {
   const text = raw.replace(/^﻿/, '').trim()
-  if (!text) return { rows: [], format: 'unknown', errors: ['The file is empty.'] }
+  if (!text) return { rows: [], format: 'unknown', errors: ['The file is empty.'], warnings: [] }
 
   if (text.startsWith('{') || text.startsWith('[')) {
     let data: unknown
     try {
       data = JSON.parse(text)
     } catch {
-      return { rows: [], format: 'json', errors: ['The file is not valid JSON.'] }
+      return { rows: [], format: 'json', errors: ['The file is not valid JSON.'], warnings: [] }
     }
     const features = Array.isArray(data) ? data : as_obj(data).features
-    if (!Array.isArray(features) || features.length === 0) return { rows: [], format: 'json', errors: ['No places found in this file.'] }
-    return { rows: features.map(row_from_feature), format: 'json', errors: [] }
+    if (!Array.isArray(features) || features.length === 0) return { rows: [], format: 'json', errors: ['No places found in this file.'], warnings: [] }
+    return finish(features.map(row_from_feature), 'json')
   }
 
   const table = read_csv(text)
   const header = (table[0] ?? []).map((h) => h.trim().toLowerCase())
   const title_at = header.findIndex((h) => h === 'title' || h === 'name')
-  if (title_at < 0) return { rows: [], format: 'csv', errors: ['This CSV has no Title column, so it does not look like a Google Maps list export.'] }
+  if (title_at < 0) return { rows: [], format: 'csv', errors: ['This CSV has no Title column, so it does not look like a Google Maps list export.'], warnings: [] }
   const url_at = header.indexOf('url')
   const note_at = header.indexOf('note')
 
@@ -141,8 +163,8 @@ export function parse_takeout(raw: string): ParseResult {
     const c = coords_from_url(url)
     rows.push({ title, address: '', lat: c?.lat ?? null, lng: c?.lng ?? null, url, note: note_at >= 0 ? (cells[note_at] ?? '').trim() : '' })
   }
-  if (rows.length === 0) return { rows: [], format: 'csv', errors: ['No places found in this file.'] }
-  return { rows, format: 'csv', errors: [] }
+  if (rows.length === 0) return { rows: [], format: 'csv', errors: ['No places found in this file.'], warnings: [] }
+  return finish(rows, 'csv')
 }
 
 /* ---------- matching rows to our catalogue ---------- */
@@ -241,7 +263,9 @@ export function apply_import(
   if (options.include_unmatched) {
     for (const u of report.unmatched) {
       if (u.can_add && u.row.lat !== null && u.row.lng !== null) {
-        put({ place_id: null, name: u.row.title, address: u.row.address, lat: u.row.lat, lng: u.row.lng, source: 'import' })
+        const name = clean_text(u.row.title, MAX_NAME)
+        if (!name) continue
+        put({ place_id: null, name, address: clean_text(u.row.address, MAX_ADDRESS), lat: u.row.lat, lng: u.row.lng, source: 'import' })
       }
     }
   }

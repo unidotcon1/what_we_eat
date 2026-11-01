@@ -27,7 +27,7 @@ FIND A PLACE
 TARGET AND CONQUER
 - Tap the crosshair to Target a place you want to go to.
 - Plant your flag when you have been: it becomes a Conquered Spot.
-- Bring in a list you already saved in Google Maps (from a Google Takeout export). The file is read on your phone and is not uploaded.
+- Bring in a list you already saved in Google Maps (from a Google Takeout export). The file itself is read on your phone and is not uploaded; the places you import are saved like any other Spot.
 
 DECIDE TOGETHER
 - Pick a few places, send a link to your group chat on WhatsApp or Telegram, and friends vote with one tap. They do not need an account or to install anything.

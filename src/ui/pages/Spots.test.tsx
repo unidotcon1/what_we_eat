@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import Spots from './Spots'
 import { reset_spots_store_for_test } from '../../local/spots_store'
+import { clear_sync_problem, report_sync_problem } from '../../local/sync_status'
 import type { Spot } from '../../domain/spots'
 
 const make = (over: Partial<Spot>): Spot => ({
@@ -114,4 +115,13 @@ test('Conquered uses a flag icon everywhere on the screen, and nothing uses a st
 test('the Spots screen has an Add button that opens Add a spot', () => {
   setup()
   expect(screen.getByRole('link', { name: 'Add a spot' })).toHaveAttribute('href', '/add')
+})
+
+test('shows a plain notice when spots could not be saved to the account, and nothing otherwise', () => {
+  const { unmount } = setup()
+  expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  unmount()
+  report_sync_problem(new Error('boom'))
+  setup()
+  expect(screen.getByRole('status')).toHaveTextContent(/still saved on this device/i)
 })

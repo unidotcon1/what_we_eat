@@ -147,3 +147,18 @@ test('after importing there is a link to see the Spots', async () => {
   await userEvent.click(await screen.findByRole('button', { name: 'Import 2 places' }))
   expect(await screen.findByRole('link', { name: 'See my Spots' })).toHaveAttribute('href', '/spots')
 })
+
+test('the privacy line is honest: the file is not uploaded, but the places you import are saved to your account when signed in', () => {
+  setup()
+  expect(screen.getByText(/file itself is not uploaded/i)).toBeInTheDocument()
+  expect(screen.getByText(/saved to your account/i)).toBeInTheDocument()
+  expect(screen.queryByText(/never uploaded/i)).not.toBeInTheDocument()
+})
+
+test('a file with more than 5000 places still imports the first 5000 and says so', async () => {
+  setup()
+  const features = Array.from({ length: 5100 }, (_, i) => feature(`Place ${i}`, 103.9 + i * 0.00001, 1.35))
+  await choose(file(JSON.stringify({ features }), 'big.json', 'application/json'))
+  expect(await screen.findByRole('status', { name: /notice/i })).toHaveTextContent(/first 5000/)
+  expect(screen.getByRole('button', { name: /^Import/ })).toBeInTheDocument()
+})

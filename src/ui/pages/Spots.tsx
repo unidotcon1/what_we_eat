@@ -4,12 +4,14 @@ import { Crosshair, Flag, Plus, Trash2, Undo2 } from 'lucide-react'
 import { get_catalog } from '../../data/catalog'
 import { count_spots, spots_in_state, type Spot, type SpotState } from '../../domain/spots'
 import { cuisineIcon } from '../cuisineIcons'
+import { use_sync_problem } from '../../local/sync_status'
 import { use_spot_actions } from '../use_spot_actions'
 
 const DAY = new Intl.DateTimeFormat('en-SG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Singapore' })
 
 export default function Spots() {
   const { spots, move, remove } = use_spot_actions()
+  const sync_problem = use_sync_problem()
   const [tab, setTab] = useState<SpotState>('targeted')
   const [cuisine_by_place, set_cuisine_by_place] = useState<Record<string, string>>({})
 
@@ -35,6 +37,11 @@ export default function Spots() {
           <Plus size={16} aria-hidden="true" /> Add
         </Link>
       </header>
+      {sync_problem && (
+        <p role="status" className="sub">
+          {sync_problem}
+        </p>
+      )}
       <div className="segmented" role="tablist" aria-label="Spots">
         <button type="button" role="tab" aria-selected={tab === 'targeted'} onClick={() => setTab('targeted')}>
           <Crosshair size={15} aria-hidden="true" /> Targets <span className="count">{counts.targeted}</span>

@@ -21,3 +21,17 @@ export function name_similarity(a: string, b: string): number {
   for (const word of left) if (right.has(word)) shared++
   return shared / (left.size + right.size - shared)
 }
+
+/**
+ * Makes imported text safe to store: no control characters or lone surrogates (Postgres refuses both),
+ * line breaks and tabs become spaces, runs of spaces collapse, and the result is at most max_chars whole characters.
+ */
+export function clean_text(value: string, max_chars: number): string {
+  const cleaned = value
+    .replace(/[\t\n\r]+/g, ' ')
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+    .replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '')
+    .replace(/ {2,}/g, ' ')
+    .trim()
+  return Array.from(cleaned).slice(0, max_chars).join('').trim()
+}

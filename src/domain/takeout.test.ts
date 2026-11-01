@@ -238,3 +238,81 @@ describe('apply_import', () => {
     expect(out.counts.moved).toBe(1)
   })
 })
+
+describe('parse_takeout: hostile or oversized files are made safe', () => {
+  const json_with = (properties: Record<string, unknown>, coordinates = [103.85, 1.3]) =>
+    JSON.stringify({ features: [{ geometry: { coordinates }, properties }] })
+
+  test('a title over 120 characters is cut to 120, so the database accepts it', () => {
+    const out = parse_takeout(json_with({ Title: 'x'.repeat(500) }))
+    expect(out.rows[0].title).toHaveLength(120)
+  })
+
+  test('an address over 200 characters is cut to 200', () => {
+    const out = parse_takeout(json_with({ Title: 'Foo', location: { address: 'y'.repeat(900) } }))
+    expect(out.rows[0].address).toHaveLength(200)
+  })
+
+  test('control characters and the NUL character are removed from names, addresses and notes', () => {
+    const out = parse_takeout(json_with({ Title: 'Foo\u0000\u0007 Cafe', Comment: 'tasty\u0001', location: { address: '1 A St\u0000' } }))
+    expect(out.rows[0]).toMatchObject({ title: 'Foo Cafe', address: '1 A St', note: 'tasty' })
+  })
+
+  test('a lone surrogate (which Postgres rejects) is removed, a real emoji is kept', () => {
+    const out = parse_takeout(json_with({ Title: 'Ramen \uD800 Bar 🍜' }))
+    expect(out.rows[0].title).toBe('Ramen  Bar 🍜'.replace('  ', ' '))
+  })
+
+  test('cutting never splits an emoji in half (the database counts whole characters)', () => {
+    const out = parse_takeout(json_with({ Title: 'a'.repeat(119) + '🍜🍜' }))
+    expect(out.rows[0].title).toBe('a'.repeat(119) + '🍜')
+  })
+
+  test('a name made only of control characters counts as no name', () => {
+    const out = parse_takeout(json_with({ Title: '\u0000\u0001' }))
+    expect(out.rows[0].title).toBe('')
+  })
+
+  test('csv rows get the same treatment', () => {
+    const out = parse_takeout(`Title,Note,URL\n"${'z'.repeat(300)}","a\u0000b",\n`)
+    expect(out.rows[0].title).toHaveLength(120)
+    expect(out.rows[0].note).toBe('ab')
+  })
+
+  test('more than 5000 rows are cut to 5000 and the person is told', () => {
+    const features = Array.from({ length: 5200 }, (_, i) => ({ geometry: { coordinates: [103.85, 1.3] }, properties: { Title: `Place ${i}` } }))
+    const out = parse_takeout(JSON.stringify({ features }))
+    expect(out.rows).toHaveLength(5000)
+    expect(out.errors).toEqual([])
+    expect(out.warnings.join(' ')).toMatch(/5000/)
+  })
+
+  test('csv with more than 5000 rows is cut too', () => {
+    const csv = 'Title\n' + Array.from({ length: 5100 }, (_, i) => `Place ${i}`).join('\n')
+    const out = parse_takeout(csv)
+    expect(out.rows).toHaveLength(5000)
+    expect(out.errors).toEqual([])
+    expect(out.warnings.join(' ')).toMatch(/5000/)
+  })
+
+  test('the note is limited too', () => {
+    const out = parse_takeout(json_with({ Title: 'Foo', Comment: 'n'.repeat(5000) }))
+    expect(out.rows[0].note.length).toBeLessThanOrEqual(500)
+  })
+})
+
+describe('apply_import: only values the database accepts are stored', () => {
+  test('a spot built from an unmatched row never exceeds the name and address limits', () => {
+    const long_row = row('n'.repeat(400), { address: 'a'.repeat(400), lat: 1.3, lng: 103.85 })
+    const report = match_rows([long_row], [])
+    const { spots } = apply_import([], report, 'targeted', now, { include_unmatched: true })
+    expect(spots[0].name.length).toBeLessThanOrEqual(120)
+    expect(spots[0].address.length).toBeLessThanOrEqual(200)
+  })
+
+  test('rows whose cleaned name is empty are not added', () => {
+    const report = match_rows([row('\u0000', { lat: 1.3, lng: 103.85 })], [])
+    const { spots } = apply_import([], report, 'targeted', now, { include_unmatched: true })
+    expect(spots).toHaveLength(0)
+  })
+})

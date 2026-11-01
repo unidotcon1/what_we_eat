@@ -39,6 +39,8 @@ async function main() {
   ]
   const missing = wanted_headers.filter((h) => !home.headers.has(h))
   check('security headers present', missing.length === 0, missing.length ? `missing: ${missing.join(', ')}` : undefined)
+  const csp = home.headers.get('content-security-policy') ?? ''
+  check('CSP allows only our own database host, no wildcard', !csp.includes('*') && csp.includes(new URL(db_url).host))
 
   for (const path of ['/vote', '/saved', '/me', '/privacy', '/terms', '/p/abc1234567', '/sw.js', '/manifest.webmanifest']) {
     const r = await fetch(`${site}${path}`)

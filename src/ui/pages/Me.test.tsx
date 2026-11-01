@@ -133,11 +133,33 @@ describe('deleting the account', () => {
     expect(mocked.delete_my_account).not.toHaveBeenCalled()
   })
 
+  test('the final button stays disabled until DELETE is typed exactly', async () => {
+    signed_in()
+    mocked.delete_my_account.mockResolvedValue(undefined)
+    setup()
+    await userEvent.click(await screen.findByRole('button', { name: 'Delete my account' }))
+    const final = screen.getByRole('button', { name: 'Yes, delete my account' })
+    expect(final).toBeDisabled()
+    await userEvent.type(screen.getByLabelText(/type DELETE/i), 'delete')
+    expect(final).toBeDisabled()
+    await userEvent.clear(screen.getByLabelText(/type DELETE/i))
+    await userEvent.type(screen.getByLabelText(/type DELETE/i), 'DELETE')
+    expect(final).toBeEnabled()
+    expect(mocked.delete_my_account).not.toHaveBeenCalled()
+  })
+
+  test('signing out says that spots stay in the account and come back on the next sign-in', async () => {
+    signed_in()
+    setup()
+    expect(await screen.findByText(/signing out clears the spots on this phone/i)).toBeInTheDocument()
+  })
+
   test('confirming deletes the account and says so', async () => {
     signed_in()
     mocked.delete_my_account.mockResolvedValue(undefined)
     setup()
     await userEvent.click(await screen.findByRole('button', { name: 'Delete my account' }))
+    await userEvent.type(screen.getByLabelText(/type DELETE/i), 'DELETE')
     await userEvent.click(screen.getByRole('button', { name: 'Yes, delete my account' }))
     expect(mocked.delete_my_account).toHaveBeenCalledOnce()
     expect(await screen.findByText(/Your account has been deleted/)).toBeInTheDocument()
@@ -148,6 +170,7 @@ describe('deleting the account', () => {
     mocked.delete_my_account.mockRejectedValue(new Error('Could not delete your account: boom'))
     setup()
     await userEvent.click(await screen.findByRole('button', { name: 'Delete my account' }))
+    await userEvent.type(screen.getByLabelText(/type DELETE/i), 'DELETE')
     await userEvent.click(screen.getByRole('button', { name: 'Yes, delete my account' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not delete your account: boom')
     expect(screen.queryByText(/Your account has been deleted/)).not.toBeInTheDocument()

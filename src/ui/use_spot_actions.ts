@@ -14,6 +14,7 @@ import {
 } from '../domain/spots'
 import type { Restaurant } from '../domain/types'
 import { get_spots, set_spots, use_spots } from '../local/spots_store'
+import { clear_sync_problem, report_sync_problem } from '../local/sync_status'
 
 /** Everything the screens do with Spots. Changes are saved on the device at once and, when signed in, written to the account. */
 export function use_spot_actions() {
@@ -26,7 +27,7 @@ export function use_spot_actions() {
     if (!user) return
     const client = getClient()
     if (!client) return
-    push_changes(client, user.id, diff_spots(prev, next)).catch(() => undefined)
+    push_changes(client, user.id, diff_spots(prev, next)).then(clear_sync_problem, report_sync_problem)
     const added = next.filter((s) => !prev.some((p) => p.id === s.id))
     if (added.length) claim_points_for_new(client, added).catch(() => undefined)
   }

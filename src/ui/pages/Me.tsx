@@ -15,6 +15,7 @@ export default function Me() {
   const [confirming, set_confirming] = useState(false)
   const [deleting, set_deleting] = useState(false)
   const [deleted, set_deleted] = useState(false)
+  const [typed, set_typed] = useState('')
 
   useEffect(() => {
     if (user) fetchMyStats().then(setStats, (e: Error) => setError(e.message))
@@ -33,6 +34,7 @@ export default function Me() {
       await delete_my_account()
       set_deleted(true)
       set_confirming(false)
+      set_typed('')
     } catch (e) {
       setError((e as Error).message)
     } finally {
@@ -100,6 +102,7 @@ export default function Me() {
           <button type="button" className="chip" onClick={() => void signOut()}>
             Sign out
           </button>
+          <p className="sub">Signing out clears the Spots on this phone. They stay in your account and come back when you sign in.</p>
 
           {!confirming ? (
             <button type="button" className="chip danger-link" onClick={() => set_confirming(true)}>
@@ -111,10 +114,22 @@ export default function Me() {
                 This permanently deletes your account, your Spots and your points from our servers. It cannot be undone. Spots saved on
                 this phone stay on this phone.
               </p>
-              <button type="button" className="apply danger" disabled={deleting} onClick={() => void run_delete()}>
+              <label>
+                To confirm, type DELETE
+                <input value={typed} onChange={(e) => set_typed(e.target.value)} autoComplete="off" autoCapitalize="characters" />
+              </label>
+              <button type="button" className="apply danger" disabled={deleting || typed !== 'DELETE'} onClick={() => void run_delete()}>
                 Yes, delete my account
               </button>
-              <button type="button" className="chip" disabled={deleting} onClick={() => set_confirming(false)}>
+              <button
+                type="button"
+                className="chip"
+                disabled={deleting}
+                onClick={() => {
+                  set_confirming(false)
+                  set_typed('')
+                }}
+              >
                 Cancel
               </button>
             </div>

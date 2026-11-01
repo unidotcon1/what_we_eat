@@ -4,6 +4,7 @@ import { get_catalog } from '../data/catalog'
 import { sync_spots } from '../data/spots'
 import { getClient } from '../data/supabase'
 import { get_spots, run_legacy_migration, set_spots } from '../local/spots_store'
+import { clear_sync_problem, report_sync_problem } from '../local/sync_status'
 
 /** Renders nothing. Moves old hearts into Spots once, and joins device spots with the account copy after sign-in. */
 export function SpotsBootstrap() {
@@ -29,9 +30,11 @@ export function SpotsBootstrap() {
     let alive = true
     sync_spots(client, user_id, get_spots())
       .then((merged) => {
-        if (alive) set_spots(merged)
+        if (!alive) return
+        set_spots(merged)
+        clear_sync_problem()
       })
-      .catch(() => undefined) // the account copy may not exist yet; the device copy keeps working
+      .catch(report_sync_problem) // the device copy keeps working
     return () => {
       alive = false
     }

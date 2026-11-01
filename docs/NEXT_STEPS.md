@@ -15,7 +15,18 @@ State at 2026-11-02 (import screen built on main, not yet pushed after the live 
 | Task | Where | Then Claude |
 |------|-------|-------------|
 | Confirm **Redirect URLs** are only `https://what-we-eat.unidotcon.workers.dev/**` and `http://localhost:5173/**`, Site URL = the live address | Supabase, Authentication, URL Configuration | Cannot be checked from outside; ask for a screenshot of the list. |
+| Run `supabase/migrations/006_security_hardening.sql` (poll throttle, nightly poll clean-up, safer functions). Say "ran 006". | Supabase, SQL editor | Run `npm run check:live`; try creating a poll. If the last block prints "pg_cron is not available", enable the pg_cron extension (Database, Extensions) and run just that block again. |
+| Turn on **2-step verification / a passkey** for GitHub, Cloudflare, Supabase and the Google account that owns the Cloud project | Each site's security settings | Nothing to check from here. These four logins are the real way in to the app (see Security below). |
+| GitHub: protect `main` (require a pull request, block force pushes), switch on secret scanning, push protection and Dependabot alerts | github.com/unidotcon1/what_we_eat, Settings | Dependabot opens weekly update PRs once `.github/dependabot.yml` is pushed. |
+| Supabase: confirm Google is the only sign-in provider, then run **Security Advisor** (Database, Advisors) and send a screenshot of anything red or orange | Supabase dashboard | Fix what it reports. |
+| Google Cloud: OAuth consent screen scopes are only `openid`, `email`, `profile`; the client's Authorised redirect URI is only the Supabase callback | console.cloud.google.com | Ask for a screenshot. |
 | Decide the restaurant data source (see below) | - | Run the coverage tests and build the import. |
+
+## Security (audit of 2026-11-01)
+Result: no way found to take over a user's Google account or to get admin access. Google passwords never reach the app (Google sign-in with PKCE; the app holds only the public key). Anonymous visitors cannot write to any table, cannot call the points or delete functions, and cannot reach the auth admin API (probed live). Production dependencies: 0 known vulnerabilities.
+Fixed in code (2026-11-01): the Google Maps import (the weakest link) now strips control characters, cuts names and addresses to the database limits and caps a file at 5000 places; saving to the account goes in chunks, retries rows one by one and shows a notice if some fail; signing out clears this phone's spots; account deletion needs the word DELETE typed; the CSP names only our own database host; the import page no longer claims places are never uploaded.
+Still open (cannot be fixed in code): the owner's own logins (above); Supabase redirect-URL list (above); a Cloudflare rate-limit rule on `/rest/v1/rpc/create_poll` is a good extra layer. Accepted: points can be farmed up to the 30 a day cap by inserting spots directly; review spam across many Google accounts. `npm audit` still lists build-only items via vite-plugin-pwa (never shipped).
+Rule of thumb: nothing secret in the repo or the app bundle; `.env` stays on this machine; if the Supabase secret key is ever pasted anywhere, rotate it.
 
 ## Next build tasks (Stage 1 remainder), in order
 1. ~~Google Maps import screen~~ built 2026-11-02 (route `/import`, reached from Add a spot). Still to do: test it with a real export from the owner, since fixtures cannot show every real Google file layout.

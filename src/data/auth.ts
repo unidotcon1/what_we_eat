@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { getLocalSaves } from '../local/store'
+import { clearLocalSaves, getLocalSaves } from '../local/store'
+import { set_spots } from '../local/spots_store'
+import { has_sync_problem } from '../local/sync_status'
 import { getClient } from './supabase'
 
 export type User = { id: string; email: string }
@@ -34,8 +36,15 @@ export async function signInWithGoogle(redirectPath = '/me'): Promise<void> {
   if (error) throw new Error(error.message)
 }
 
+/**
+ * Signs out. The spots on this phone belong to the account that was signed in, so they are cleared here (they come back on the next
+ * sign-in) and the next person does not inherit them. If the last save to the account failed, they are kept so nothing is lost.
+ */
 export async function signOut(): Promise<void> {
   await getClient()?.auth.signOut()
+  if (has_sync_problem()) return
+  set_spots([])
+  clearLocalSaves()
 }
 
 export function useUser(): { user: User | null; ready: boolean } {
