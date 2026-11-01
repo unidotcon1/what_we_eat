@@ -27,5 +27,7 @@ Live: https://what-we-eat.unidotcon.workers.dev. Repo: github.com/unidotcon1/wha
 ## Decisions (do not re-litigate without the owner)
 Video uploads and a Telegram bot were cut. Saving works without login (device first, merged and synced when signed in). Voting needs no login. Reviews are approved by hand in the Supabase dashboard (+5 points). There is no restaurant-suggestion form: the owner dropped the Google Form idea (2026-11-01). Restaurants come from curated open data (see `docs/NEXT_STEPS.md`). The 25 restaurants are **sample data**, and the terms page says so; replace with real places before promoting.
 
+**Direction set 2026-11-01:** the saving feature becomes **Target** (a crosshair icon replaces the heart) and the personal record becomes **Conquered Spots** (private by default, optional share). Use the words in `GLOSSARY.md`; never "Saved", "Journal" or "Review" in new UI text. Priority: a neater, more pleasing UI first, then Target and Conquered Spots, then real restaurants, then an Android (Google Play) release; the Eatventure app is inspiration for patterns only (do not copy its mascot, orange-on-charcoal look or the word "foodprint"). Parked ideas live in `docs/FUTURE_IDEAS.md`.
+
 ## Accepted risks
 Ballot stuffing is possible under no-login voting (capped at 500 votes per poll); one device token is reused across polls (hashed server-side); `reviews.user_id` is visible through the API. Four low `npm audit` items sit in build-only tooling.
