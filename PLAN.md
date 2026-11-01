@@ -77,3 +77,8 @@ Social feed, followers, user posts, curated editor lists, feed-unlock gating. Al
 - Conquered Spots can carry a 1 to 5 rating and a note up to 280 characters, private by default with an optional "share with everyone" switch (text only, no photos), which will replace the separate review form. Moderation: publish at once with a Report button and a daily limit. Shown with a chosen nickname, never the Google name or email. Sharing needs sign-in; Target works without sign-in. Not part of Stage 1.
 - Google Maps import is part of the plan (built as Takeout import in Stage 1).
 - Release path: Android first through Google Play (wrapper app). See docs/ANDROID_RELEASE.md.
+
+## UI pass, 2026-11-01 (built on this branch, not pushed)
+Built and tested (322 tests pass): bottom bar Explore | Map | Add (square crosshair button) | Spots | Profile; one crosshair Target button per card (filled when a Target, a flag when Conquered); "Start a vote" mode on Explore replaces the second button on every card; Spots screen with Targets and Conquered tabs (Conquer, move back, remove); Map tab with pins that differ by shape as well as colour, plus a legend; Add a spot (search our catalogue); Profile shows Target and Conquered counts; old Saved page and old save code removed; old hearts become Targets on first load (device) and join the account copy after sign-in.
+Decision: the **flag** icon means Conquered everywhere (owner, 2026-11-01). The Spots tab uses a list icon so the flag stays reserved for Conquered.
+Not built yet: Takeout import screen (data layer exists), add by map pin, add by hand, Conquered rating/note/share, onboarding, Android icon. The database file 004_spots.sql has not been run, so spots stay on the device until the owner runs it.

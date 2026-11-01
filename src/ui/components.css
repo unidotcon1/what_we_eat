@@ -422,3 +422,284 @@ textarea {
 .legal-links a {
   color: inherit;
 }
+
+/* ---------- Spots, Targets and Conquered (UI pass, November 2026) ---------- */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.page-head h1 {
+  margin: 0;
+}
+
+.head-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-control);
+  background: transparent;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* bottom bar: five equal slots, our own square centre button (not a raised circle) */
+.tabbar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  padding: 6px 4px 8px;
+}
+
+.tab.add {
+  opacity: 1;
+}
+
+.add-shape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-text);
+  border: 1px solid color-mix(in srgb, var(--accent-text) 35%, transparent);
+}
+
+.tab.add[aria-current='page'] .add-shape {
+  outline: 2px solid var(--icon);
+  outline-offset: 2px;
+}
+
+/* the one action on a card */
+.target,
+.pick {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--icon);
+  background: transparent;
+  color: var(--icon);
+}
+
+.target {
+  border-radius: 12px;
+}
+
+.target.targeted {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.target.conquered {
+  border-style: double;
+  border-width: 4px;
+}
+
+.pick {
+  border-radius: 50%;
+}
+
+.pick.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.conquered-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--icon);
+  border-radius: 4px;
+  color: var(--icon);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+/* bar that appears while picking places for a vote */
+.vote-bar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 76px;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  border: 1px solid var(--muted);
+  border-radius: 14px;
+  background: var(--surface);
+  font-size: 14px;
+}
+
+.vote-bar .apply {
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* Spots screen */
+.segmented {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.segmented button {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 8px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font-size: 14px;
+}
+
+.segmented button[aria-selected='true'] {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.segmented .count {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  font-size: 12px;
+  text-align: center;
+}
+
+.spot-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spot-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.conquer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 13px;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--muted);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--icon);
+}
+
+.added {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.empty {
+  padding: 28px 8px;
+  text-align: center;
+  opacity: 0.8;
+}
+
+/* Profile counts */
+.spot-counts {
+  margin-top: 0;
+}
+
+/* Map legend and pins: shape differs as well as colour */
+.legend {
+  display: flex;
+  gap: 16px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #9a8f86;
+  background: var(--cotton);
+}
+
+.swatch.targeted {
+  border-radius: 4px;
+  border-color: var(--cotton);
+  background: var(--cherry);
+  outline: 1px solid var(--icon);
+}
+
+.swatch.conquered {
+  border: 4px double var(--cherry);
+}
+
+.pin span {
+  border-color: #9a8f86;
+}
+
+.pin.targeted span {
+  border-radius: 9px;
+  border-color: var(--cotton);
+  background: var(--cherry);
+  box-shadow: 0 0 0 1px var(--noir);
+}
+
+.pin.conquered span {
+  border: 4px double var(--cherry);
+}

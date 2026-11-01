@@ -73,7 +73,7 @@ export default function Vote() {
       <section aria-label="Draft shortlist">
         <h2>Your shortlist</h2>
         {picked.length === 0 ? (
-          <p className="empty">Add places from Explore with the + button to start a shortlist.</p>
+          <p className="empty">Tap Start a vote on Explore, then pick the places you are choosing between.</p>
         ) : (
           <>
             <label className="field">

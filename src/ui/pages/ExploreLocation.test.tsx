@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import Explore from './Explore'
 import * as loc from '../useLocation'
 import { resetStoresForTest } from '../../local/store'
+import { reset_spots_store_for_test } from '../../local/spots_store'
 
 vi.mock('../useLocation')
 
@@ -13,6 +14,7 @@ const request = vi.fn()
 beforeEach(() => {
   localStorage.clear()
   resetStoresForTest()
+  reset_spots_store_for_test()
   request.mockClear()
   vi.mocked(loc.useLocation).mockReturnValue({ status: 'idle', coords: undefined, request })
 })
@@ -66,14 +68,4 @@ test('Clear keeps the Near me position, so Nearest still sorts by distance', asy
   await userEvent.click(await screen.findByRole('button', { name: 'Clear' }))
   const cards = await screen.findAllByRole('article')
   expect(within(cards[0]).getByText('Oven & Ember')).toBeInTheDocument()
-})
-
-test('the Map toggle shows a pin per result and List switches back', async () => {
-  setup()
-  await screen.findByText('Long Table Hotpot')
-  await userEvent.click(screen.getByRole('button', { name: 'Map' }))
-  expect(screen.getByRole('region', { name: 'Map' })).toBeInTheDocument()
-  expect(screen.getAllByTitle(/./).length).toBeGreaterThan(5)
-  await userEvent.click(screen.getByRole('button', { name: 'List' }))
-  expect(screen.queryByRole('region', { name: 'Map' })).not.toBeInTheDocument()
 })

@@ -19,7 +19,7 @@ const setup = () =>
 
 test('with an empty draft it explains how to start a shortlist', async () => {
   setup()
-  expect(await screen.findByText(/Add places from Explore/)).toBeInTheDocument()
+  expect(await screen.findByText(/Tap Start a vote on Explore/)).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Send to friends' })).not.toBeInTheDocument()
 })
 

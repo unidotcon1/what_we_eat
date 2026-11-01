@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import type { SpotState } from '../../domain/spots'
 import type { Restaurant } from '../../domain/types'
 import { cuisineIcon } from '../cuisineIcons'
 
@@ -21,7 +22,7 @@ function popupFor(r: Restaurant): HTMLElement {
   return box
 }
 
-export function MapView({ items }: { items: Restaurant[] }) {
+export function MapView({ items, states = {} }: { items: Restaurant[]; states?: Record<string, SpotState> }) {
   const el = useRef<HTMLDivElement>(null)
   const map = useRef<L.Map | null>(null)
   const pins = useRef<L.LayerGroup | null>(null)
@@ -49,12 +50,12 @@ export function MapView({ items }: { items: Restaurant[] }) {
     items.forEach((r) => {
       L.marker([r.lat, r.lng], {
         title: r.name,
-        icon: L.divIcon({ className: 'pin', html: `<span>${cuisineIcon(r.cuisine)}</span>`, iconSize: [32, 32] }),
+        icon: L.divIcon({ className: `pin${states[r.id] ? ` ${states[r.id]}` : ''}`, html: `<span>${cuisineIcon(r.cuisine)}</span>`, iconSize: [32, 32] }),
       })
         .bindPopup(popupFor(r))
         .addTo(group)
     })
-  }, [items])
+  }, [items, states])
 
   return (
     <section aria-label="Map" className="map">

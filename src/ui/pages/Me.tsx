@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { accountsAvailable, fetchMyStats, signInWithGoogle, signOut, useUser, type MyStats } from '../../data/auth'
 import { levelFor } from '../../domain/points'
+import { count_spots } from '../../domain/spots'
+import { use_spots } from '../../local/spots_store'
 import { currentTheme, setTheme, type Theme } from '../theme'
 
 export default function Me() {
@@ -21,10 +23,22 @@ export default function Me() {
   }
 
   const level = stats ? levelFor(stats.points) : null
+  const counts = count_spots(use_spots())
 
   return (
     <>
-      <h1>Me</h1>
+      <h1>Profile</h1>
+
+      <div className="stats spot-counts">
+        <div>
+          <strong>{counts.targeted}</strong>
+          <span>Targets</span>
+        </div>
+        <div>
+          <strong>{counts.conquered}</strong>
+          <span>Conquered</span>
+        </div>
+      </div>
 
       {!accountsAvailable() ? (
         <p className="sub">Accounts need the online database, which is not set up yet. Saving and voting still work.</p>
@@ -51,10 +65,6 @@ export default function Me() {
                 />
               </div>
               <div className="stats">
-                <div>
-                  <strong>{stats.saves}</strong>
-                  <span>Saved places</span>
-                </div>
                 <div>
                   <strong>{stats.reviews}</strong>
                   <span>Reviews</span>

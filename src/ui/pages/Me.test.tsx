@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import Me from './Me'
 import * as auth from '../../data/auth'
+import { reset_spots_store_for_test } from '../../local/spots_store'
 
 vi.mock('../../data/auth')
 
@@ -10,6 +11,7 @@ const mocked = vi.mocked(auth)
 
 beforeEach(() => {
   localStorage.clear()
+  reset_spots_store_for_test()
   document.documentElement.removeAttribute('data-theme')
   mocked.accountsAvailable.mockReturnValue(true)
   mocked.useUser.mockReturnValue({ user: null, ready: true })
@@ -43,7 +45,6 @@ test('signed in: shows points, level progress and counts', async () => {
   expect(await screen.findByText('92 / 150 points')).toBeInTheDocument()
   expect(screen.getByText(/Level 2/)).toBeInTheDocument()
   expect(screen.getByText(/Food Explorer/)).toBeInTheDocument()
-  expect(screen.getByText('14')).toBeInTheDocument()
   expect(screen.getByText('6')).toBeInTheDocument()
 })
 
@@ -74,4 +75,33 @@ test('without a database the page explains that accounts are unavailable', () =>
   setup()
   expect(screen.getByText(/Accounts need the online database/)).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Sign in with Google' })).not.toBeInTheDocument()
+})
+
+test('the page is called Profile', () => {
+  setup()
+  expect(screen.getByRole('heading', { level: 1, name: 'Profile' })).toBeInTheDocument()
+})
+
+test('shows how many Targets and Conquered Spots there are, even when signed out', () => {
+  const base = { source: 'catalog', created_at: '2026-11-01T10:00:00.000Z', updated_at: '2026-11-01T10:00:00.000Z', address: '', lat: 1.3, lng: 103.8 }
+  localStorage.setItem(
+    'wwe.spots',
+    JSON.stringify([
+      { ...base, id: 'r:a', place_id: 'a', name: 'A', state: 'targeted', conquered_at: null },
+      { ...base, id: 'r:b', place_id: 'b', name: 'B', state: 'targeted', conquered_at: null },
+      { ...base, id: 'r:c', place_id: 'c', name: 'C', state: 'conquered', conquered_at: '2026-11-01T10:00:00.000Z' },
+    ]),
+  )
+  setup()
+  const targets = screen.getByText('Targets').closest('div')!
+  const conquered = screen.getByText('Conquered').closest('div')!
+  expect(targets).toHaveTextContent('2')
+  expect(conquered).toHaveTextContent('1')
+})
+
+test('the old "Saved places" count is gone', async () => {
+  mocked.useUser.mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
+  setup()
+  await screen.findByText('92 / 150 points')
+  expect(screen.queryByText('Saved places')).not.toBeInTheDocument()
 })
