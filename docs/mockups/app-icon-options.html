@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What We Eat: app icon options</title>
+<style>
+  :root { --cherry:#810100; --maroon:#630000; --cotton:#EDEBDD; --noir:#1B1717; }
+  body { margin:0; padding:24px 16px 48px; font-family:system-ui,sans-serif; background:#f4f2ea; color:#1B1717; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  p.sub { margin:0 0 20px; opacity:.75; font-size:14px; }
+  .opt { background:#fff; border-radius:16px; padding:16px; margin-bottom:18px; box-shadow:0 1px 4px rgba(0,0,0,.12); }
+  .opt h2 { font-size:17px; margin:0 0 2px; }
+  .opt p { margin:0 0 12px; font-size:13px; opacity:.8; line-height:1.4; }
+  .row { display:flex; gap:18px; align-items:flex-end; flex-wrap:wrap; }
+  .cell { text-align:center; font-size:11px; opacity:.85; }
+  .cell svg { display:block; margin:0 auto 6px; }
+  .round svg, .squircle svg { margin:0; }
+  .round { border-radius:50%; overflow:hidden; }
+  .squircle { border-radius:22%; overflow:hidden; }
+  .home { background:#2b2b33; padding:14px; border-radius:16px; display:flex; gap:14px; align-items:flex-start; }
+  .home .cell { color:#fff; }
+</style>
+</head>
+<body>
+<h1>App icon options</h1>
+<p class="sub">Each is shown full size, as Android crops it (circle and rounded square), and small on a home screen. All three stay inside Android's safe zone so nothing is cut off.</p>
+
+<template id="a"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" fill="#810100"/>
+  <path d="M196 156 C196 84 316 84 316 156" fill="none" stroke="#EDEBDD" stroke-width="16" stroke-linecap="round"/>
+  <rect x="150" y="156" width="212" height="72" rx="24" fill="#EDEBDD"/>
+  <rect x="150" y="236" width="212" height="72" rx="24" fill="#EDEBDD"/>
+  <rect x="150" y="316" width="212" height="72" rx="24" fill="#EDEBDD"/>
+  <rect x="136" y="396" width="240" height="16" rx="8" fill="#EDEBDD"/>
+  <g fill="#630000"><circle cx="196" cy="192" r="7"/><circle cx="196" cy="272" r="7"/><circle cx="196" cy="352" r="7"/></g>
+  <path d="M256 156 V388" stroke="#630000" stroke-width="6" stroke-linecap="round" opacity=".55"/></svg></template>
+
+<template id="b"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" fill="#810100"/>
+  <circle cx="256" cy="256" r="118" fill="none" stroke="#EDEBDD" stroke-width="18"/>
+  <g stroke="#EDEBDD" stroke-width="18" stroke-linecap="round"><path d="M256 92V140"/><path d="M256 372V420"/><path d="M92 256H140"/><path d="M372 256H420"/></g>
+  <g fill="none" stroke="#EDEBDD" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M232 204 V240 Q232 264 256 264 Q280 264 280 240 V204"/><path d="M256 204 V264"/><path d="M256 264 V318"/></g></svg></template>
+
+<template id="c"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" fill="#810100"/>
+  <circle cx="256" cy="256" r="136" fill="#EDEBDD"/>
+  <circle cx="256" cy="256" r="104" fill="none" stroke="#630000" stroke-width="9"/>
+  <circle cx="256" cy="256" r="28" fill="#810100"/>
+  <g stroke="#EDEBDD" stroke-width="18" stroke-linecap="round"><path d="M256 68V108"/><path d="M256 404V444"/><path d="M68 256H108"/><path d="M404 256H444"/></g></svg></template>
+
+<div id="out"></div>
+<script>
+const options = [
+  { id: 'a', title: 'A. The tingkat', note: 'A stacked Singapore tiffin carrier. Distinct, friendly, nobody else owns it. Three tiers hint at filter, shortlist and vote.' },
+  { id: 'b', title: 'B. Fork in a crosshair', note: 'Says the app in one glance: aim (Target) at somewhere to eat. Simple and bold, reads well even tiny.' },
+  { id: 'c', title: 'C. Plate that is a target', note: 'A plate seen from above that is also a bullseye with crosshair ticks. Closest to the Target idea and to the current placeholder.' },
+]
+const out = document.getElementById('out')
+for (const o of options) {
+  const svg = document.getElementById(o.id).innerHTML
+  const sized = (px) => svg.replace('<svg ', `<svg width="${px}" height="${px}" `)
+  out.insertAdjacentHTML('beforeend', `
+  <section class="opt"><h2>${o.title}</h2><p>${o.note}</p>
+    <div class="row">
+      <div class="cell">${sized(120)}Full</div>
+      <div class="cell"><div class="round">${sized(96)}</div>Circle crop</div>
+      <div class="cell"><div class="squircle">${sized(96)}</div>Rounded square</div>
+      <div class="home"><div class="cell"><div class="squircle">${sized(56)}</div>What We Eat</div><div class="cell"><div class="squircle">${sized(36)}</div>Small</div></div>
+    </div></section>`)
+}
+</script>
+</body>
+</html>

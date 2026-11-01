@@ -59,7 +59,7 @@ export function PrivacyPage() {
 
       <h2>Your choices</h2>
       <p>
-        To ask for your account data to be deleted, <a href={issues_url}>open an issue</a> on the project page without
+        You can delete your account yourself in the app (Profile, then Delete my account); see <Link to="/delete-account">how to delete your account</Link>. If you cannot sign in, <a href={issues_url}>open an issue</a> on the project page without
         including private details, and we will arrange a private way to confirm it is you.
       </p>
     </LegalShell>
@@ -96,6 +96,31 @@ export function TermsPage() {
       <p>
         The source code is available under the MIT license on the project page. These terms cover the hosted website. To
         reach us, <a href={issues_url}>open an issue</a>.
+      </p>
+    </LegalShell>
+  )
+}
+
+export function DeleteAccountPage() {
+  return (
+    <LegalShell title="Delete your account" other={{ to: '/privacy', label: 'Privacy policy' }}>
+      <h2>In the app</h2>
+      <p>
+        Sign in, open <strong>Profile</strong>, press <strong>Delete my account</strong>, then confirm. This is immediate and cannot be undone.
+      </p>
+      <h2>What is deleted</h2>
+      <p>
+        Your account, your email address, your Spots (Targets and Conquered), your points and any reviews are removed from our servers. Spots
+        saved on your phone stay on your phone until you clear the app’s data.
+      </p>
+      <p>
+        Group polls and votes are anonymous. They are tied to a code on your device, not to your account, so they hold no personal details and
+        are not removed with the account.
+      </p>
+      <h2>If you cannot sign in</h2>
+      <p>
+        <a href={issues_url}>Open an issue</a> on the project page without including private details, and we will arrange a private way to confirm
+        it is you before deleting your data.
       </p>
     </LegalShell>
   )

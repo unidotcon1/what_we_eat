@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { accountsAvailable, fetchMyStats, signInWithGoogle, signOut, useUser, type MyStats } from '../../data/auth'
+import { accountsAvailable, delete_my_account, fetchMyStats, signInWithGoogle, signOut, useUser, type MyStats } from '../../data/auth'
 import { levelFor } from '../../domain/points'
 import { count_spots } from '../../domain/spots'
 import { use_spots } from '../../local/spots_store'
@@ -11,6 +11,9 @@ export default function Me() {
   const [stats, setStats] = useState<MyStats | null>(null)
   const [theme, setThemeState] = useState<Theme>(currentTheme)
   const [error, setError] = useState<string | null>(null)
+  const [confirming, set_confirming] = useState(false)
+  const [deleting, set_deleting] = useState(false)
+  const [deleted, set_deleted] = useState(false)
 
   useEffect(() => {
     if (user) fetchMyStats().then(setStats, (e: Error) => setError(e.message))
@@ -22,12 +25,28 @@ export default function Me() {
     setThemeState(next)
   }
 
+  async function run_delete() {
+    set_deleting(true)
+    setError(null)
+    try {
+      await delete_my_account()
+      set_deleted(true)
+      set_confirming(false)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      set_deleting(false)
+    }
+  }
+
   const level = stats ? levelFor(stats.points) : null
   const counts = count_spots(use_spots())
 
   return (
     <>
       <h1>Profile</h1>
+
+      {deleted && <p role="status">Your account has been deleted. Spots saved on this phone are still here.</p>}
 
       <div className="stats spot-counts">
         <div>
@@ -76,6 +95,25 @@ export default function Me() {
           <button type="button" className="chip" onClick={() => void signOut()}>
             Sign out
           </button>
+
+          {!confirming ? (
+            <button type="button" className="chip danger-link" onClick={() => set_confirming(true)}>
+              Delete my account
+            </button>
+          ) : (
+            <div role="alertdialog" aria-label="Confirm account deletion" className="confirm">
+              <p>
+                This permanently deletes your account, your Spots and your points from our servers. It cannot be undone. Spots saved on
+                this phone stay on this phone.
+              </p>
+              <button type="button" className="apply danger" disabled={deleting} onClick={() => void run_delete()}>
+                Yes, delete my account
+              </button>
+              <button type="button" className="chip" disabled={deleting} onClick={() => set_confirming(false)}>
+                Cancel
+              </button>
+            </div>
+          )}
         </section>
       )}
 

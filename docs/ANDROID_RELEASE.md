@@ -35,3 +35,21 @@ Google requires new personal developer accounts (created after 13 November 2023)
 - If the tester count drops below 12 during the 14 days, the clock effectively restarts.
 - A bare website wrapper can be rejected for being "just a website" on the App Store; on Google Play the main risks are the policies above (account deletion, user content, data safety).
 - iPhone: stays the website added to the home screen for now. The App Store needs the paid Apple developer account (about US$99 a year, unverified), a Mac or a cloud builder, and real native features. Parked.
+
+## Status, 2026-11-02 (Claude's prep is done except where marked)
+- **Manifest polished** (done, tested): stable id, food category, portrait, long-press shortcuts to Spots, Map and Add, separate maskable icon.
+- **Account deletion** (built and tested; needs the owner to run `supabase/migrations/005_delete_account.sql`): Profile has "Delete my account" with a confirmation step, and https://what-we-eat.unidotcon.workers.dev/delete-account explains it. This is the web address to give Play Console.
+- **Android link file** (placeholder live after the next push): `/.well-known/assetlinks.json` is an empty list. Locally it is built and served as JSON. After the first Play upload, send me the **App signing SHA-256 fingerprint** (Play Console, Test and release, App integrity) and I will put it in the file and push.
+- **App icon**: three options in `docs/mockups/app-icon-options.html`. Waiting for the owner's choice (A, B or C), then I generate the 192, 512 and maskable PNGs and the store graphic.
+- **Store text and data-safety answers** are drafted in `docs/PLAY_LISTING.md`.
+- **Reporting content**: Play expects a way to report abusive user content if users can share it. Today the only user text is reviews, which are shown only after hand approval, and there is no public Conquered Spot sharing yet. Re-check this against the Play user-generated-content policy before submitting (unverified), and build a Report button before adding public sharing.
+
+## Packaging with PWABuilder (owner steps; details may differ slightly from PWABuilder's current screens)
+1. Go to pwabuilder.com and enter `https://what-we-eat.unidotcon.workers.dev`.
+2. Review the score. Fix anything it flags as required (tell Claude what it says).
+3. Choose **Package for stores**, then **Android**.
+4. Set the package ID (the permanent name you chose), app name "What We Eat", version 1 (version code 1), and let PWABuilder create a **new signing key**.
+5. Download the zip. It contains the `.aab` (the file to upload) and a **signing key file and its password**. Keep these in a safe place outside the project folder and never commit them: losing them blocks future updates.
+6. In Play Console: Create app, Testing, Closed testing, Create release, upload the `.aab`, add testers, publish the release to testers.
+7. Open **Test and release, App integrity** and copy the **App signing SHA-256 fingerprint**. Give it to Claude for `assetlinks.json`.
+8. Share the opt-in link with the 12 testers. The 14-day clock needs 12 testers opted in continuously.

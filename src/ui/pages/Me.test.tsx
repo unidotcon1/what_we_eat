@@ -105,3 +105,51 @@ test('the old "Saved places" count is gone', async () => {
   await screen.findByText('92 / 150 points')
   expect(screen.queryByText('Saved places')).not.toBeInTheDocument()
 })
+
+describe('deleting the account', () => {
+  const signed_in = () => mocked.useUser.mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
+
+  test('the delete button is only shown when signed in', () => {
+    setup()
+    expect(screen.queryByRole('button', { name: 'Delete my account' })).not.toBeInTheDocument()
+  })
+
+  test('pressing it asks for confirmation first and deletes nothing yet', async () => {
+    signed_in()
+    mocked.delete_my_account.mockResolvedValue(undefined)
+    setup()
+    await userEvent.click(await screen.findByRole('button', { name: 'Delete my account' }))
+    expect(screen.getByRole('alertdialog')).toHaveTextContent(/cannot be undone/i)
+    expect(screen.getByRole('alertdialog')).toHaveTextContent(/stay on this phone/i)
+    expect(mocked.delete_my_account).not.toHaveBeenCalled()
+  })
+
+  test('Cancel closes the confirmation without deleting', async () => {
+    signed_in()
+    setup()
+    await userEvent.click(await screen.findByRole('button', { name: 'Delete my account' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(mocked.delete_my_account).not.toHaveBeenCalled()
+  })
+
+  test('confirming deletes the account and says so', async () => {
+    signed_in()
+    mocked.delete_my_account.mockResolvedValue(undefined)
+    setup()
+    await userEvent.click(await screen.findByRole('button', { name: 'Delete my account' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Yes, delete my account' }))
+    expect(mocked.delete_my_account).toHaveBeenCalledOnce()
+    expect(await screen.findByText(/Your account has been deleted/)).toBeInTheDocument()
+  })
+
+  test('a failure is shown and nothing claims success', async () => {
+    signed_in()
+    mocked.delete_my_account.mockRejectedValue(new Error('Could not delete your account: boom'))
+    setup()
+    await userEvent.click(await screen.findByRole('button', { name: 'Delete my account' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Yes, delete my account' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not delete your account: boom')
+    expect(screen.queryByText(/Your account has been deleted/)).not.toBeInTheDocument()
+  })
+})

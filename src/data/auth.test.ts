@@ -56,3 +56,34 @@ test('a failing save upsert surfaces a readable error', async () => {
   }
   await expect(mergeLocalSaves(client as never, 'u', ['a'])).rejects.toThrow('Could not sync saves: denied')
 })
+
+import { delete_account } from './auth'
+
+describe('delete_account', () => {
+  test('asks the database to delete the signed-in person, then signs out', async () => {
+    const calls: string[] = []
+    const client = {
+      rpc: async (fn: string) => {
+        calls.push(`rpc:${fn}`)
+        return { data: null, error: null }
+      },
+      auth: {
+        signOut: async () => {
+          calls.push('signOut')
+          return { error: null }
+        },
+      },
+    }
+    await delete_account(client as never)
+    expect(calls).toEqual(['rpc:delete_my_account', 'signOut'])
+  })
+
+  test('a database error is reported clearly and the person is not signed out', async () => {
+    const client = {
+      rpc: async () => ({ data: null, error: { message: 'boom' } }),
+      auth: { signOut: vi.fn() },
+    }
+    await expect(delete_account(client as never)).rejects.toThrow('Could not delete your account: boom')
+    expect(client.auth.signOut).not.toHaveBeenCalled()
+  })
+})

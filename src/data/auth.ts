@@ -84,3 +84,16 @@ export async function fetchMyStatsFrom(client: SupabaseClient): Promise<MyStats>
   ])
   return { points: (points.data as number | null) ?? 0, saves: saves.count ?? 0, reviews: reviews.count ?? 0 }
 }
+
+/** Deletes the signed-in person's account and everything tied to it (the database function does the removing), then signs out. */
+export async function delete_account(client: SupabaseClient): Promise<void> {
+  const { error } = await client.rpc('delete_my_account')
+  if (error) throw new Error(`Could not delete your account: ${error.message}`)
+  await client.auth.signOut()
+}
+
+export async function delete_my_account(): Promise<void> {
+  const client = getClient()
+  if (!client) throw new Error('Accounts need the online database, which is not set up yet.')
+  await delete_account(client)
+}

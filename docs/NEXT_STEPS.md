@@ -24,6 +24,11 @@ State at 2026-11-02 (import screen built on main, not yet pushed after the live 
 4. Android release prep (see docs/ANDROID_RELEASE.md): icon, account deletion, 12-tester closed test.
 5. Onboarding (cuisine chips, location prompt), then Stage 3 and 4 in PLAN.md.
 
+## Android prep status (2026-11-02)
+Done and committed, not yet pushed: manifest polish, in-app account deletion plus /delete-account page, empty /.well-known/assetlinks.json, icon options, store listing drafts (docs/PLAY_LISTING.md), PWABuilder guide (docs/ANDROID_RELEASE.md).
+Waiting on the owner: choose the icon (A, B or C); run supabase/migrations/005_delete_account.sql; create the Google Play developer account; pick the package name; recruit 12 testers; replace the sample restaurants with real ones before any store release.
+Waiting on Play: after the first upload, the App signing SHA-256 fingerprint goes into public/.well-known/assetlinks.json.
+
 ## Claude tasks
 ### Replace the made-up sample restaurants with real ones (the main open task)
 Legal sources researched on 2026-11-01 (not legal advice):

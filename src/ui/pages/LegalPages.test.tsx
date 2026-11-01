@@ -44,3 +44,26 @@ test('both pages link back to the app and to each other', () => {
   expect(screen.getByRole('link', { name: /back to what we eat/i })).toHaveAttribute('href', '/')
   expect(screen.getByRole('link', { name: 'Terms of service' })).toHaveAttribute('href', '/terms')
 })
+
+import { DeleteAccountPage } from './LegalPages'
+
+test('the delete-account page explains the in-app steps and what is removed', () => {
+  in_router(<DeleteAccountPage />)
+  expect(screen.getByRole('heading', { level: 1, name: 'Delete your account' })).toBeInTheDocument()
+  const text = document.body.textContent ?? ''
+  expect(text).toMatch(/Profile/)
+  expect(text).toMatch(/Delete my account/)
+  expect(text).toMatch(/Spots/)
+  expect(text).toMatch(/points/)
+  expect(text).toMatch(/polls/i)
+})
+
+test('the delete-account page offers a way to ask when someone cannot sign in', () => {
+  in_router(<DeleteAccountPage />)
+  expect(screen.getByRole('link', { name: /open an issue/i })).toHaveAttribute('href', 'https://github.com/unidotcon1/what_we_eat/issues')
+})
+
+test('the privacy policy links to the delete-account page', () => {
+  in_router(<PrivacyPage />)
+  expect(screen.getByRole('link', { name: /delete your account/i })).toHaveAttribute('href', '/delete-account')
+})
