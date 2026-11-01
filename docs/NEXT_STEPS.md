@@ -20,6 +20,7 @@ State at 2026-11-02 (import screen built on main, not yet pushed after the live 
 | GitHub: protect `main` (require a pull request, block force pushes), switch on secret scanning, push protection and Dependabot alerts | github.com/unidotcon1/what_we_eat, Settings | Dependabot opens weekly update PRs once `.github/dependabot.yml` is pushed. |
 | Supabase: confirm Google is the only sign-in provider, then run **Security Advisor** (Database, Advisors) and send a screenshot of anything red or orange | Supabase dashboard | Fix what it reports. |
 | Google Cloud: OAuth consent screen scopes are only `openid`, `email`, `profile`; the client's Authorised redirect URI is only the Supabase callback | console.cloud.google.com | Ask for a screenshot. |
+| Draw the cuisine icons and send them (SVG, or PNG at least 192 px, transparent background, one per cuisine) | - | Wire them in during UI refresh P5; until then the emoji stay. |
 | Decide the restaurant data source (see below) | - | Run the coverage tests and build the import. |
 
 ## Security (audit of 2026-11-01)

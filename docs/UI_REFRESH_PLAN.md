@@ -23,24 +23,24 @@ Status: **plan only, nothing built** (written 2026-11-02). Owner priority: most 
 | Cards with a strong visual | Larger cuisine tile as the card's left block, name in a bigger weight | Fewer chips, bigger shapes |
 | Quick filters | One horizontal chip row: Date night, Big group, Late, Halal, then "More" | Replaces the Filters and Sort buttons as the first thing you see |
 | Reward moment | Press the crosshair: it "locks on" (short ring animation). Conquer: a flag plants and the card settles | 300 ms, no popups, no confetti |
-| Social | "Start a vote" and "Can't decide? Pick one for us" at the top of Explore | Our real strength: deciding as a group, which a logging app does not do |
+| Social | "Start a vote" stays the one group action at the top of Explore ("Pick one for us" is parked) | Our real strength: deciding as a group, which a logging app does not do |
 
 ## Phases (each ends with screenshots on 360 and 375 px, light and dark, for the owner to approve)
-**P0. Direction (before any code).** Three HTML mockups of Explore, Spots and Profile in `docs/mockups/` (same method as before), built on the real palette. The owner picks one. Also decide the two open questions below.
-**P1. Foundations.** Design tokens in `theme.css`: type scale, spacing scale, three levels of surface tone, radius, shadow, motion durations. Fix dark-mode contrast (cherry as a fill). Add one self-hosted font file (the CSP already allows `font-src 'self'`, so no new host). Contrast check on every colour pair.
-**P2. Explore.** New card (the five-things rule), chip row, "Pick one for us" hero, calmer header, the lock-on animation, and a skeleton loader instead of "Loading...".
+**P0. Direction (before any code).** Three HTML mockups of Explore, Spots and Profile in `docs/mockups/` (same method as before), built on the real palette, dark first. The owner picks one.
+**P1. Foundations and clean-up.** Design tokens in `theme.css`: type scale, spacing scale, three levels of surface tone, radius, shadow, motion durations. Fix dark-mode contrast (cherry as a fill). Add one self-hosted font file (the CSP already allows `font-src 'self'`, so no new host). Contrast check on every colour pair. Clean-up audit: list every file, CSS rule, image and dependency that nothing uses; show the list; delete after the owner says yes.
+**P2. Explore.** New card (the five-things rule), chip row, calmer header, the lock-on animation, and a skeleton loader instead of "Loading...".
 **P3. Spots and Profile.** Progress ring, level badge, nicer empty states with one illustration each, flag-plant animation on Conquer.
 **P4. Map.** Pins keep shape plus colour. Tapping a pin opens a small bottom card (name, area, Target button) instead of a popup.
-**P5. Icons.** Replace emoji cuisine tiles with our own small SVG set (about 12 cuisines) so Android and iPhone look the same. Own artwork, so no licence problem.
+**P5. Icons.** Replace emoji cuisine tiles with the owner's own drawings (about 12 cuisines, to be sent later) so Android and iPhone look the same. Own artwork, so no licence problem. Blocked until the files arrive.
 **P6. Polish and audit.** Run the `avoid-ai-design` skill, reduced-motion pass, touch targets at least 44 px, screen-reader names kept (existing tests must stay green), bundle size and Lighthouse before and after, 5-second test: show someone the Explore screen for 5 seconds and ask what it is for.
 
 Each phase is test-first where there is logic (animation state, progress count, chip filters) and screenshot-checked where it is visual. Nothing is pushed until the owner says so.
 
-## Open questions for the owner
-1. Light or dark as the default look in the mockups? (Both will be built; one leads.)
-2. Own SVG cuisine icons (P5), or keep emoji for now and spend the time elsewhere?
-3. "Pick one for us" on Explore: yes or later? It is the biggest difference from Eatventure but it is new behaviour, so it needs your OK.
-4. Is a self-hosted font file acceptable (adds roughly 30 to 60 KB, unverified until chosen)?
+## Owner decisions (2026-11-02)
+1. **Dark leads.** Mockups and the first build pass are dark-first; light mode is built and checked second.
+2. **Cuisine icons: the owner draws them** and will send them later. Until then the emoji stay. P5 waits for the files; ask for SVG (or PNG at least 192 px), one per cuisine, transparent background.
+3. **"Pick one for us" is parked** as one of the last options (see `docs/FUTURE_IDEAS.md`). It is not in P2.
+4. **A self-hosted font is fine, with a lean-files rule:** ship only the weights and characters actually used (for example one variable font file, Latin only), and in P1 also audit the project for files nobody uses (source files, images, CSS rules, dependencies, docs) and remove them with the owner's OK. Nothing is deleted without listing it first.
 
 ## Not in this plan
 Photos of food (licensing and moderation), a mascot, a raised centre tab button, parked ideas in `FUTURE_IDEAS.md`, and the Conquered rating and note feature (separate task).

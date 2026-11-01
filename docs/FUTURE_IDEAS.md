@@ -26,6 +26,9 @@ Rule of thumb: at most two visual encodings per pin, and never colour alone (add
 ## 5. Toggleable layers
 One "Layers" button on the map opens a small sheet with switches: Places, Busy now, Events, Areas. Remember the choice on the device. Default: Places only, so the map stays calm.
 
+## 5b. "Pick one for us" (parked on purpose, one of the last options; owner, 2026-11-02)
+A big button on Explore that picks one place from what the current filters show, with a short animation, for groups who cannot decide. New behaviour, so it needs its own design (does it use only Targets? does it respect "open now"? can it re-roll?). Revisit after the UI refresh, the tour, Android release and the real restaurant list.
+
 ## 6. Other parked items
 - Foursquare and Overture coverage tests for Singapore.
 - Pull saves from the account onto a new device after sign-in.
