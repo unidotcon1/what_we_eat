@@ -5,7 +5,7 @@ Live: https://what-we-eat.unidotcon.workers.dev. Repo: github.com/unidotcon1/wha
 
 ## Start of every session
 1. Read `docs/NEXT_STEPS.md` (open tasks and what to do when the owner says each one is done).
-2. `git status -sb`, then `npm test`, then `npm run check:live` (28 checks on the live site and database; all should PASS).
+2. `git status -sb`, then `npm test`, then `npm run check:live` (30 checks on the live site and database; all should PASS).
 3. Read `docs/superpowers/specs/2026-10-30-what-we-eat-design.md` only if a product question comes up.
 
 ## Rules the owner set

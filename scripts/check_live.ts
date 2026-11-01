@@ -62,6 +62,10 @@ async function main() {
     const rows = (await (await fetch(`${db_url}/rest/v1/${table}?select=*`, { headers: anon })).json()) as unknown
     check(`anonymous visitors cannot list ${table}`, Array.isArray(rows) && rows.length === 0)
   }
+  // the spots table from migration 004 exists, and anonymous visitors are locked out of it
+  const spots_res = await fetch(`${db_url}/rest/v1/spots?select=id&limit=1`, { headers: anon })
+  check('migration 004 is applied (spots table exists)', spots_res.status !== 404, String(spots_res.status))
+  check('anonymous visitors cannot read the spots table', spots_res.status === 401 || spots_res.status === 403, String(spots_res.status))
   for (const fn of ['grant_points', 'claim_first_save', 'my_points', 'delete_old_polls']) {
     const r = await call(fn, fn === 'grant_points' ? { p_user: '00000000-0000-0000-0000-000000000000', p_kind: 'review', p_restaurant: 'x' } : fn === 'claim_first_save' ? { p_restaurant: 'x' } : {})
     check(`anonymous visitors cannot call ${fn}`, r.status === 401 || r.status === 403, String(r.status))

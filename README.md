@@ -79,7 +79,7 @@ Add the repository secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY` so `.github/wo
 
 ```bash
 npm test               # unit tests
-npm run check:live     # 28 checks against the live site and database (needs .env and .env.local)
+npm run check:live     # 30 checks against the live site and database (needs .env and .env.local)
 ```
 
 Open tasks and how to resume work: `docs/NEXT_STEPS.md` and `CLAUDE.md`.

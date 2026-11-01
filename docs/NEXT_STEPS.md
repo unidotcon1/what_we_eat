@@ -1,6 +1,6 @@
 # Next steps
 
-State at 2026-11-02 (import screen built on main, not yet pushed after the live UI release): the Spots UI is live (Explore with one crosshair per card, Map tab, Spots screen with Targets and Conquered, Add a spot, four-tab bar; Conquered uses a flag icon). 325 unit tests pass and `npm run check:live` passes 28 of 28. Migrations 001 to 003 are applied; **004_spots.sql is not applied yet**, so spots live on the device only until the owner pastes it into the Supabase SQL editor.
+State at 2026-11-02 (import screen built on main, not yet pushed after the live UI release): the Spots UI is live (Explore with one crosshair per card, Map tab, Spots screen with Targets and Conquered, Add a spot, four-tab bar; Conquered uses a flag icon). 325 unit tests pass and `npm run check:live` passes 30 of 30. Migrations 001 to 003 are applied; **004_spots.sql is not applied yet**, so spots live on the device only until the owner pastes it into the Supabase SQL editor.
 
 ## Done by the owner (verified where noted)
 - Google consent screen published (privacy and terms links added).
