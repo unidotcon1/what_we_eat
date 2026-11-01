@@ -57,6 +57,15 @@ npx tsx scripts/seed.ts
 
 Edit `data/sample-restaurants.csv` to change the list. Columns: name, area, lat, lng, price_band (1-4), cuisine, tags (separated by `|`), hours (for example `daily 11:00-22:00`, blank if unknown), closed (`yes` to hide).
 
+## Finding real restaurants (OpenStreetMap candidates)
+
+```bash
+npm run candidates:osm              # downloads once, then reuses data/candidates/osm-raw.json
+npm run candidates:osm -- --refresh # download again
+```
+
+Writes `data/candidates/osm-sg-candidates.csv` (about 7,600 Singapore restaurants, cafes and fast-food places) with the same columns as `data/sample-restaurants.csv` plus `osm_id`, `osm_cuisine` and `source`. It is read-only: nothing touches the app or the database. `price_band` is left blank on purpose; you fill in price and tags such as `group` or `date`, then copy the rows you keep into `data/`. The data is © OpenStreetMap contributors under the ODbL: keep the `source` column, credit OpenStreetMap, and keep the published restaurant list open.
+
 ## Reviews
 
 Reviews arrive as `approved = false`. Approve one in the Supabase table editor (set `approved` to true) and the reviewer gets +5 points.

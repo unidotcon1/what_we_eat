@@ -26,7 +26,9 @@ Legal sources researched on 2026-11-01 (not legal advice):
 - **Overture Maps places** (CDLA-Permissive-2.0): an open public question about upstream rights; second choice.
 - **Do not use**: Google Places (storing results is restricted), or scraping Burpple, Chope, Google Maps or Instagram.
 - None of these give price bands or "group" / "date" tags. The owner curates those from their own knowledge; copy only facts (name, area, coordinates, cuisine), never descriptions, photos or reviews.
-Plan: coverage test of OpenStreetMap and Foursquare, then a dry-run import script that writes a candidate CSV (columns as in `data/sample-restaurants.csv`) for the owner to curate, then `npm run seed`. Update the terms page once the listings are real (it currently says they are samples).
+**Built 2026-11-01:** `npm run candidates:osm` writes `data/candidates/osm-sg-candidates.csv` (git-ignored; 7,609 candidates: 58% with a cuisine, 21% with opening hours, 96% with an approximate area, 268 halal-tagged). Area names are the nearest of about 50 known centres within 2.5 km, so they are approximate. `price_band` and tags like `group`/`date` are blank for the owner to fill.
+Next: the owner picks and fills in a few hundred rows; then make `scripts/seed.ts` accept a CSV path (it reads `data/sample-restaurants.csv` now), seed, replace the sample data, add a "data credits: OpenStreetMap contributors" line to the privacy page, and update the terms page (it currently says listings are samples). Optionally test Overture Maps as a second source.
+
 
 ### Other
 - Real-database check of the review unique and not-blank rules and the back-dating trigger from migration 003 (applied, only partly exercised).

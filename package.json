@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "check:live": "tsx scripts/check_live.ts",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "candidates:osm": "tsx scripts/osm_candidates.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

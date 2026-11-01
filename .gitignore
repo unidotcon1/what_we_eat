@@ -9,6 +9,9 @@ coverage
 .env*
 !.env.example
 
+# generated candidate lists (OpenStreetMap downloads; curate, then copy chosen rows into data/)
+data/candidates/
+
 # local tooling and scratch files
 .wrangler/
 .claude/
