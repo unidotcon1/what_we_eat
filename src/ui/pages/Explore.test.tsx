@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import Explore from './Explore'
@@ -106,4 +106,23 @@ test('there is no + button in the header: the search bar already finds places', 
   setup()
   await screen.findByText('Long Table Hotpot')
   expect(screen.queryByRole('link', { name: 'Add a spot' })).not.toBeInTheDocument()
+})
+
+test('press and hold on a card, then Conquer, makes it a Conquered Spot', async () => {
+  setup()
+  await screen.findByText('Long Table Hotpot')
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+  try {
+    const btn = screen.getByRole('button', { name: 'Target Kopi & Kin' })
+    fireEvent.pointerDown(btn)
+    act(() => {
+      vi.advanceTimersByTime(700)
+    })
+    fireEvent.pointerUp(btn)
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Conquer Kopi & Kin' }))
+  } finally {
+    vi.useRealTimers()
+  }
+  expect(await screen.findByRole('button', { name: 'Move Kopi & Kin back to Targets' })).toBeInTheDocument()
+  expect(screen.getByText('Conquered')).toBeInTheDocument()
 })

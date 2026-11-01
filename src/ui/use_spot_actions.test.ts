@@ -117,3 +117,24 @@ test('commit_spots saves a whole new list at once and writes it to the account w
   expect(result.current.spots).toHaveLength(2)
   expect(vi.mocked(remote.push_changes).mock.calls[0][2].upserts.map((s) => s.id)).toEqual(['m:extra'])
 })
+
+test('set_state puts a place in the chosen state without toggling', () => {
+  const { result } = renderHook(() => use_spot_actions())
+  act(() => result.current.set_state(kopi, 'targeted'))
+  act(() => result.current.set_state(kopi, 'targeted'))
+  expect(result.current.state_of('kopi-kin')).toBe('targeted')
+  expect(result.current.spots).toHaveLength(1)
+  act(() => result.current.set_state(kopi, 'conquered'))
+  expect(result.current.state_of('kopi-kin')).toBe('conquered')
+  act(() => result.current.set_state(kopi, 'targeted'))
+  expect(result.current.state_of('kopi-kin')).toBe('targeted')
+})
+
+test('remove_place deletes the spot for a place, and does nothing for a place that is not a spot', () => {
+  const { result } = renderHook(() => use_spot_actions())
+  act(() => result.current.remove_place(kopi))
+  expect(result.current.spots).toHaveLength(0)
+  act(() => result.current.set_state(kopi, 'conquered'))
+  act(() => result.current.remove_place(kopi))
+  expect(result.current.spots).toHaveLength(0)
+})

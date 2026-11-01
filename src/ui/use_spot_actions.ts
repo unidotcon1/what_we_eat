@@ -3,6 +3,7 @@ import { claim_points_for_new, push_changes } from '../data/spots'
 import { getClient } from '../data/supabase'
 import {
   diff_spots,
+  find_spot,
   move_spot,
   remove_spot,
   set_spot_state,
@@ -40,6 +41,15 @@ export function use_spot_actions() {
     /** Target button on a card: adds a Target, removes it if it already is one, and moves a Conquered Spot back to Target. */
     toggle_target(r: Restaurant) {
       commit(toggle_spot_state(get_spots(), spot_input_from_restaurant(r), 'targeted', now()))
+    },
+    /** Puts a place in exactly this state (the press-and-hold menu), without toggling. */
+    set_state(r: Restaurant, state: SpotState) {
+      commit(set_spot_state(get_spots(), spot_input_from_restaurant(r), state, now()).spots)
+    },
+    /** Removes a place from the person's Spots; does nothing if it was not one. */
+    remove_place(r: Restaurant) {
+      const found = find_spot(get_spots(), spot_input_from_restaurant(r))
+      if (found) commit(remove_spot(get_spots(), found.id))
     },
     conquer(r: Restaurant) {
       commit(set_spot_state(get_spots(), spot_input_from_restaurant(r), 'conquered', now()).spots)

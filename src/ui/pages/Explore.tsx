@@ -20,7 +20,7 @@ export default function Explore() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [picking, setPicking] = useState(false)
   const location = useLocation()
-  const { state_of, toggle_target } = use_spot_actions()
+  const { state_of, toggle_target, set_state, remove_place } = use_spot_actions()
   const shortlist = useShortlist()
 
   useEffect(() => {
@@ -81,6 +81,7 @@ export default function Explore() {
             r={r}
             state={state_of(r.id)}
             on_target={() => toggle_target(r)}
+            on_choose={(choice) => (choice === 'none' ? remove_place(r) : set_state(r, choice))}
             picking={picking}
             picked={shortlist.ids.includes(r.id)}
             on_pick={() => shortlist.toggle(r.id)}

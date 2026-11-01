@@ -86,3 +86,5 @@ Not built yet: Takeout import screen (data layer exists), add by map pin, add by
 Update 2026-11-02: the UI pass is live on the main branch. Add a spot moved out of the bottom bar (it looked like search): there is now a + at the top left of Explore and an Add button in the Spots header, and the bar has four tabs: Explore, Map, Spots, Profile.
 
 Update 2026-11-02 (later): Import screen built at /import (upload a Takeout .csv or .json, preview matched and unmatched, choose Targets or Conquered, optionally add places not in our list, confirm; nothing is written before the confirm; never demotes a Conquered Spot; the file is read on the device). The + at the top left of Explore was removed (it duplicated search). Add a spot now also offers the import.
+
+Update 2026-11-02 (later still): press and hold on a card's crosshair opens a small menu (Target, Conquer, and Remove when the place is already a spot). A quick tap still toggles the Target. The menu also opens on right-click or the keyboard menu key, closes on Escape or a tap elsewhere, and a hold cancelled by scrolling (moving more than 10 px) opens nothing. Hold time 500 ms.
