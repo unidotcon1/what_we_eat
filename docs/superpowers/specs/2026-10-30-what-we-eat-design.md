@@ -8,7 +8,7 @@ A Singapore restaurant finder for two moments: a large group of friends choosing
 - Bookmark restaurants.
 - Create a shortlist, press "Send to friends", and share a no-login poll link via WhatsApp or Telegram share.
 - Points for contributing (reviews, submitted restaurants, first saves) with a daily cap and levels.
-- Users can submit restaurants through a Google Form; entries are approved before they appear.
+- ~~Users can submit restaurants through a Google Form~~ (dropped by the owner on 2026-11-01).
 - Light and dark mode, following the phone setting with a manual toggle.
 - Publish for ~$0.
 
@@ -45,7 +45,7 @@ The user chose A.
 **Filters sheet** (five groups): Price ($, $$, $$$, $$$$ per person); Location (near me or pick an area, distance slider); Who's eating (big group 6+, date night, solo/small); Cuisine; Dietary and hours (halal, vegetarian, open now). A "Show N places" live-count button applies them.
 **Shortlist and poll:** "Send to friends" creates a poll row in Postgres with a short link; the share sheet opens WhatsApp or Telegram with a prefilled message listing options plus the link. Friends vote without login; results update live.
 **Points:** +5 approved review, +5 approved restaurant submission, +5 first save of a restaurant; cap 30 points per day; levels at 50, 150, 400 points. Numbers tunable after testing.
-**Submissions:** Google Form -> response Sheet -> user approves -> imported into the database. Form is for restaurants only.
+**Submissions:** dropped on 2026-11-01. The Google Form, the import script and the suggest link were removed. The +5 submission points still exist in SQL but nothing awards them.
 **Theme:** Cotton `#EDEBDD`, Cherry Red `#810100`, Maroon `#630000`, Noir Black `#1B1717`. Dark mode: Noir background, Cotton text, Cherry/Maroon accents. Light mode: Cotton background, Noir text, Cherry buttons. App name: What We Eat. Mockups are in `.superpowers/brainstorm/`.
 
 ## Added after the builder check

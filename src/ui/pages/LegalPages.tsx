@@ -27,8 +27,7 @@ export function PrivacyPage() {
       <h2>What we store</h2>
       <p>
         If you sign in with Google, Google shares your email address and basic profile details (name and picture) with
-        Supabase, which runs our sign-in and database. We use your email address to identify your account and to match
-        restaurant suggestions to you.
+        Supabase, which runs our sign-in and database. We use your email address to identify your account.
       </p>
       <p>
         We also store what you create: the places you save, your reviews (a rating and up to 280 characters of text), your
@@ -86,7 +85,7 @@ export function TermsPage() {
 
       <h2>What you post</h2>
       <p>
-        Reviews and restaurant suggestions should be your own honest words. Do not post spam, abuse, or anything
+        Reviews should be your own honest words. Do not post spam, abuse, or anything
         unlawful. Reviews are approved by hand, and we may edit or remove content that breaks these rules.
       </p>
 

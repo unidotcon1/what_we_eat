@@ -1,33 +1,44 @@
 # Next steps
 
-State at 2026-10-30: v1 is live and verified (`npm run check:live` passes 28 of 28, 166 unit tests pass). Migrations 001 to 003 are applied. The items below are what is left.
+State at 2026-11-01: v1 is live and verified (`npm run check:live` passes 28 of 28). Migrations 001 to 003 are applied.
 
-## Owner tasks (things only the owner can click)
-Tell Claude "done" for any of these and use the "Then Claude" column.
+## Done by the owner (verified where noted)
+- Google consent screen published (privacy and terms links added).
+- Cloudflare "Always Use HTTPS" on.
+- Two-phone poll test completed.
+- Supabase: Email provider off (public settings show only Google, verified 2026-11-01); "Allow anonymous sign-ins" off (screenshot); "Allow new users to sign up" stays ON (needed for new Google users).
+- GitHub keep-alive: manual run passed on 2026-10-30. Next scheduled runs: Monday and Thursday 03:00 UTC. If the Actions tab ever shows a red run, check the secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+- Claude's saved Cloudflare login revoked.
+- Google Form idea dropped (the suggest link, import script and form docs were removed).
 
-| # | Task | Where | Then Claude |
-|---|------|-------|-------------|
-| 1 | Turn off **Email** sign-ups and **anonymous sign-ins** | Supabase, Authentication, Sign In / Providers | Test that email sign-up is refused: `POST <supabase url>/auth/v1/signup` with the anon key and a fake email should fail ("signups not allowed"). Add that check to `scripts/check_live.ts`. |
-| 2 | Narrow **Redirect URLs** to the live address and localhost, no wildcards; Site URL = live address | Supabase, Authentication, URL Configuration | Nothing to test from outside; ask the owner to sign in on the live site once. |
-| 3 | **Publish** the Google consent screen (fill Branding: authorized domain `unidotcon.workers.dev`, privacy link `/privacy`, terms link `/terms`) | Google Cloud, Google Auth Platform | Ask the owner to sign in with a second Google account. |
-| 4 | Fix the **keep-alive** workflow (a run failed; likely a malformed secret) | GitHub, Actions, "Keep Supabase awake", Run workflow | If it fails, ask for the last lines of the "Read one restaurant row" step. Secrets must be exactly `SUPABASE_URL` (`https://<id>.supabase.co`, no slash) and `SUPABASE_ANON_KEY` (publishable key). |
-| 5 | Switch on **Always Use HTTPS** | Cloudflare, the site's settings | `curl -sI http://what-we-eat.unidotcon.workers.dev/` should redirect to https. |
-| 6 | **Two-phone test**: open one poll on two phones, vote on one, see the other update (about 3 seconds) | phones | Fix if it does not. |
-| 7 | Make a **Google Form** for restaurant suggestions (collect email plus the columns in `data/sample-restaurants.csv`) | Google Forms | Put its link in `VITE_SUGGEST_FORM_URL` in `.env.local` and as a Cloudflare build variable, push, then check the Explore page shows "Suggest a restaurant". |
-| 8 | Optionally revoke Claude's saved Cloudflare login | Cloudflare, My Profile, API Tokens | Nothing; deploys do not need it. |
+## Still open for the owner
+| Task | Where | Then Claude |
+|------|-------|-------------|
+| Confirm **Redirect URLs** are only `https://what-we-eat.unidotcon.workers.dev/**` and `http://localhost:5173/**`, Site URL = the live address | Supabase, Authentication, URL Configuration | Cannot be checked from outside; ask for a screenshot of the list. |
+| Decide the restaurant data source (see below) | - | Run the coverage tests and build the import. |
 
-## Claude tasks (no owner action needed)
-- Replace the made-up sample restaurants with real ones (the owner supplies or approves the list; keep the CSV columns; run `npm run seed`). Until then the terms page honestly says listings are samples.
-- After an owner approves a Google Form export: `npx tsx scripts/import-approved.ts approved.csv` (header row matches the CSV plus `email`). This script has not been run on a real export yet.
-- Real-database check of the points cap and review approval after migration 003 (the review unique and not-blank rules and the back-dating trigger were applied but only partly exercised).
+## Claude tasks
+### Replace the made-up sample restaurants with real ones (the main open task)
+Legal sources researched on 2026-11-01 (not legal advice):
+- **data.gov.sg hawker centres** (NEA; Open Data Licence, free for personal and commercial use): hawker centres only.
+- **OpenStreetMap** (ODbL: credit required; publishing a database built from it means offering that database under ODbL, so keep the restaurant list public in the repo and add a "data credits" line to the privacy page). Overpass count on 2026-11-01: about 8,800 restaurants, cafes, fast-food places and food courts in Singapore; about 4,300 named ones with a cuisine tag, 1,900 with opening hours, 340 with halal info.
+- **Foursquare Open Source Places** (Apache 2.0, attribution): coverage for Singapore not yet checked; dataset access may need a Hugging Face login.
+- **Overture Maps places** (CDLA-Permissive-2.0): an open public question about upstream rights; second choice.
+- **Do not use**: Google Places (storing results is restricted), or scraping Burpple, Chope, Google Maps or Instagram.
+- None of these give price bands or "group" / "date" tags. The owner curates those from their own knowledge; copy only facts (name, area, coordinates, cuisine), never descriptions, photos or reviews.
+Plan: coverage test of OpenStreetMap and Foursquare, then a dry-run import script that writes a candidate CSV (columns as in `data/sample-restaurants.csv`) for the owner to curate, then `npm run seed`. Update the terms page once the listings are real (it currently says they are samples).
+
+### Other
+- Real-database check of the review unique and not-blank rules and the back-dating trigger from migration 003 (applied, only partly exercised).
+- Points of kind `submission` still exist in SQL and `src/domain/points.ts` but nothing awards them now; remove in a future migration if wanted.
 
 ## Ideas, not started
 - Pull saves from the account onto a new device after sign-in (today they are pushed up, not pulled down).
-- Food icons from Twemoji or Noto Emoji so they look the same on every phone (today: native emoji).
-- Custom domain (optional, about US$10 to 30 a year).
-- Make the per-poll voting token different for every poll (needs a migration plan for existing polls).
+- Food icons from Twemoji or Noto Emoji so they look the same on every phone.
+- Custom domain (optional).
+- A different voting token for every poll (needs a migration plan for existing polls).
 - Hide `user_id` on public review reads (use a view; test how row rules interact with column rights).
-- Cleanup job for old polls: `delete_old_polls()` exists (30 days) but nothing runs it yet.
+- A cleanup job for old polls: `delete_old_polls()` exists (30 days) but nothing runs it yet.
 
 ## Minor items deferred during the build
 A failed vote (network blip, or the poll closing mid-tap) replaces the whole poll page with the error text instead of showing it inline, "Open now" crashes on hand-edited hours missing a day key, closed places are unlabeled on the Saved tab, the theme toggle has no "follow my phone" option, a name-derived restaurant id can overwrite an existing one on import, the GitHub keep-alive schedule stops after 60 days of no repo activity.

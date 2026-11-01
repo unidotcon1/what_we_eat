@@ -30,7 +30,6 @@ Designed to run for $0: Cloudflare Pages and Supabase free tiers, plus a schedul
 ### Known gaps
 
 - Live vote updates between two phones have not been tested yet.
-- `scripts/import-approved.ts` has not been run against a real Google Form export.
 - Saves made on another device are pushed to the account but not pulled back.
 
 Design: `docs/superpowers/specs/2026-10-30-what-we-eat-design.md`. Plan: `docs/superpowers/plans/2026-10-30-what-we-eat-v1.md`.
@@ -49,7 +48,7 @@ Without Supabase the app uses the 25 bundled sample restaurants, and polls only 
 1. Create a free project at supabase.com.
 2. In the SQL editor run `supabase/migrations/001_schema.sql`, then `002_points.sql`, then `003_hardening.sql` (private polls, size limits, review and points hardening).
 3. Auth > Providers > Google: enable it (needs a Google Cloud OAuth client) and add your site URL to the redirect URLs.
-4. Create `.env.local` (used by the app) with `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (the publishable key) and optionally `VITE_SUGGEST_FORM_URL`.
+4. Create `.env.local` (used by the app) with `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (the publishable key).
 5. Create `.env` (used by the scripts only, never committed) with `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` (the secret key). Then load the sample restaurants:
 
 ```bash
@@ -58,15 +57,9 @@ npx tsx scripts/seed.ts
 
 Edit `data/sample-restaurants.csv` to change the list. Columns: name, area, lat, lng, price_band (1-4), cuisine, tags (separated by `|`), hours (for example `daily 11:00-22:00`, blank if unknown), closed (`yes` to hide).
 
-## Reviews and suggested restaurants
+## Reviews
 
-- Reviews arrive as `approved = false`. Approve one in the Supabase table editor (set `approved` to true) and the reviewer gets +5 points.
-- Create a Google Form that collects the submitter's email plus the same columns as the CSV. Put its link in `VITE_SUGGEST_FORM_URL`.
-- Export approved responses to a CSV (header row matching the columns above plus `email`) and run:
-
-```bash
-npx tsx scripts/import-approved.ts approved.csv
-```
+Reviews arrive as `approved = false`. Approve one in the Supabase table editor (set `approved` to true) and the reviewer gets +5 points.
 
 ## Deploy free on Cloudflare Pages
 

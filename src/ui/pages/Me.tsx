@@ -30,7 +30,7 @@ export default function Me() {
         <p className="sub">Accounts need the online database, which is not set up yet. Saving and voting still work.</p>
       ) : !user ? (
         <section>
-          <p className="sub">Sign in to review restaurants, suggest places and earn points.</p>
+          <p className="sub">Sign in to review restaurants and earn points.</p>
           <button type="button" className="apply" onClick={() => void signInWithGoogle().catch((e: Error) => setError(e.message))}>
             Sign in with Google
           </button>
@@ -60,7 +60,7 @@ export default function Me() {
                   <span>Reviews</span>
                 </div>
               </div>
-              <p className="sub">+5 review · +5 suggested place · +5 first save · 30 points a day at most</p>
+              <p className="sub">+5 review · +5 first save · 30 points a day at most</p>
             </>
           )}
           <button type="button" className="chip" onClick={() => void signOut()}>
