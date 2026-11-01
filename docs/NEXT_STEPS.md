@@ -1,6 +1,6 @@
 # Next steps
 
-State at 2026-11-01: v1 is live and verified (`npm run check:live` passes 28 of 28). Migrations 001 to 003 are applied.
+State at 2026-11-02: the Spots UI is live (Explore with one crosshair per card, Map tab, Spots screen with Targets and Conquered, Add a spot, four-tab bar; Conquered uses a flag icon). 325 unit tests pass and `npm run check:live` passes 28 of 28. Migrations 001 to 003 are applied; **004_spots.sql is not applied yet**, so spots live on the device only until the owner pastes it into the Supabase SQL editor.
 
 ## Done by the owner (verified where noted)
 - Google consent screen published (privacy and terms links added).
@@ -16,6 +16,13 @@ State at 2026-11-01: v1 is live and verified (`npm run check:live` passes 28 of 
 |------|-------|-------------|
 | Confirm **Redirect URLs** are only `https://what-we-eat.unidotcon.workers.dev/**` and `http://localhost:5173/**`, Site URL = the live address | Supabase, Authentication, URL Configuration | Cannot be checked from outside; ask for a screenshot of the list. |
 | Decide the restaurant data source (see below) | - | Run the coverage tests and build the import. |
+
+## Next build tasks (Stage 1 remainder), in order
+1. Google Maps import screen (Takeout): the reading and matching code is in `src/domain/takeout.ts`; build the upload, preview (matched and unmatched) and confirm screen. Ask the owner for a real export to test with.
+2. Add by map pin and add by hand (name and pin required).
+3. Conquered Spot rating (1 to 5), note (280 characters), private by default with a share switch, nickname, Report button (replaces the review form; see "Owner decisions" in PLAN.md).
+4. Android release prep (see docs/ANDROID_RELEASE.md): icon, account deletion, 12-tester closed test.
+5. Onboarding (cuisine chips, location prompt), then Stage 3 and 4 in PLAN.md.
 
 ## Claude tasks
 ### Replace the made-up sample restaurants with real ones (the main open task)
