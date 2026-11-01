@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Check, Crosshair, Flag, MapPin, Trash2 } from 'lucide-react'
+import { Check, Circle, Crosshair, Flag, MapPin } from 'lucide-react'
 import type { SpotState } from '../../domain/spots'
 import type { Restaurant } from '../../domain/types'
 import { cuisineIcon } from '../cuisineIcons'
@@ -183,8 +183,8 @@ export function RestaurantCard({ r, state, on_target, on_choose, picking, picked
             <Flag size={16} aria-hidden="true" /> Conquer
           </button>
           {state && (
-            <button type="button" role="menuitem" aria-label={`Remove ${r.name} from my Spots`} onClick={() => choose('none')}>
-              <Trash2 size={16} aria-hidden="true" /> Remove
+            <button type="button" role="menuitem" aria-label={`Untarget ${r.name}`} onClick={() => choose('none')}>
+              <Circle size={16} aria-hidden="true" /> Untarget
             </button>
           )}
         </div>

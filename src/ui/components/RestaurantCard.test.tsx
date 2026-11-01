@@ -173,24 +173,34 @@ describe('press and hold on the Target button', () => {
     expect(props.on_choose).toHaveBeenCalledWith('targeted')
   })
 
-  test('the current state is marked, and a Remove choice appears for a place that is already a spot', () => {
+  test('the current state is marked, and an Untarget choice appears for a place that is already a spot', () => {
     setup({ state: 'targeted' })
     hold(button('Remove Kopi & Kin from Targets'))
     expect(screen.getByRole('menuitem', { name: 'Make Kopi & Kin a Target' })).toHaveAttribute('aria-current', 'true')
-    expect(screen.getByRole('menuitem', { name: 'Remove Kopi & Kin from my Spots' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Untarget Kopi & Kin' })).toBeInTheDocument()
   })
 
-  test('no Remove choice for a place that is not a spot yet', () => {
+  test('no Untarget choice for a place that is not a spot yet', () => {
     setup()
     hold(button())
-    expect(screen.queryByRole('menuitem', { name: /Remove/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /Untarget/ })).not.toBeInTheDocument()
   })
 
-  test('Remove reports none', () => {
+  test('Untarget reports none', () => {
     const props = setup({ state: 'conquered' })
     hold(button('Move Kopi & Kin back to Targets'))
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Remove Kopi & Kin from my Spots' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Untarget Kopi & Kin' }))
     expect(props.on_choose).toHaveBeenCalledWith('none')
+  })
+
+  test('Untarget is worded that way and uses a circle icon, not a bin', () => {
+    setup({ state: 'targeted' })
+    hold(button('Remove Kopi & Kin from Targets'))
+    const item = screen.getByRole('menuitem', { name: 'Untarget Kopi & Kin' })
+    expect(item).toHaveTextContent('Untarget')
+    expect(item.querySelector('svg.lucide-circle')).not.toBeNull()
+    expect(item.querySelector('svg.lucide-trash-2, svg.lucide-trash')).toBeNull()
+    expect(screen.queryByText('Remove', { selector: 'button[role="menuitem"]' })).not.toBeInTheDocument()
   })
 
   test('Escape closes the menu without choosing', () => {
