@@ -5,7 +5,7 @@ Drafts to paste into Play Console. Check each against the real app on release da
 ## Blockers before anyone can install it from the store
 1. **Replace the sample restaurants.** The 25 restaurants are made up (the terms page says so). A store listing must not mislead: publish only after real places are loaded (see `docs/NEXT_STEPS.md`, OpenStreetMap candidates).
 2. Run `supabase/migrations/005_delete_account.sql` so "Delete my account" works.
-3. App icon chosen and generated (options in `docs/mockups/app-icon-options.html`).
+3. ~~App icon~~ done: option C. Files are in `docs/store/` (icon 512 and feature graphic 1024 x 500).
 
 ## App name
 What We Eat

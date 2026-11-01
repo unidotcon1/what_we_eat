@@ -26,7 +26,7 @@ State at 2026-11-02 (import screen built on main, not yet pushed after the live 
 
 ## Android prep status (2026-11-02)
 Done and committed, not yet pushed: manifest polish, in-app account deletion plus /delete-account page, empty /.well-known/assetlinks.json, icon options, store listing drafts (docs/PLAY_LISTING.md), PWABuilder guide (docs/ANDROID_RELEASE.md).
-Waiting on the owner: choose the icon (A, B or C); run supabase/migrations/005_delete_account.sql; create the Google Play developer account; pick the package name; recruit 12 testers; replace the sample restaurants with real ones before any store release.
+Icon chosen (C, plate that is a target) and generated. Waiting on the owner: run supabase/migrations/005_delete_account.sql; create the Google Play developer account; pick the package name; recruit 12 testers; replace the sample restaurants with real ones before any store release.
 Waiting on Play: after the first upload, the App signing SHA-256 fingerprint goes into public/.well-known/assetlinks.json.
 
 ## Claude tasks

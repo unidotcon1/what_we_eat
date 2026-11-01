@@ -1,10 +1,14 @@
+// Draws the app icon (a plate that is also a target) and the Play Store graphics as PNG files, with no image library.
+// Usage: npx tsx scripts/make-icons.ts
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 import { deflateSync } from 'node:zlib'
 
-const CHERRY = [0x81, 0x01, 0x00]
-const COTTON = [0xed, 0xeb, 0xdd]
-const MAROON = [0x63, 0x00, 0x00]
+type Rgb = [number, number, number]
+
+const CHERRY: Rgb = [0x81, 0x01, 0x00]
+const COTTON: Rgb = [0xed, 0xeb, 0xdd]
+const MAROON: Rgb = [0x63, 0x00, 0x00]
 
 function crc32(buf: Buffer): number {
   let c = ~0
@@ -24,25 +28,64 @@ function chunk(type: string, data: Buffer): Buffer {
   return out
 }
 
-/** A plain plate: Cherry Red square, Cotton plate with a Maroon rim. Safe-zone friendly for maskable icons. */
-export function makePng(size: number): Buffer {
-  const rows = Buffer.alloc(size * (size * 4 + 1))
-  const c = size / 2
-  for (let y = 0; y < size; y++) {
-    rows[y * (size * 4 + 1)] = 0
-    for (let x = 0; x < size; x++) {
-      const d = Math.hypot(x + 0.5 - c, y + 0.5 - c) / size
-      const rgb = d < 0.2 ? COTTON : d < 0.26 ? MAROON : d < 0.34 ? COTTON : CHERRY
-      const i = y * (size * 4 + 1) + 1 + x * 4
-      rows[i] = rgb[0]
-      rows[i + 1] = rgb[1]
-      rows[i + 2] = rgb[2]
+/** distance from point (px, py) to the line segment a-b */
+function distance_to_segment(px: number, py: number, ax: number, ay: number, bx: number, by: number): number {
+  const dx = bx - ax
+  const dy = by - ay
+  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)))
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy))
+}
+
+// The emblem is drawn on a 512 x 512 canvas, centre (0, 0). Everything sits within 190 of the centre,
+// well inside Android's maskable safe zone (a circle of radius 205).
+const TICKS: [number, number, number, number][] = [
+  [0, -188, 0, -148],
+  [0, 148, 0, 188],
+  [-188, 0, -148, 0],
+  [148, 0, 188, 0],
+]
+
+/** Colour of the emblem at (x, y), measured in 512-canvas units from its centre. */
+function emblem_color(x: number, y: number): Rgb {
+  const d = Math.hypot(x, y)
+  if (d <= 28) return CHERRY // bullseye dot
+  if (Math.abs(d - 104) <= 4.5) return MAROON // thin ring on the plate
+  if (d <= 136) return COTTON // plate
+  for (const [ax, ay, bx, by] of TICKS) {
+    if (distance_to_segment(x, y, ax, ay, bx, by) <= 9) return COTTON // crosshair ticks
+  }
+  return CHERRY
+}
+
+/** Renders a width x height image; each pixel averages ss x ss samples so edges are smooth. */
+function render_png(width: number, height: number, color_at: (x: number, y: number) => Rgb, ss = 4): Buffer {
+  const stride = width * 4 + 1
+  const rows = Buffer.alloc(height * stride)
+  for (let y = 0; y < height; y++) {
+    rows[y * stride] = 0
+    for (let x = 0; x < width; x++) {
+      let r = 0
+      let g = 0
+      let b = 0
+      for (let sy = 0; sy < ss; sy++) {
+        for (let sx = 0; sx < ss; sx++) {
+          const c = color_at(x + (sx + 0.5) / ss, y + (sy + 0.5) / ss)
+          r += c[0]
+          g += c[1]
+          b += c[2]
+        }
+      }
+      const n = ss * ss
+      const i = y * stride + 1 + x * 4
+      rows[i] = Math.round(r / n)
+      rows[i + 1] = Math.round(g / n)
+      rows[i + 2] = Math.round(b / n)
       rows[i + 3] = 255
     }
   }
   const ihdr = Buffer.alloc(13)
-  ihdr.writeUInt32BE(size, 0)
-  ihdr.writeUInt32BE(size, 4)
+  ihdr.writeUInt32BE(width, 0)
+  ihdr.writeUInt32BE(height, 4)
   ihdr[8] = 8 // bit depth
   ihdr[9] = 6 // RGBA
   return Buffer.concat([
@@ -53,8 +96,26 @@ export function makePng(size: number): Buffer {
   ])
 }
 
+/** The square app icon. Full-bleed Cherry Red so Android can crop it into a circle or rounded square. */
+export function make_icon_png(size: number): Buffer {
+  const scale = 512 / size
+  return render_png(size, size, (x, y) => emblem_color((x - size / 2) * scale, (y - size / 2) * scale))
+}
+
+/** The wide Play Store banner: the emblem centred on Cherry Red. */
+export function make_feature_png(width: number, height: number): Buffer {
+  const emblem_px = height * 0.92
+  const scale = 512 / emblem_px
+  return render_png(width, height, (x, y) => emblem_color((x - width / 2) * scale, (y - height / 2) * scale))
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   mkdirSync('public', { recursive: true })
-  for (const size of [192, 512]) writeFileSync(`public/icon-${size}.png`, makePng(size))
-  console.log('wrote public/icon-192.png and public/icon-512.png')
+  mkdirSync('docs/store', { recursive: true })
+  writeFileSync('public/icon-192.png', make_icon_png(192))
+  writeFileSync('public/icon-512.png', make_icon_png(512))
+  writeFileSync('public/apple-touch-icon.png', make_icon_png(180))
+  writeFileSync('docs/store/play-icon-512.png', make_icon_png(512))
+  writeFileSync('docs/store/feature-graphic-1024x500.png', make_feature_png(1024, 500))
+  console.log('wrote the app icons in public/ and the Play Store graphics in docs/store/')
 }
