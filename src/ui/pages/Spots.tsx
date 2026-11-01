@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Crosshair, Flag, Trash2, Undo2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Crosshair, Flag, Plus, Trash2, Undo2 } from 'lucide-react'
 import { get_catalog } from '../../data/catalog'
 import { count_spots, spots_in_state, type Spot, type SpotState } from '../../domain/spots'
 import { cuisineIcon } from '../cuisineIcons'
@@ -28,7 +29,12 @@ export default function Spots() {
 
   return (
     <>
-      <h1>Spots</h1>
+      <header className="page-head">
+        <h1>Spots</h1>
+        <Link className="head-action" to="/add" aria-label="Add a spot">
+          <Plus size={16} aria-hidden="true" /> Add
+        </Link>
+      </header>
       <div className="segmented" role="tablist" aria-label="Spots">
         <button type="button" role="tab" aria-selected={tab === 'targeted'} onClick={() => setTab('targeted')}>
           <Crosshair size={15} aria-hidden="true" /> Targets <span className="count">{counts.targeted}</span>

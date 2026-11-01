@@ -110,3 +110,8 @@ test('Conquered uses a flag icon everywhere on the screen, and nothing uses a st
   expect(screen.getByRole('button', { name: 'Conquer Kopi & Kin' }).querySelector('svg.lucide-flag')).not.toBeNull()
   expect(container.querySelector('svg.lucide-stamp')).toBeNull()
 })
+
+test('the Spots screen has an Add button that opens Add a spot', () => {
+  setup()
+  expect(screen.getByRole('link', { name: 'Add a spot' })).toHaveAttribute('href', '/add')
+})

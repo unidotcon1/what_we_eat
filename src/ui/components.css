@@ -459,34 +459,6 @@ textarea {
   white-space: nowrap;
 }
 
-/* bottom bar: five equal slots, our own square centre button (not a raised circle) */
-.tabbar {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  align-items: center;
-  padding: 6px 4px 8px;
-}
-
-.tab.add {
-  opacity: 1;
-}
-
-.add-shape {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 40px;
-  border-radius: 12px;
-  background: var(--accent);
-  color: var(--accent-text);
-  border: 1px solid color-mix(in srgb, var(--accent-text) 35%, transparent);
-}
-
-.tab.add[aria-current='page'] .add-shape {
-  outline: 2px solid var(--icon);
-  outline-offset: 2px;
-}
 
 /* the one action on a card */
 .target,
@@ -702,4 +674,40 @@ textarea {
 
 .pin.conquered span {
   border: 4px double var(--cherry);
+}
+
+/* bottom bar: four equal tabs */
+.tabbar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  padding: 6px 4px 8px;
+}
+
+/* + Add: top left of Explore, and in the Spots header */
+.head-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.head-title h1 {
+  margin: 0;
+}
+
+.add-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-text);
+  text-decoration: none;
+}
+
+a.head-action {
+  text-decoration: none;
+  color: inherit;
 }

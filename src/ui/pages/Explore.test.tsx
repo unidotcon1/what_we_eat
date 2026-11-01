@@ -101,3 +101,12 @@ test('Cancel leaves picking and brings the Target buttons back', async () => {
   expect(screen.getByRole('button', { name: 'Target Kopi & Kin' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Start a vote' })).toBeInTheDocument()
 })
+
+test('a + button at the top left opens Add a spot, before the title', async () => {
+  setup()
+  await screen.findByText('Long Table Hotpot')
+  const add = screen.getByRole('link', { name: 'Add a spot' })
+  expect(add).toHaveAttribute('href', '/add')
+  const title = screen.getByRole('heading', { level: 1, name: 'What We Eat' })
+  expect(add.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+})
