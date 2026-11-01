@@ -69,3 +69,11 @@ Social feed, followers, user posts, curated editor lists, feed-unlock gating. Al
 10. **Storage:** spots live on the device first and sync to a new `spots` table when signed in. Until the owner runs `004_spots.sql`, spots stay on the device and nothing breaks.
 11. **No new keys, hosts or packages are needed in Stage 1**, so the content policy and environment variables are unchanged.
 12. The Stage 1 branch is **not pushed**: pushing `main` deploys the live site, and the brief says to stop so the owner can upload.
+
+## Owner decisions, 2026-11-01 (added after review)
+- The Stage 1 branch is the base; the earlier "Marker" and "Journal" working names are dropped.
+- Words in the app: **Target** for a place to go next (a crosshair icon replaces the heart), **Conquered Spot** for a place been to, and **Spots** as the name of the bottom-bar tab and the umbrella word. Do not use "Targets/Conquered" or "Targeted Spots" as labels.
+- Focus before adding more content: make the UI neater and more pleasing. The brand stays cherry, cotton and noir. Borrow patterns from Eatventure, not its mascot, orange-on-charcoal look or the word "foodprint". Avoid a raised round centre button in a pill bar that mimics Eatventure; give the centre action our own shape.
+- Conquered Spots can carry a 1 to 5 rating and a note up to 280 characters, private by default with an optional "share with everyone" switch (text only, no photos), which will replace the separate review form. Moderation: publish at once with a Report button and a daily limit. Shown with a chosen nickname, never the Google name or email. Sharing needs sign-in; Target works without sign-in. Not part of Stage 1.
+- Google Maps import is part of the plan (built as Takeout import in Stage 1).
+- Release path: Android first through Google Play (wrapper app). See docs/ANDROID_RELEASE.md.

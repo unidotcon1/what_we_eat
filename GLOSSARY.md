@@ -22,12 +22,16 @@ _Avoid_: Survey, ballot
 
 ### Personal record
 
+**Spot**:
+A place that a person has put in their own record. A Spot is either a Target or a Conquered Spot, and moves from one to the other.
+_Avoid_: Saved place, bookmark, pin
+
 **Target**:
-A place a person has aimed at as the next one to go to.
-_Avoid_: Saved, bookmark, favourite, marker, wishlist
+A Spot a person has aimed at as the next one to go to.
+_Avoid_: Saved, bookmark, favourite, marker, wishlist, Targeted Spot (as a tab or button name)
 
 **Conquered Spot**:
-A person's own record of a place they have been to, with their rating and note. It is private unless they choose to share it.
+A Spot a person has been to. It can carry their rating and note, and is private unless they choose to share it.
 _Avoid_: Journal, review, check-in, visit, foodprint
 
 **Shared Conquered Spot**:
