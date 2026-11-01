@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { FileUp } from 'lucide-react'
 import { accountsAvailable, delete_my_account, fetchMyStats, signInWithGoogle, signOut, useUser, type MyStats } from '../../data/auth'
 import { levelFor } from '../../domain/points'
 import { count_spots } from '../../domain/spots'
@@ -58,6 +59,10 @@ export default function Me() {
           <span>Conquered</span>
         </div>
       </div>
+
+      <Link className="import-link" to="/import">
+        <FileUp size={18} aria-hidden="true" /> Import from Google Maps
+      </Link>
 
       {!accountsAvailable() ? (
         <p className="sub">Accounts need the online database, which is not set up yet. Saving and voting still work.</p>

@@ -153,3 +153,16 @@ describe('deleting the account', () => {
     expect(screen.queryByText(/Your account has been deleted/)).not.toBeInTheDocument()
   })
 })
+
+test('Profile has an Import from Google Maps button that opens the import screen, signed in or not', () => {
+  setup()
+  expect(screen.getByRole('link', { name: /Import from Google Maps/ })).toHaveAttribute('href', '/import')
+})
+
+test('the import button sits right under the Target and Conquered counts', () => {
+  setup()
+  const counts = document.querySelector('.spot-counts')!
+  const link = screen.getByRole('link', { name: /Import from Google Maps/ })
+  expect(counts.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(link.compareDocumentPosition(screen.getByRole('button', { name: 'Dark mode: off' })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+})
