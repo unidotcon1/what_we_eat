@@ -44,6 +44,10 @@ export function use_spot_actions() {
     conquer(r: Restaurant) {
       commit(set_spot_state(get_spots(), spot_input_from_restaurant(r), 'conquered', now()).spots)
     },
+    /** Saves a whole new list at once (used by the import). */
+    commit_spots(next: Spot[]) {
+      commit(next)
+    },
     move(id: string, state: SpotState) {
       commit(move_spot(get_spots(), id, state, now()))
     },

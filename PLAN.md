@@ -84,3 +84,5 @@ Decision: the **flag** icon means Conquered everywhere (owner, 2026-11-01). The 
 Not built yet: Takeout import screen (data layer exists), add by map pin, add by hand, Conquered rating/note/share, onboarding, Android icon. The database file 004_spots.sql has not been run, so spots stay on the device until the owner runs it.
 
 Update 2026-11-02: the UI pass is live on the main branch. Add a spot moved out of the bottom bar (it looked like search): there is now a + at the top left of Explore and an Add button in the Spots header, and the bar has four tabs: Explore, Map, Spots, Profile.
+
+Update 2026-11-02 (later): Import screen built at /import (upload a Takeout .csv or .json, preview matched and unmatched, choose Targets or Conquered, optionally add places not in our list, confirm; nothing is written before the confirm; never demotes a Conquered Spot; the file is read on the device). The + at the top left of Explore was removed (it duplicated search). Add a spot now also offers the import.

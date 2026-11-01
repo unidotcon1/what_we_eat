@@ -1,6 +1,6 @@
 # Next steps
 
-State at 2026-11-02: the Spots UI is live (Explore with one crosshair per card, Map tab, Spots screen with Targets and Conquered, Add a spot, four-tab bar; Conquered uses a flag icon). 325 unit tests pass and `npm run check:live` passes 28 of 28. Migrations 001 to 003 are applied; **004_spots.sql is not applied yet**, so spots live on the device only until the owner pastes it into the Supabase SQL editor.
+State at 2026-11-02 (import screen built on main, not yet pushed after the live UI release): the Spots UI is live (Explore with one crosshair per card, Map tab, Spots screen with Targets and Conquered, Add a spot, four-tab bar; Conquered uses a flag icon). 325 unit tests pass and `npm run check:live` passes 28 of 28. Migrations 001 to 003 are applied; **004_spots.sql is not applied yet**, so spots live on the device only until the owner pastes it into the Supabase SQL editor.
 
 ## Done by the owner (verified where noted)
 - Google consent screen published (privacy and terms links added).
@@ -18,7 +18,7 @@ State at 2026-11-02: the Spots UI is live (Explore with one crosshair per card, 
 | Decide the restaurant data source (see below) | - | Run the coverage tests and build the import. |
 
 ## Next build tasks (Stage 1 remainder), in order
-1. Google Maps import screen (Takeout): the reading and matching code is in `src/domain/takeout.ts`; build the upload, preview (matched and unmatched) and confirm screen. Ask the owner for a real export to test with.
+1. ~~Google Maps import screen~~ built 2026-11-02 (route `/import`, reached from Add a spot). Still to do: test it with a real export from the owner, since fixtures cannot show every real Google file layout.
 2. Add by map pin and add by hand (name and pin required).
 3. Conquered Spot rating (1 to 5), note (280 characters), private by default with a share switch, nickname, Report button (replaces the review form; see "Owner decisions" in PLAN.md).
 4. Android release prep (see docs/ANDROID_RELEASE.md): icon, account deletion, 12-tester closed test.

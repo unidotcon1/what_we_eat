@@ -105,3 +105,15 @@ test('a failed write to the account does not break the device copy', async () =>
   await act(async () => result.current.toggle_target(kopi))
   expect(result.current.state_of('kopi-kin')).toBe('targeted')
 })
+
+test('commit_spots saves a whole new list at once and writes it to the account when signed in', () => {
+  vi.mocked(auth.useUser).mockReturnValue({ user: { id: 'u1', email: 'a@b.sg' }, ready: true })
+  const { result } = renderHook(() => use_spot_actions())
+  act(() => result.current.toggle_target(kopi))
+  const before = result.current.spots
+  vi.mocked(remote.push_changes).mockClear()
+  const extra = { ...before[0], id: 'm:extra', place_id: null, name: 'Extra' }
+  act(() => result.current.commit_spots([...before, extra]))
+  expect(result.current.spots).toHaveLength(2)
+  expect(vi.mocked(remote.push_changes).mock.calls[0][2].upserts.map((s) => s.id)).toEqual(['m:extra'])
+})

@@ -67,3 +67,8 @@ test('the Conquered button uses a flag icon, not a stamp', async () => {
   expect(button.querySelector('svg.lucide-flag')).not.toBeNull()
   expect(container.querySelector('svg.lucide-stamp')).toBeNull()
 })
+
+test('offers the Google Maps import', () => {
+  setup()
+  expect(screen.getByRole('link', { name: /Import from Google Maps/ })).toHaveAttribute('href', '/import')
+})

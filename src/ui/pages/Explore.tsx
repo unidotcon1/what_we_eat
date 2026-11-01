@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Vote, X } from 'lucide-react'
+import { Vote, X } from 'lucide-react'
 import { applyFilters, sortRestaurants } from '../../domain/filters'
 import type { Filters, Restaurant } from '../../domain/types'
 import { get_catalog } from '../../data/catalog'
@@ -49,12 +49,7 @@ export default function Explore() {
   return (
     <>
       <header className="page-head">
-        <div className="head-title">
-          <Link className="add-link" to="/add" aria-label="Add a spot">
-            <Plus size={20} aria-hidden="true" />
-          </Link>
-          <h1>What We Eat</h1>
-        </div>
+        <h1>What We Eat</h1>
         {picking ? (
           <button type="button" className="head-action" onClick={cancel_vote}>
             <X size={16} aria-hidden="true" /> Cancel vote

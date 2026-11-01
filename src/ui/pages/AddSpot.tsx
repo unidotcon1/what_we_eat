@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Crosshair, Flag } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Crosshair, FileUp, Flag } from 'lucide-react'
 import { get_catalog } from '../../data/catalog'
 import { applyFilters } from '../../domain/filters'
 import type { Restaurant } from '../../domain/types'
@@ -30,6 +31,9 @@ export default function AddSpot() {
   return (
     <>
       <h1>Add a spot</h1>
+      <Link className="import-link" to="/import">
+        <FileUp size={18} aria-hidden="true" /> Import from Google Maps
+      </Link>
       <div className="filterbar">
         <label className="search">
           <span className="visually-hidden">Search places</span>
