@@ -12,9 +12,9 @@
     "candidates:osm": "tsx scripts/osm_candidates.ts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.118.0",
+    "@supabase/supabase-js": "^2.119.0",
     "leaflet": "^1.9.4",
-    "lucide-react": "^1.64.0",
+    "lucide-react": "^1.68.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.18.5"
@@ -27,13 +27,13 @@
     "@types/node": "^26.6.6",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
-    "@vitejs/plugin-react": "^6.1.2",
+    "@vitejs/plugin-react": "^6.2.1",
     "jsdom": "^30.1.3",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.5",
     "vite-plugin-pwa": "^2.0.0",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   },
   "optionalDependencies": {
     "@rolldown/binding-linux-x64-gnu": "^1.2.16",
