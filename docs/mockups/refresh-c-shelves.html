@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What We Eat: direction C, Shelves</title>
+<style>
+/* Tokens. Palette: cotton #EDEBDD, cherry #810100, maroon #630000, noir #1B1717 and tints of them. Dark leads. */
+:root,:root[data-theme="dark"]{
+  --cherry:#810100; --on-cherry:#EDEBDD;           /* 9.05:1 */
+  --bg:#1B1717; --surface:#2A2222; --lift:#352B2A; --tile:#3B2F2E;
+  --text:#EDEBDD; --muted:#B3AEA2;                  /* 14.84 / 8.03 on bg, 12.98 / 7.03 on card */
+  --ctl:#8C877B; --icon:#D9D5C6; --line:#3F3433;    /* ctl 4.34 on card (3:1 needed) */
+  --conq-bg:#EDEBDD; --conq-fg:#1B1717; --ring:#EDEBDD; --track:#4A3B3B;
+  --edge:inset 0 1px 0 rgba(237,235,221,.05); --canvas:#0E0B0B; --shadow:0 12px 40px rgba(0,0,0,.5);
+  --sk1:#342A29; --sk2:#413534;
+}
+:root[data-theme="light"]{
+  --bg:#EDEBDD; --surface:#F7F5EC; --lift:#E2DECC; --tile:#E4E0CF;
+  --text:#1B1717; --muted:#5E5555;                  /* 14.84 on bg, 16.27 / 6.62 on card */
+  --ctl:#7A7068; --icon:#3A3131; --line:#D8D4C2;
+  --conq-bg:#1B1717; --conq-fg:#EDEBDD; --ring:#810100; --track:#D8D4C2;
+  --edge:0 1px 2px rgba(27,23,23,.10),0 4px 14px rgba(27,23,23,.06); --canvas:#CFCBB8; --shadow:0 12px 40px rgba(27,23,23,.2);
+  --sk1:#DDD9C6; --sk2:#E9E5D4;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--canvas);color:var(--text);font:15px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:0 0 48px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+h1,h2,h3,p{margin:0}
+.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.i.fill{fill:currentColor}
+:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+
+/* mockup chrome (not part of the app) */
+.top{display:flex;align-items:center;justify-content:center;gap:16px;padding:16px;font-size:14px;color:var(--text)}
+.top button{padding:10px 16px;min-height:44px;border-radius:22px;background:var(--surface);box-shadow:var(--edge)}
+.row{display:flex;flex-wrap:wrap;gap:36px;justify-content:center;align-items:flex-start}
+figure{margin:0;width:375px;max-width:100%}
+figcaption{margin-top:12px;font-size:13px;line-height:1.45;color:var(--text);opacity:.8;text-align:center;padding:0 8px}
+.ctrl{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.ctrl button{min-height:44px;padding:0 14px;border-radius:22px;background:var(--surface);font-size:13px;box-shadow:var(--edge)}
+.ctrl button[aria-pressed="true"]{background:var(--lift);font-weight:650}
+
+/* phone frame */
+.phone{position:relative;width:375px;max-width:100%;height:812px;background:var(--bg);border-radius:38px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
+.scr{height:100%;overflow-y:auto;scrollbar-width:none;padding:18px 0 96px}
+.scr::-webkit-scrollbar{display:none}
+.pad{padding:0 16px}
+
+/* header and the one primary action */
+.hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;margin-bottom:14px}
+h1{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.cta{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:14px;background:var(--cherry);color:var(--on-cherry);font-weight:600;font-size:14px;transition:transform .15s}
+.cta:active{transform:scale(.97)}
+.cta .i{width:18px;height:18px}
+.quiet{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:14px;color:var(--text);font-size:14px;box-shadow:inset 0 0 0 1.5px var(--ctl)}
+
+/* search + ONE quiet filter button */
+.sb{display:flex;gap:8px;padding:0 16px;margin-bottom:6px}
+.search{flex:1;display:flex;align-items:center;gap:10px;min-height:48px;padding:0 14px;border-radius:14px;background:var(--surface);box-shadow:var(--edge);color:var(--muted)}
+.search input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--text);font:inherit}
+.search input::placeholder{color:var(--muted);opacity:1}
+.fbtn{width:48px;height:48px;border-radius:14px;background:var(--surface);box-shadow:var(--edge);display:grid;place-items:center;color:var(--icon)}
+
+/* shelves */
+.shelf{margin-top:18px}
+.sh-h{display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin-bottom:4px}
+.sh-h h2{font-size:17px;font-weight:650}
+.shelf.hero .sh-h h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+.see{display:inline-flex;align-items:center;gap:2px;min-height:44px;padding-left:12px;font-size:13px;color:var(--muted)}
+.see .i{width:16px;height:16px}
+.rail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;scroll-padding-left:16px;padding:4px 16px 8px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.cd{position:relative;flex:none;width:140px;scroll-snap-align:start;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto auto;gap:0 8px;padding:12px;border-radius:18px;background:var(--surface);box-shadow:var(--edge);transition:transform .2s,background .2s}
+.hero .cd{width:156px}
+.tile{width:44px;height:44px;border-radius:13px;background:var(--tile);display:grid;place-items:center;font-size:24px;line-height:1}
+.hero .tile{width:48px;height:48px;font-size:26px}
+.cd h3{grid-column:1/-1;margin-top:10px;font-size:15px;font-weight:650;line-height:1.25;min-height:2.5em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cd p{grid-column:1/-1;margin-top:2px;font-size:12.5px;color:var(--muted)}
+
+/* Target button: three states, told apart by icon and fill, never by cherry alone */
+.tg{position:relative;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--icon);box-shadow:inset 0 0 0 1.5px var(--ctl);margin:-4px -4px 0 0;transition:background .2s,transform .15s}
+.tg:active{transform:scale(.92)}
+.tg.t,.tg.lock{background:var(--cherry);color:var(--on-cherry);box-shadow:none}
+.tg.c{background:var(--conq-bg);color:var(--conq-fg);box-shadow:none}
+.tg .i{width:22px;height:22px}
+
+/* pressed / locked-on: card settles, rings close in on the button (under 400 ms in the real build; looped here to be seen) */
+.cd.lock{transform:scale(.97);background:var(--lift)}
+.tg.lock::before,.tg.lock::after{content:"";position:absolute;inset:-2px;border-radius:16px;border:2px solid var(--text);opacity:0;animation:lock 1.6s ease-out infinite}
+.tg.lock::after{animation-delay:.5s}
+@keyframes lock{0%{transform:scale(1.9);opacity:0}25%{opacity:.65}100%{transform:scale(1);opacity:0}}
+
+/* skeleton */
+.sk{background:var(--sk1);border-radius:8px;animation:sh 1.4s ease-in-out infinite alternate}
+@keyframes sh{to{background:var(--sk2)}}
+.cd.s{height:152px;display:block}
+.cd.s .sk{margin-bottom:10px}
+.hero .cd.s{height:164px}
+
+/* ring hero (Spots, Profile) */
+.hero-card{display:flex;align-items:center;gap:20px;margin:0 16px 18px;padding:18px;border-radius:22px;background:var(--surface);box-shadow:var(--edge)}
+.ring{position:relative;width:96px;height:96px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9;stroke-linecap:round}
+.ring .tr{stroke:var(--track)}
+.ring .fg{stroke:var(--ring);transition:stroke-dashoffset .5s ease-out}
+.ring .n{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring b{font-size:30px;line-height:1;font-weight:700}
+.ring span{font-size:12px;color:var(--muted);margin-top:2px}
+.lab{font-size:13px;color:var(--muted)}
+.badge{display:inline-block;margin:6px 0 4px;padding:5px 12px;border-radius:999px;background:var(--cherry);color:var(--on-cherry);font-size:13px;font-weight:650}
+.hero-card .nm{font-size:17px;font-weight:650}
+.hero-card.big{flex-direction:column;text-align:center;gap:12px;padding:24px 18px}
+.big .ring{width:132px;height:132px}.big .ring b{font-size:42px}.big .ring circle{stroke-width:10}
+
+/* Spots tabs and rows */
+.tabs{display:flex;margin:0 16px 12px;border-bottom:1px solid var(--line)}
+.tabs button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--text);font-weight:650;border-color:var(--text)}
+.tabs .n{font-size:13px;opacity:.85}
+.pn{display:none;padding:0 16px}
+[data-v="t"] .pn-t,[data-v="c"] .pn-c,[data-v="et"] .pn-et,[data-v="ec"] .pn-ec{display:block}
+.rw{display:flex;align-items:center;gap:12px;padding:12px;margin-bottom:10px;border-radius:18px;background:var(--surface);box-shadow:var(--edge)}
+.rw .tile{flex:none}
+.rw .b{flex:1;min-width:0}
+.rw h3{font-size:15px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw p{font-size:12.5px;color:var(--muted)}
+.rw .tg{margin:0;flex:none;width:44px}
+.empty{text-align:center;padding:12px 16px}
+.empty svg{width:150px;height:116px;margin-bottom:6px}
+.empty h3{font-size:17px;font-weight:650}
+.empty p{color:var(--muted);margin:6px auto 18px;max-width:260px;font-size:14px}
+
+/* Profile list */
+.grp{margin:0 16px 14px;border-radius:18px;background:var(--surface);box-shadow:var(--edge);overflow:hidden}
+.li{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:0 16px;text-align:left}
+.li+.li{border-top:1px solid var(--line)}
+.li span{flex:1}
+.li .i:last-child{color:var(--muted)}
+.sw{position:relative;width:46px;height:28px;border-radius:14px;background:var(--track);box-shadow:inset 0 0 0 1.5px var(--ctl);flex:none}
+.sw::after{content:"";position:absolute;top:4px;left:4px;width:20px;height:20px;border-radius:50%;background:var(--text);transition:transform .2s}
+[aria-checked="true"].sw::after{transform:translateX(18px)}
+.foot{padding:6px 16px;text-align:center;font-size:12.5px;color:var(--muted);line-height:2.2}
+.foot a{color:inherit;text-decoration:underline;padding:12px 4px}
+
+/* bottom tab bar: four equal tabs, no raised button */
+.tabbar{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px 16px;background:var(--bg);border-top:1px solid var(--line)}
+.tb{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;color:var(--muted);min-height:48px}
+.tb .p{display:grid;place-items:center;width:56px;height:30px;border-radius:15px;transition:background .2s}
+.tb[aria-current="page"]{color:var(--text);font-weight:650}
+.tb[aria-current="page"] .p{background:var(--lift)}
+
+@media (max-width:420px){.row{gap:28px}.phone{border-radius:0;border-left:0;border-right:0}.top{padding:12px}}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important}
+  .sk{animation:none}
+  .tg.lock::before{animation:none;opacity:.5;transform:scale(1.2)}
+  .tg.lock::after{animation:none;opacity:0}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16.2 7.8l-2.1 6.3-6.3 2.1 2.1-6.3z"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></symbol>
+<symbol id="i-crosshair" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 22V3"/><path d="M5 4h14l-3 4.5 3 4.5H5"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></symbol>
+<symbol id="i-vote" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 12l3 3 5-6"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></symbol>
+<symbol id="i-out" viewBox="0 0 24 24"><path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></symbol>
+</defs></svg>
+
+<div class="top"><b>Direction C: Shelves</b>
+  <button id="th" type="button" aria-label="Switch between dark and light">Show light</button></div>
+
+<main class="row">
+
+<!-- EXPLORE -->
+<figure>
+<section class="phone" aria-label="Explore">
+ <div class="scr">
+  <header class="hd"><h1>What We Eat</h1>
+   <button class="cta" type="button"><svg class="i"><use href="#i-vote"/></svg>Start a vote</button></header>
+  <div class="sb">
+   <label class="search"><svg class="i"><use href="#i-search"/></svg><input placeholder="Search places" aria-label="Search places"></label>
+   <button class="fbtn" type="button" aria-label="Filters"><svg class="i"><use href="#i-sliders"/></svg></button>
+  </div>
+  <div id="shelves"></div>
+ </div>
+ <nav class="tabbar" aria-label="Main"></nav>
+</section>
+<figcaption>Explore. Three shelves, each with one tag in its title, so cards carry none. Card 1 of Date night is pressed and locked on (loops here). Kopi &amp; Kin and Long Table Hotpot are Conquered, Sakura Counter is a Target.</figcaption>
+</figure>
+
+<!-- SPOTS -->
+<figure>
+<section class="phone sp" id="sp" data-v="t" aria-label="Spots">
+ <div class="scr">
+  <header class="hd"><h1>Spots</h1>
+   <button class="quiet" type="button" aria-label="Add a spot"><svg class="i" style="width:18px;height:18px"><use href="#i-plus"/></svg>Add</button></header>
+  <div class="hero-card">
+   <div class="ring" role="img" aria-label="Conquered 3 of 25"><svg viewBox="0 0 100 100"><circle class="tr" cx="50" cy="50" r="42"/><circle class="fg" id="rg" cx="50" cy="50" r="42" stroke-dasharray="263.9" stroke-dashoffset="232"/></svg>
+    <div class="n"><b id="rn">3</b><span>of 25</span></div></div>
+   <div><p class="lab">Conquered</p><span class="badge" id="lv">Level 2</span><p class="nm" id="ln">Food Explorer</p></div>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Spots">
+   <button type="button" role="tab" id="tt" aria-selected="true"><svg class="i" style="width:18px;height:18px"><use href="#i-crosshair"/></svg>Targets <span class="n" id="n1">2</span></button>
+   <button type="button" role="tab" id="tc" aria-selected="false"><svg class="i fill" style="width:18px;height:18px"><use href="#i-flag"/></svg>Conquered <span class="n" id="n2">3</span></button>
+  </div>
+  <div class="pn pn-t" id="lt"></div>
+  <div class="pn pn-c" id="lc"></div>
+  <div class="pn pn-et empty">
+   <svg viewBox="0 0 150 116" aria-hidden="true"><ellipse cx="75" cy="102" rx="46" ry="6" fill="var(--tile)"/><circle cx="75" cy="56" r="44" fill="var(--surface)" stroke="var(--ctl)" stroke-width="2"/><circle cx="75" cy="56" r="28" fill="none" stroke="var(--ctl)" stroke-width="2" stroke-dasharray="4 5"/><path d="M75 6v22M75 84v22M25 56h22M103 56h22" stroke="var(--icon)" stroke-width="3" stroke-linecap="round"/><circle cx="75" cy="56" r="9" fill="var(--cherry)"/></svg>
+   <h3>No Targets yet</h3><p>Tap the crosshair on a place to aim at it.</p>
+   <button class="cta" type="button">Find a place</button></div>
+  <div class="pn pn-ec empty">
+   <svg viewBox="0 0 150 116" aria-hidden="true"><ellipse cx="75" cy="100" rx="52" ry="8" fill="var(--tile)"/><path d="M40 100c6-26 24-36 35-36s29 10 35 36z" fill="var(--surface)" stroke="var(--ctl)" stroke-width="2" stroke-linejoin="round"/><path d="M75 66V14" stroke="var(--icon)" stroke-width="3" stroke-linecap="round"/><path d="M75 16h30l-7 11 7 11H75z" fill="var(--cherry)"/></svg>
+   <h3>Nothing conquered yet</h3><p>When you have been somewhere, conquer it from your Targets.</p></div>
+ </div>
+ <nav class="tabbar" aria-label="Main"></nav>
+</section>
+<div class="ctrl" aria-label="Preview controls (mockup only)">
+ <button type="button" data-fresh="0" aria-pressed="true">Has spots</button>
+ <button type="button" data-fresh="1" aria-pressed="false">New user (empty)</button></div>
+<figcaption>Spots. One ring is the hero, tabs are plain text with an underline (no cherry), rows hold one quiet action. Remove and move-back live in press and hold, as on Explore. Use the buttons above to preview the empty states.</figcaption>
+</figure>
+
+<!-- PROFILE -->
+<figure>
+<section class="phone" aria-label="Profile">
+ <div class="scr">
+  <header class="hd"><h1>Profile</h1></header>
+  <div class="hero-card big">
+   <div class="ring" role="img" aria-label="Conquered 3 of 25"><svg viewBox="0 0 100 100"><circle class="tr" cx="50" cy="50" r="42"/><circle class="fg" cx="50" cy="50" r="42" stroke-dasharray="263.9" stroke-dashoffset="232"/></svg>
+    <div class="n"><b>3</b><span>of 25</span></div></div>
+   <div><p class="lab">Conquered</p><span class="badge">Level 2 · Food Explorer</span><p class="lab">84 of 150 points to Regular</p></div>
+  </div>
+  <div class="grp">
+   <button class="li" type="button"><svg class="i"><use href="#i-up"/></svg><span>Import from Google Maps</span><svg class="i"><use href="#i-chev"/></svg></button>
+   <div class="li"><svg class="i"><use href="#i-moon"/></svg><span id="dm">Dark mode</span><button class="sw" id="sw" type="button" role="switch" aria-checked="true" aria-labelledby="dm"></button></div>
+   <button class="li" type="button"><svg class="i"><use href="#i-out"/></svg><span>Sign out</span></button>
+  </div>
+  <p class="foot">you@example.com<br><a href="#">Privacy policy</a> · <a href="#">Terms of service</a><br><a href="#">Delete my account</a></p>
+ </div>
+ <nav class="tabbar" aria-label="Main"></nav>
+</section>
+<figcaption>Profile. Same ring, bigger, plus the level badge (the only cherry here). No cherry button: signed in, there is nothing to push. Signed out, "Sign in with Google" would take the one cherry fill.</figcaption>
+</figure>
+
+<!-- SKELETON -->
+<figure>
+<section class="phone" aria-label="Explore loading" aria-busy="true">
+ <div class="scr">
+  <header class="hd"><h1>What We Eat</h1>
+   <button class="cta" type="button"><svg class="i"><use href="#i-vote"/></svg>Start a vote</button></header>
+  <div class="sb"><div class="search"><svg class="i"><use href="#i-search"/></svg>Search places</div>
+   <div class="fbtn"><svg class="i"><use href="#i-sliders"/></svg></div></div>
+  <div id="skel"></div>
+ </div>
+ <nav class="tabbar" aria-label="Main"></nav>
+</section>
+<figcaption>Explore while loading. Same shelf and card shapes as grey blocks that breathe slowly (static if the phone asks for reduced motion). Replaces the bare "Loading…".</figcaption>
+</figure>
+
+</main>
+
+<script>
+const ic=(id,x='')=>`<svg class="i ${x}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+const money=n=>'$'.repeat(n);
+// name, emoji, area, price band, state ('' none, t target, c conquered, lock pressed)
+const P={
+ lt:['Long Table Hotpot','🥟','Bugis',2],kk:['Kopi & Kin','☕','Tiong Bahru',1],sr:['Spice Route','🍛','Little India',2],
+ cb:['Candlelight Bistro','🍝','Tanjong Pagar',3],sc:['Sakura Counter','🍣','Orchard',3],oe:['Oven & Ember','🍝','Dempsey',2]};
+function btn(n,s){
+  const lab=s==='t'||s==='lock'?`Remove ${n} from Targets`:s==='c'?`Move ${n} back to Targets`:`Target ${n}`;
+  return `<button class="tg ${s}" type="button" aria-label="${lab}">${s==='c'?ic('flag','fill'):ic('crosshair')}</button>`;
+}
+function card(k,s=''){const [n,e,a,p]=P[k];
+  return `<article class="cd ${s==='lock'?'lock':''}"><span class="tile" aria-hidden="true">${e}</span>${btn(n,s)}<h3>${n}</h3><p>${a} · ${money(p)}</p></article>`;}
+function shelf(t,cards,hero){
+  return `<section class="shelf ${hero?'hero':''}"><div class="sh-h"><h2>${t}</h2><button class="see" type="button" aria-label="See all: ${t}">See all ${ic('chev')}</button></div><div class="rail">${cards.map(c=>card(...c)).join('')}</div></section>`;}
+document.getElementById('shelves').innerHTML=
+  shelf('Near you',[['sr'],['kk','c'],['lt','c'],['cb']],true)+
+  shelf('Date night',[['cb','lock'],['sc','t'],['oe','c'],['sr']])+
+  shelf('Open late',[['lt','c'],['sr'],['sc','t']]);
+const sk=hero=>`<section class="shelf ${hero?'hero':''}"><div class="sh-h" style="min-height:44px"><div class="sk" style="width:${hero?130:110}px;height:${hero?20:16}px"></div></div><div class="rail">${[0,1,2].map(()=>`<article class="cd s"><div class="sk" style="width:${hero?48:44}px;height:${hero?48:44}px;border-radius:13px;margin-bottom:14px"></div><div class="sk" style="width:90%;height:13px"></div><div class="sk" style="width:60%;height:11px"></div></article>`).join('')}</div></section>`;
+document.getElementById('skel').innerHTML=sk(1)+sk()+sk();
+
+// tab bar, drawn once per phone
+const T=[['compass','Explore'],['map','Map'],['crosshair','Spots'],['user','Profile']];
+document.querySelectorAll('.phone').forEach(ph=>{
+  const cur=ph.getAttribute('aria-label').startsWith('Spots')?'Spots':ph.getAttribute('aria-label')==='Profile'?'Profile':'Explore';
+  ph.querySelector('.tabbar').innerHTML=T.map(([i,l])=>`<a class="tb" href="#" ${l===cur?'aria-current="page"':''} style="text-decoration:none"><span class="p">${ic(i)}</span>${l}</a>`).join('');
+});
+
+// Spots rows
+const row=(k,s,sub)=>{const [n,e,a]=P[k];return `<div class="rw"><span class="tile" aria-hidden="true">${e}</span><div class="b"><h3>${n}</h3><p>${sub||a}</p></div>${s==='t'?`<button class="quiet" type="button" aria-label="Conquer ${n}">${ic('flag','fill')}Conquer</button>`:`<span class="tg c" role="img" aria-label="Conquered">${ic('flag','fill')}</span>`}</div>`};
+document.getElementById('lt').innerHTML=row('cb','t','Tanjong Pagar')+row('sc','t','Orchard');
+document.getElementById('lc').innerHTML=row('kk','c','Tiong Bahru · 12 Nov')+row('oe','c','Dempsey · 8 Nov')+row('lt','c','Bugis · 2 Nov');
+
+// Spots preview: tab + has/new user
+const sp=document.getElementById('sp');let tab='t',fresh=0;
+function show(){
+  sp.dataset.v=(fresh?'e':'')+tab;
+  tt.setAttribute('aria-selected',tab==='t');tc.setAttribute('aria-selected',tab==='c');
+  const c=fresh?0:3;rn.textContent=c;rg.style.strokeDashoffset=263.9*(1-c/25);
+  n1.textContent=fresh?0:2;n2.textContent=c;lv.textContent=fresh?'Level 1':'Level 2';ln.textContent=fresh?'Newcomer':'Food Explorer';
+}
+tt.onclick=()=>{tab='t';show()};tc.onclick=()=>{tab='c';show()};
+document.querySelectorAll('[data-fresh]').forEach(b=>b.onclick=()=>{fresh=+b.dataset.fresh;
+  document.querySelectorAll('[data-fresh]').forEach(x=>x.setAttribute('aria-pressed',x===b));show()});
+
+// theme (the Profile switch drives the same setting)
+const root=document.documentElement;
+function theme(t){root.dataset.theme=t;th.textContent=t==='dark'?'Show light':'Show dark';sw.setAttribute('aria-checked',t==='dark')}
+th.onclick=()=>theme(root.dataset.theme==='dark'?'light':'dark');
+sw.onclick=()=>theme(root.dataset.theme==='dark'?'light':'dark');
+</script>
+</body>
+</html>

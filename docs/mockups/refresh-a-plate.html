@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What We Eat, direction A: Plate list</title>
+<style>
+/* Palette: cotton #EDEBDD, cherry #810100, maroon #630000, noir #1B1717 plus tints. Dark leads. */
+:root{
+  --bg:#1B1717; --surface:#262020; --surface-hi:#2F2727; --raise:#302827; --plate:#3A302F;
+  --line:#3C3332; --ring:#857B72; --text:#EDEBDD; --muted:#B3AEA1;
+  --accent:#810100; --on-accent:#EDEBDD; --lift:#C45A52; --track:#3C3332;
+  --chip-on:#EDEBDD; --on-chip:#1B1717; --halo:rgba(196,90,82,.55); --halo-soft:rgba(196,90,82,.34); --halo-faint:rgba(196,90,82,.14);
+  --stage:#0F0C0C; --shadow:0 18px 44px rgba(0,0,0,.55);
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+:root[data-theme="light"]{
+  --bg:#EDEBDD; --surface:#F8F6EE; --surface-hi:#FFFEF8; --raise:#E6E3D2; --plate:#E3E0CF;
+  --line:#D3CFBB; --ring:#857E6E; --text:#1B1717; --muted:#5C524D;
+  --accent:#810100; --on-accent:#EDEBDD; --lift:#810100; --track:#D3CFBB;
+  --chip-on:#1B1717; --on-chip:#EDEBDD; --halo:rgba(129,1,0,.4); --halo-soft:rgba(129,1,0,.26); --halo-faint:rgba(129,1,0,.1);
+  --stage:#D9D5C3; --shadow:0 18px 40px rgba(27,23,23,.2);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--stage);color:var(--text);font-family:var(--font);transition:background .3s}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.i{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* page chrome around the mockup, not part of the app */
+.topbar{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;padding:16px 24px;max-width:1280px;margin:0 auto}
+.topbar h1{margin:0;font-size:18px}
+.topbar p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.mode{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:99px;background:var(--text);color:var(--bg);font-weight:700;font-size:14px}
+.stage{display:flex;flex-wrap:wrap;gap:36px 32px;justify-content:center;align-items:flex-start;padding:8px 24px 48px}
+.cap{width:375px;margin:14px 0 0;font-size:13px;line-height:1.45;color:var(--muted)}
+.cap b{color:var(--text)}
+
+/* phone frame, 375 px */
+.phone{width:375px;height:812px;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);border-radius:38px;border:1px solid var(--line);box-shadow:var(--shadow);transition:background .3s}
+.screen{flex:1;min-height:0;overflow-y:auto;padding:26px 16px 14px;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+
+/* header and the one primary action: cherry fill, cotton text */
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px}
+.head h2{margin:0;font-size:26px;font-weight:800;letter-spacing:-.01em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:99px;background:var(--accent);color:var(--on-accent);font-weight:700;font-size:14px;white-space:nowrap;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn .i{width:18px;height:18px}
+.round{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--surface);color:var(--text)}
+
+/* search and the single chip row */
+.search{display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;border-radius:16px;background:var(--surface);color:var(--muted)}
+.search input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--text);font:inherit;font-size:15px}
+.search input::placeholder{color:var(--muted);opacity:1}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:12px -16px 16px;padding:2px 16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:4px;min-height:40px;padding:0 16px;border-radius:99px;background:var(--surface);font-size:14px;font-weight:600;transition:background .2s,color .2s}
+.chip[aria-pressed="true"]{background:var(--chip-on);color:var(--on-chip)}
+.chip.more{background:none;box-shadow:inset 0 0 0 1.5px var(--ring);color:var(--text)}
+.chip .i{width:16px;height:16px}
+
+/* plate card: five things only (plate, name, area and price, one tag, Target button) */
+.card{position:relative;display:flex;align-items:center;gap:14px;padding:12px 14px 12px 12px;margin:0 0 10px;background:var(--surface);border-radius:22px;transition:transform .2s,background .2s}
+.card[hidden]{display:none}
+.card.locked{transform:scale(.985);background:var(--surface-hi)}
+/* cuisine slot: 64 px tile, the owner's drawing goes here later (emoji for now) */
+.plate{flex:none;position:relative;width:64px;height:64px;display:grid;place-items:center;border-radius:20px;background:var(--plate);font-size:32px;line-height:1}
+.plate::after{content:"";position:absolute;inset:6px;border-radius:50%;border:1.5px solid var(--line);opacity:.9}
+.body{flex:1;min-width:0}
+.body h3{margin:0;font-size:16px;font-weight:700;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta{margin:2px 0 8px;font-size:13px;color:var(--muted)}
+.tag{display:inline-block;padding:3px 10px;border-radius:99px;background:var(--raise);color:var(--muted);font-size:12px;font-weight:600}
+
+/* the Target button: quiet ring, cherry fill when Targeted, inverted solid when Conquered */
+.tg{flex:none;position:relative;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--raise);color:var(--text);box-shadow:inset 0 0 0 1.5px var(--ring);transition:background .2s,transform .12s}
+.tg:active{transform:scale(.9)}
+.tg.on{background:var(--accent);color:var(--on-accent);box-shadow:none}
+.tg.done{background:var(--text);color:var(--bg);box-shadow:none}
+.tg.hold{transform:scale(.94);box-shadow:0 0 0 5px var(--halo-soft),0 0 0 11px var(--halo-faint)}
+.tg.fresh{animation:lock .4s ease-out}
+.tg.fresh .i{animation:aim .3s ease-out}
+.tg.planted .i{animation:plant .35s ease-out}
+@keyframes lock{from{box-shadow:0 0 0 0 var(--halo)}to{box-shadow:0 0 0 16px transparent}}
+@keyframes aim{from{transform:scale(1.6) rotate(-70deg);opacity:.2}to{transform:none;opacity:1}}
+@keyframes plant{0%{transform:translateY(-9px) rotate(-18deg);opacity:0}65%{transform:translateY(1px) rotate(4deg);opacity:1}100%{transform:none}}
+
+/* skeleton loader */
+.sk{display:block;background:var(--plate);border-radius:12px;animation:pulse 1.4s ease-in-out infinite}
+.card.skel{min-height:88px}
+.sk.p{width:64px;height:64px;border-radius:20px;flex:none}
+.sk.c{width:44px;height:44px;border-radius:50%;flex:none}
+.sk.l{height:14px;margin:0 0 9px}
+.sk.s{height:22px;width:84px;border-radius:99px;margin:0}
+.sk.search-sk{height:48px;border-radius:16px;background:var(--surface)}
+.sk.chip-sk{width:96px;height:40px;border-radius:99px;flex:none;background:var(--surface)}
+@keyframes pulse{50%{opacity:.5}}
+
+/* tab bar: Explore, Map, Spots, Profile */
+.tabbar{display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px 20px;background:var(--bg);border-top:1px solid var(--line)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:48px;font-size:11.5px;font-weight:600;color:var(--muted);text-decoration:none}
+.tab span.pill{display:grid;place-items:center;width:58px;height:30px;border-radius:99px}
+.tab[aria-current="page"]{color:var(--text);font-weight:800}
+.tab[aria-current="page"] span.pill{background:var(--surface-hi);box-shadow:inset 0 0 0 1px var(--line)}
+
+/* progress ring: the hero of Spots and Profile */
+.hero{display:flex;align-items:center;gap:18px;padding:18px;margin:0 0 16px;background:var(--surface);border-radius:26px}
+.hero.big{flex-direction:column;text-align:center;gap:14px;padding:26px 18px 22px}
+.ringwrap{position:relative;flex:none;width:96px;height:96px}
+.big .ringwrap{width:148px;height:148px}
+.ringwrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ringwrap .trk{fill:none;stroke:var(--track);stroke-width:10}
+.ringwrap .arc{fill:none;stroke:var(--lift);stroke-width:10;stroke-linecap:round;stroke-dasharray:var(--d) 264;animation:draw .4s ease-out}
+@keyframes draw{from{stroke-dasharray:0 264}}
+.ringnum{position:absolute;inset:0;display:grid;place-items:center;font-size:30px;font-weight:800}
+.big .ringnum{font-size:46px}
+.hero .lbl{margin:0;font-size:13px;color:var(--muted)}
+.hero .val{margin:0 0 8px;font-size:26px;font-weight:800;line-height:1.1}
+.big .val{margin:0 0 10px;font-size:22px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;background:var(--raise);font-size:12.5px;font-weight:600}
+.badge b{font-weight:800}
+.pts{margin:10px 0 0;font-size:13px;color:var(--muted)}
+
+/* Spots tabs and rows */
+.seg{display:flex;gap:4px;padding:4px;margin:0 0 14px;border-radius:99px;background:var(--surface)}
+.seg button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;border-radius:99px;font-size:14px;font-weight:600;color:var(--muted);transition:background .2s,color .2s}
+.seg button[aria-selected="true"]{background:var(--chip-on);color:var(--on-chip)}
+.seg .i{width:17px;height:17px}
+.seg .n{font-size:13px;opacity:.85}
+.hint{margin:6px 0 0;text-align:center;font-size:13px;color:var(--muted)}
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 12px}
+.empty svg{width:200px;height:140px;color:var(--text)}
+.empty h3{margin:6px 0 4px;font-size:19px}
+.empty p{margin:0 0 18px;max-width:250px;font-size:14px;line-height:1.45;color:var(--muted)}
+
+/* Profile list */
+.group{margin:0 0 16px;background:var(--surface);border-radius:22px;overflow:hidden}
+.row{display:flex;align-items:center;gap:14px;width:100%;min-height:56px;padding:0 16px;text-align:left;font-size:15px;font-weight:600}
+.row + .row{border-top:1px solid var(--line)}
+.row .grow{flex:1}
+.row .chev{color:var(--muted);width:18px;height:18px}
+.switch{flex:none;width:50px;height:30px;border-radius:99px;background:var(--plate);box-shadow:inset 0 0 0 1.5px var(--ring);position:relative;transition:background .2s}
+.switch::after{content:"";position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;background:var(--text);transition:transform .2s}
+.switch[aria-checked="true"]{background:var(--chip-on);box-shadow:none}
+.switch[aria-checked="true"]::after{transform:translateX(20px);background:var(--on-chip)}
+.foot{margin:18px 0 0;text-align:center;font-size:12.5px;color:var(--muted)}
+
+@media (max-width:440px){.stage{padding:8px 0 40px}.topbar{padding:14px 16px}.phone{border-radius:0;border-left:0;border-right:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-crosshair" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></symbol>
+  <symbol id="i-aim" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h12l-2.5 4.5L17 13H5"/></symbol>
+  <symbol id="i-flag-f" viewBox="0 0 24 24"><path d="M5 21V4M5 4h12l-2.5 4.5L17 13H5" fill="currentColor"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></symbol>
+  <symbol id="i-vote" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 12.5l3 3 5-6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14"/></symbol>
+  <symbol id="i-plate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M12 17v-6M9.5 13.5L12 11l2.5 2.5"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M9 21H5V3h4M16 17l5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/></symbol>
+</svg>
+
+<div class="topbar">
+  <div>
+    <h1>Direction A: Plate list</h1>
+    <p>Calm single column, big cuisine plate, one chip row, one cherry action per screen. Tap the Target buttons and chips; they work.</p>
+  </div>
+  <button type="button" class="mode" id="mode" aria-pressed="true"><svg class="i" aria-hidden="true"><use href="#i-sun"/></svg><span>Switch to light</span></button>
+</div>
+
+<main class="stage">
+
+  <!-- EXPLORE -->
+  <section>
+    <div class="phone" aria-label="Explore screen">
+      <div class="screen">
+        <header class="head">
+          <h2>What We Eat</h2>
+          <button type="button" class="btn"><svg class="i" aria-hidden="true"><use href="#i-vote"/></svg>Start a vote</button>
+        </header>
+        <label class="search"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg><input type="search" placeholder="Search places or areas" aria-label="Search places or areas"></label>
+        <div class="chips" role="group" aria-label="Quick filters">
+          <button type="button" class="chip" aria-pressed="false" data-f="Date night">Date night</button>
+          <button type="button" class="chip" aria-pressed="false" data-f="Big group">Big group</button>
+          <button type="button" class="chip" aria-pressed="false" data-f="Late">Late</button>
+          <button type="button" class="chip" aria-pressed="false" data-f="Halal">Halal</button>
+          <button type="button" class="chip more">More<svg class="i" aria-hidden="true"><use href="#i-down"/></svg></button>
+        </div>
+        <div id="explore-list"></div>
+      </div>
+      <nav class="tabbar" aria-label="Main"><div id="tabs-explore" style="display:contents"></div></nav>
+    </div>
+    <p class="cap"><b>Explore.</b> Hero: the plate list. Row 1 is Targeted (cherry fill), row 2 is mid-press, locked on (halo, card sinks a little), row 4 is Conquered (inverted flag). Try a chip: the list filters.</p>
+  </section>
+
+  <!-- EXPLORE LOADING -->
+  <section>
+    <div class="phone" aria-label="Explore screen, loading">
+      <div class="screen">
+        <header class="head">
+          <h2>What We Eat</h2>
+          <button type="button" class="btn" disabled style="opacity:.5"><svg class="i" aria-hidden="true"><use href="#i-vote"/></svg>Start a vote</button>
+        </header>
+        <div class="sk search-sk"></div>
+        <div class="chips" aria-hidden="true"><i class="sk chip-sk"></i><i class="sk chip-sk"></i><i class="sk chip-sk" style="width:72px"></i><i class="sk chip-sk" style="width:80px"></i></div>
+        <div id="skel-list" role="status" aria-label="Loading places"></div>
+      </div>
+      <nav class="tabbar" aria-label="Main"><div id="tabs-skel" style="display:contents"></div></nav>
+    </div>
+    <p class="cap"><b>Explore, loading.</b> Same shapes as the real rows, so nothing jumps when data arrives. Slow pulse, off when the phone asks for reduced motion.</p>
+  </section>
+
+  <!-- SPOTS -->
+  <section>
+    <div class="phone" aria-label="Spots screen">
+      <div class="screen">
+        <header class="head">
+          <h2>Spots</h2>
+          <button type="button" class="round" aria-label="Add a spot"><svg class="i" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        </header>
+        <div class="hero" id="spots-hero"></div>
+        <div class="seg" role="tablist" aria-label="Spots">
+          <button type="button" role="tab" aria-selected="true" data-tab="t"><svg class="i" aria-hidden="true"><use href="#i-crosshair"/></svg>Targets <span class="n">3</span></button>
+          <button type="button" role="tab" aria-selected="false" data-tab="c"><svg class="i" aria-hidden="true"><use href="#i-flag"/></svg>Conquered <span class="n">3</span></button>
+        </div>
+        <div id="spots-list"></div>
+      </div>
+      <nav class="tabbar" aria-label="Main"><div id="tabs-spots" style="display:contents"></div></nav>
+    </div>
+    <p class="cap"><b>Spots.</b> Hero: one ring, "Conquered 3 of 25", with the level badge. Two tabs, rows are the same plate card. Tap the Conquered tab.</p>
+  </section>
+
+  <!-- SPOTS EMPTY -->
+  <section>
+    <div class="phone" aria-label="Spots screen, nothing yet">
+      <div class="screen">
+        <header class="head">
+          <h2>Spots</h2>
+          <button type="button" class="round" aria-label="Add a spot"><svg class="i" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        </header>
+        <div class="hero" id="empty-hero"></div>
+        <div class="seg" role="tablist" aria-label="Spots">
+          <button type="button" role="tab" aria-selected="true"><svg class="i" aria-hidden="true"><use href="#i-crosshair"/></svg>Targets <span class="n">0</span></button>
+          <button type="button" role="tab" aria-selected="false"><svg class="i" aria-hidden="true"><use href="#i-flag"/></svg>Conquered <span class="n">0</span></button>
+        </div>
+        <div class="empty">
+          <svg viewBox="0 0 200 140" aria-hidden="true">
+            <ellipse cx="100" cy="126" rx="62" ry="7" fill="currentColor" opacity=".08"/>
+            <circle cx="100" cy="70" r="54" fill="var(--plate)"/>
+            <circle cx="100" cy="70" r="40" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/>
+            <g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" opacity=".9"><circle cx="100" cy="70" r="19"/><path d="M100 41v12M100 87v12M71 70h12M117 70h12"/></g>
+            <circle cx="100" cy="70" r="4.5" fill="var(--lift)"/>
+            <g fill="none" stroke="var(--ring)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M28 46v10a6 6 0 0 0 12 0V46M34 46v54"/><path d="M168 46c-9 8-9 26 0 32M168 46v54"/></g>
+            <path d="M151 34V14l16 5-16 6" fill="var(--lift)" stroke="var(--lift)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h3>No Targets yet</h3>
+          <p>Tap the crosshair on a place to aim at it. It will wait for you here.</p>
+          <button type="button" class="btn">Find places</button>
+        </div>
+      </div>
+      <nav class="tabbar" aria-label="Main"><div id="tabs-empty" style="display:contents"></div></nav>
+    </div>
+    <p class="cap"><b>Spots, new user.</b> One illustration, one sentence, one cherry action. The ring starts empty at 0 of 25.</p>
+  </section>
+
+  <!-- PROFILE -->
+  <section>
+    <div class="phone" aria-label="Profile screen">
+      <div class="screen">
+        <header class="head"><h2>Profile</h2></header>
+        <div class="hero big" id="profile-hero"></div>
+        <div class="group">
+          <button type="button" class="row"><svg class="i" aria-hidden="true"><use href="#i-import"/></svg><span class="grow">Import from Google Maps</span><svg class="i chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
+          <div class="row"><svg class="i" aria-hidden="true"><use href="#i-moon"/></svg><span class="grow" id="dm-lbl">Dark mode</span><button type="button" class="switch" role="switch" aria-checked="true" aria-labelledby="dm-lbl" id="dm-switch"></button></div>
+          <button type="button" class="row"><svg class="i" aria-hidden="true"><use href="#i-out"/></svg><span class="grow">Sign out</span></button>
+        </div>
+        <p class="foot">Privacy policy · Terms of service</p>
+      </div>
+      <nav class="tabbar" aria-label="Main"><div id="tabs-profile" style="display:contents"></div></nav>
+    </div>
+    <p class="cap"><b>Profile.</b> Hero: the same ring, bigger, with the level badge and points to the next level. Everything else is three quiet rows. No cherry button here by design.</p>
+  </section>
+
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const ico = (n) => `<svg class="i" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const root = document.documentElement;
+
+/* sample data (names from the app; emoji are placeholders for the owner's drawings) */
+const P = {
+  hot: { n: 'Long Table Hotpot', a: 'Bugis', p: '$$', t: 'Big group', e: '🥟' },
+  can: { n: 'Candlelight Bistro', a: 'Tanjong Pagar', p: '$$$', t: 'Date night', e: '🍝' },
+  kop: { n: 'Kopi & Kin', a: 'Tiong Bahru', p: '$', t: 'Late', e: '☕' },
+  sak: { n: 'Sakura Counter', a: 'Orchard', p: '$$$', t: 'Date night', e: '🍣' },
+  ove: { n: 'Oven & Ember', a: 'Holland Village', p: '$$', t: 'Late', e: '🍝' },
+  spi: { n: 'Spice Route', a: 'Little India', p: '$$', t: 'Halal', e: '🍛' },
+};
+
+/* Target button states: '' none, 'on' Targeted, 'done' Conquered */
+const label = (p, s) => s === 'on' ? `Remove ${p.n} from Targets` : s === 'done' ? `Move ${p.n} back to Targets` : `Target ${p.n}`;
+const glyph = (s) => s === 'done' ? ico('flag-f') : ico(s === 'on' ? 'aim' : 'crosshair');
+const tg = (p, s, extra = '') => `<button type="button" class="tg ${s} ${extra}" data-n="${p.n}" aria-label="${label(p, s)}" aria-pressed="${s === 'on'}">${glyph(s)}</button>`;
+
+const card = (p, s = '', cls = '', tgx = '') =>
+  `<article class="card ${cls}" data-tag="${p.t}"><span class="plate" aria-hidden="true">${p.e}</span>` +
+  `<div class="body"><h3>${p.n}</h3><p class="meta">${p.a} · ${p.p}</p><span class="tag">${p.t}</span></div>${tg(p, s, tgx)}</article>`;
+
+const row = (p, kind, when) =>
+  `<article class="card"><span class="plate" aria-hidden="true">${p.e}</span>` +
+  `<div class="body"><h3>${p.n}</h3><p class="meta" style="margin-bottom:0">${p.a}${when ? ' · ' + when : ' · ' + p.p}</p></div>` +
+  (kind === 'c'
+    ? `<button type="button" class="tg done" aria-label="Move ${p.n} back to Targets">${ico('flag-f')}</button>`
+    : `<button type="button" class="tg" aria-label="Conquer ${p.n}">${ico('flag')}</button>`) + `</article>`;
+
+$('#explore-list').innerHTML =
+  card(P.hot, 'on') + card(P.can, 'on', 'locked', 'hold fresh') + card(P.kop) + card(P.sak, 'done') + card(P.ove) + card(P.spi);
+$('#skel-list').innerHTML = Array(6).fill(
+  `<div class="card skel"><i class="sk p"></i><div class="body"><i class="sk l" style="width:70%"></i><i class="sk l" style="width:48%;height:12px"></i><i class="sk s"></i></div><i class="sk c"></i></div>`).join('');
+
+/* tab bars */
+const TABS = [['compass', 'Explore'], ['map', 'Map'], ['plate', 'Spots'], ['user', 'Profile']];
+const tabs = (cur) => TABS.map(([i, l]) => `<a class="tab" href="#" ${l === cur ? 'aria-current="page"' : ''} onclick="return false"><span class="pill">${ico(i)}</span>${l}</a>`).join('');
+$('#tabs-explore').innerHTML = tabs('Explore'); $('#tabs-skel').innerHTML = tabs('Explore');
+$('#tabs-spots').innerHTML = tabs('Spots'); $('#tabs-empty').innerHTML = tabs('Spots'); $('#tabs-profile').innerHTML = tabs('Profile');
+
+/* progress ring: one number, one arc (r=42, circumference 264) */
+const ring = (v, total) =>
+  `<div class="ringwrap" role="img" aria-label="Conquered ${v} of ${total}"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="42"/>` +
+  (v ? `<circle class="arc" cx="50" cy="50" r="42" style="--d:${(264 * v / total).toFixed(1)}"/>` : '') + `</svg><div class="ringnum">${v}</div></div>`;
+const badge = (lv, name) => `<span class="badge"><b>Lv ${lv}</b> ${name}</span>`;
+$('#spots-hero').innerHTML = ring(3, 25) + `<div><p class="lbl">Conquered</p><p class="val">3 of 25</p>${badge(2, 'Food Explorer')}</div>`;
+$('#empty-hero').innerHTML = ring(0, 25) + `<div><p class="lbl">Conquered</p><p class="val">0 of 25</p>${badge(1, 'Newcomer')}</div>`;
+$('#profile-hero').innerHTML = ring(3, 25) + `<div><p class="val">Conquered 3 of 25</p>${badge(2, 'Food Explorer')}<p class="pts">65 points to Regular</p></div>`;
+
+/* Spots tabs */
+const lists = {
+  t: row(P.kop, 't') + row(P.ove, 't') + row(P.spi, 't') + '<p class="hint">Tap the flag after you have eaten there.</p>',
+  c: row(P.sak, 'c', '3 Nov') + row(P.hot, 'c', '28 Oct') + row(P.can, 'c', '19 Oct'),
+};
+const show = (k) => {
+  $('#spots-list').innerHTML = lists[k];
+  document.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.tab === k));
+};
+document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => show(b.dataset.tab)));
+show('t');
+
+/* tap a Target button: none, Targeted (lock on), Conquered (plant the flag), none */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.card > .tg'); if (!b || !b.closest('#explore-list')) return;
+  const next = b.classList.contains('done') ? '' : b.classList.contains('on') ? 'done' : 'on';
+  const p = Object.values(P).find((x) => x.n === b.dataset.n);
+  b.className = `tg ${next}`; b.innerHTML = glyph(next); b.setAttribute('aria-label', label(p, next)); b.setAttribute('aria-pressed', next === 'on');
+  b.closest('.card').classList.remove('locked'); void b.offsetWidth;
+  if (next === 'on') b.classList.add('fresh'); if (next === 'done') b.classList.add('planted');
+});
+
+/* chips filter the list */
+document.querySelectorAll('.chip[data-f]').forEach((c) => c.addEventListener('click', () => {
+  c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true');
+  const on = [...document.querySelectorAll('.chip[aria-pressed="true"]')].map((x) => x.dataset.f);
+  document.querySelectorAll('#explore-list .card').forEach((k) => (k.hidden = on.length > 0 && !on.includes(k.dataset.tag)));
+}));
+
+/* theme: one switch for the page and one inside Profile */
+function theme(mode) {
+  root.dataset.theme = mode;
+  const dark = mode === 'dark';
+  $('#mode').setAttribute('aria-pressed', dark);
+  $('#mode span').textContent = dark ? 'Switch to light' : 'Switch to dark';
+  $('#mode use').setAttribute('href', dark ? '#i-sun' : '#i-moon');
+  $('#dm-switch').setAttribute('aria-checked', dark);
+}
+$('#mode').addEventListener('click', () => theme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+$('#dm-switch').addEventListener('click', () => theme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+</script>
+</body>
+</html>

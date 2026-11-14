@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What We Eat: direction B, hero plus list</title>
+<style>
+/* tokens: palette only (cotton, cherry, maroon, noir and tones of them) */
+:root{--cotton:#EDEBDD;--cherry:#810100;--maroon:#630000;--noir:#1B1717;
+  --r-card:20px;--r-ctl:14px;--ease:cubic-bezier(.2,.8,.2,1);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+:root[data-theme=dark]{--bg:#1B1717;--surface:#2A2222;--raise:#3A2F2F;--line:rgba(237,235,221,.09);
+  --text:#EDEBDD;--muted:#ABA597;--on-bg:#EDEBDD;--on-fg:#1B1717;--shadow:0 10px 28px rgba(0,0,0,.4);
+  --stage:#0E0B0B;--hi:rgba(237,235,221,.08)}
+:root[data-theme=light]{--bg:#EDEBDD;--surface:#F8F6EE;--raise:#E1DDCB;--line:rgba(27,23,23,.10);
+  --text:#1B1717;--muted:#5A524D;--on-bg:#1B1717;--on-fg:#EDEBDD;--shadow:0 8px 22px rgba(27,23,23,.12);
+  --stage:#D2CFBD;--hi:rgba(255,255,255,.6)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--stage);color:var(--text);transition:background .3s}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* mockup chrome (not part of the app) */
+.bar{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:20px 24px 0;max-width:1700px;margin:auto}
+.bar h1{font-size:16px;margin:0;font-weight:600}.bar p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.tog{padding:10px 16px;border-radius:20px;background:var(--text);color:var(--bg);font-size:13px;font-weight:600}
+.stage{display:flex;flex-wrap:wrap;gap:32px;justify-content:center;padding:24px}
+.col{width:375px}
+.cap{margin:12px 4px 0;font-size:12px;line-height:1.5;color:var(--muted)}
+.cap b{color:var(--text)}
+.ctl{display:flex;gap:6px;margin:10px 4px 0}
+.ctl button{padding:7px 12px;border-radius:16px;background:var(--surface);font-size:12px;border:1px solid var(--line)}
+.ctl button[aria-pressed=true]{background:var(--text);color:var(--bg)}
+
+/* phone */
+.phone{width:375px;min-height:800px;display:flex;flex-direction:column;background:var(--bg);border-radius:38px;
+  border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;transition:background .3s}
+.screen{flex:1;padding:18px 16px 16px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1.t1{margin:0;font-size:22px;letter-spacing:-.02em;font-weight:700}
+.eyebrow{margin:16px 2px 8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+/* the one primary action per screen: cherry fill, cotton text */
+.cta{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:22px;
+  background:var(--cherry);color:var(--cotton);font-size:14px;font-weight:600;transition:transform .15s var(--ease),filter .15s}
+.cta:active{transform:scale(.96)}.cta:hover{filter:brightness(1.12)}
+.cta svg.i{width:18px;height:18px}
+.quiet{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:22px;background:var(--surface);
+  border:1px solid var(--line);font-size:14px;font-weight:600}
+
+.search{display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;margin-bottom:10px;border-radius:var(--r-ctl);
+  background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.search input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:15px;color:var(--text)}
+.search input::placeholder{color:var(--muted)}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:0 -16px;padding:2px 16px 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 15px;border-radius:20px;
+  background:var(--raise);font-size:13px;font-weight:500}
+.chip.on{background:var(--on-bg);color:var(--on-fg)}
+.chip svg.i{width:16px;height:16px}
+
+/* cuisine tile slot: 56 px in rows, 96 px in the hero; emoji stands in for the owner's drawings */
+.tile{flex:none;display:grid;place-items:center;width:56px;height:56px;border-radius:16px;background:var(--raise);font-size:28px;line-height:1}
+
+/* the Target button: one control, three states */
+.tg{position:relative;flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--raise);color:var(--text);
+  transition:transform .15s var(--ease),background .2s}
+.tg:active{transform:scale(.92)}
+.tg.on{background:var(--on-bg);color:var(--on-fg)}
+.tg.won{background:var(--cherry);color:var(--cotton)}
+.tg.lg{width:56px;height:56px;border-radius:18px}.tg.lg svg.i{width:26px;height:26px}
+.tg.on.pulse::after{content:"";position:absolute;inset:0;border-radius:inherit;border:2px solid var(--text);opacity:0;
+  animation:lock 2.6s var(--ease) infinite}
+@keyframes lock{0%{transform:scale(1);opacity:.7}35%,100%{transform:scale(1.7);opacity:0}}
+
+/* hero card: the first result in the current sort order, larger. No new behaviour. */
+.hero{border-radius:26px;overflow:hidden;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.art{position:relative;height:152px;display:grid;place-items:center;
+  background:radial-gradient(circle at 22% 18%,rgba(237,235,221,.2),transparent 55%),linear-gradient(145deg,#810100,#630000 72%)}
+.art .tile{width:96px;height:96px;border-radius:28px;font-size:52px;background:rgba(237,235,221,.14);box-shadow:inset 0 0 0 1px rgba(237,235,221,.14)}
+.art .tag{position:absolute;left:14px;top:14px;background:rgba(27,23,23,.5);color:var(--cotton)}
+.hero-body{display:flex;align-items:center;gap:12px;padding:14px 16px 16px}
+.hero-body h2{margin:0;font-size:20px;letter-spacing:-.015em;font-weight:700}
+.info{flex:1;min-width:0}
+.meta{display:flex;align-items:center;gap:5px;margin:3px 0 0;font-size:13px;color:var(--muted)}
+.meta svg.i{width:13px;height:13px}
+.tag{display:inline-block;padding:3px 10px;border-radius:10px;background:var(--raise);font-size:11.5px;font-weight:500}
+
+/* compact rows */
+.list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.row{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px 10px 10px;border-radius:var(--r-card);
+  background:var(--surface);border:1px solid var(--line);transition:transform .18s var(--ease)}
+.row h3{margin:0;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .meta{font-size:12.5px}
+.row .tag{margin-top:6px;padding:2px 8px;font-size:11px}
+.row.lock{transform:scale(.975);outline:2px solid color-mix(in srgb,var(--text) 40%,transparent);outline-offset:-2px}
+
+/* skeleton loader */
+.sk{position:relative;overflow:hidden;background:var(--raise);border-radius:8px}
+.sk::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--hi),transparent);transform:translateX(-100%);animation:shim 1.4s ease-in-out infinite}
+@keyframes shim{to{transform:translateX(100%)}}
+.sk-hero .art{background:var(--raise)}.sk-hero .art .tile{background:var(--surface);box-shadow:none}
+.sk-hero .art::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--hi),transparent);transform:translateX(-100%);animation:shim 1.4s ease-in-out infinite}
+.sk-hero .art .tag{display:none}
+.chip.sk{border-radius:20px}.tile.sk{border-radius:16px}
+.sk-line{height:12px;margin:4px 0}.sk-btn{width:44px;height:44px;border-radius:14px}
+
+/* hero header panels (Spots, Profile) */
+.panel{display:flex;align-items:center;gap:18px;padding:20px;border-radius:28px;color:var(--cotton);margin-bottom:16px;
+  background:radial-gradient(circle at 15% 10%,rgba(237,235,221,.18),transparent 55%),linear-gradient(145deg,#810100,#630000 75%);box-shadow:var(--shadow)}
+.panel h2{margin:0;font-size:20px;letter-spacing:-.015em}
+.panel p{margin:6px 0 0;font-size:13.5px;line-height:1.45;color:#E4DFD0}
+.ring{position:relative;flex:none;width:112px;height:112px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .trk{stroke:rgba(237,235,221,.22)}
+.ring .arc{stroke:var(--cotton);stroke-dasharray:var(--c);stroke-dashoffset:var(--o);animation:draw .9s var(--ease) both}
+@keyframes draw{from{stroke-dashoffset:var(--c)}}
+.ring .mid{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.mid b{font-size:34px;line-height:1;letter-spacing:-.03em}.mid small{margin-top:4px;font-size:12px;color:#E4DFD0}
+.badge{position:absolute;inset:0;display:grid;place-content:center;text-align:center;color:var(--cotton)}
+.badge b{font-size:30px;line-height:1}.badge small{font-size:10px;letter-spacing:.14em;margin-top:3px}
+
+.seg{display:flex;gap:4px;padding:4px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.seg button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:44px;border-radius:12px;font-size:14px;font-weight:500;color:var(--muted);transition:background .2s,color .2s}
+.seg button[aria-selected=true]{background:var(--on-bg);color:var(--on-fg)}
+.seg svg.i{width:17px;height:17px}.seg .n{font-size:12px;opacity:.75}
+.pane[hidden]{display:none}
+
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 12px 8px}
+.empty svg.art2{width:176px;height:150px}
+.empty h3{margin:12px 0 4px;font-size:17px}.empty p{margin:0 0 16px;max-width:260px;font-size:14px;line-height:1.5;color:var(--muted)}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{padding:14px 16px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--line)}
+.stat b{display:block;font-size:26px;letter-spacing:-.02em}.stat span{font-size:13px;color:var(--muted)}
+.menu{margin-top:12px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--line);overflow:hidden}
+.menu button{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:0 16px;text-align:left;font-size:15px}
+.menu button+button{border-top:1px solid var(--line)}
+.menu .sp{flex:1}.menu .mu{color:var(--muted)}
+.sw{position:relative;width:46px;height:28px;border-radius:14px;background:var(--on-bg)}
+.sw::after{content:"";position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:var(--on-fg)}
+.foot{margin:18px 0 0;text-align:center;font-size:12px;color:var(--muted)}
+
+.tabbar{display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px 14px;background:var(--bg);border-top:1px solid var(--line)}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:8px;min-height:52px;font-size:12px;color:var(--muted)}
+.tab[aria-current=page]{color:var(--text);font-weight:600}
+.tab[aria-current=page]::before{content:"";position:absolute;top:0;width:26px;height:4px;border-radius:2px;background:var(--text)}
+
+:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cross" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h12l-2.5 4L17 12H5"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-vote" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></symbol>
+</svg>
+
+<div class="bar">
+  <div><h1>What We Eat: direction B, hero plus list</h1>
+    <p>375 px phone frames. Dark leads; the toggle shows the light variant. Sample data only. Emoji are placeholders for the owner's cuisine drawings.</p></div>
+  <button class="tog" id="theme" type="button" aria-pressed="true">Dark mode: on</button>
+</div>
+
+<main class="stage">
+
+<!-- ============ EXPLORE ============ -->
+<div class="col">
+<div class="phone"><div class="screen">
+  <div class="top"><h1 class="t1">What We Eat</h1>
+    <button class="cta" type="button"><svg class="i"><use href="#i-vote"/></svg>Start a vote</button></div>
+  <label class="search"><svg class="i"><use href="#i-search"/></svg><input placeholder="Search places or cuisine" aria-label="Search places or cuisine"></label>
+  <div class="chips" role="group" aria-label="Quick filters">
+    <button class="chip on" type="button" aria-pressed="true">Date night</button>
+    <button class="chip" type="button" aria-pressed="false">Big group</button>
+    <button class="chip" type="button" aria-pressed="false">Late</button>
+    <button class="chip" type="button" aria-pressed="false">Halal</button>
+    <button class="chip" type="button"><svg class="i"><use href="#i-sliders"/></svg>More</button>
+  </div>
+
+  <p class="eyebrow">Nearest to you</p>
+  <article class="hero">
+    <div class="art"><span class="tag">Date night</span><span class="tile" aria-hidden="true">🍝</span></div>
+    <div class="hero-body">
+      <div class="info"><h2>Candlelight Bistro</h2>
+        <p class="meta"><svg class="i"><use href="#i-pin"/></svg>Tanjong Pagar · $$$</p></div>
+      <button class="tg lg" type="button" aria-label="Target Candlelight Bistro"><svg class="i"><use href="#i-cross"/></svg></button>
+    </div>
+  </article>
+
+  <div class="list">
+    <!-- pressed / locked-on: card settles, crosshair locks on, one ring pulse -->
+    <article class="row lock"><span class="tile" aria-hidden="true">🥟</span>
+      <div class="info"><h3>Long Table Hotpot</h3><p class="meta">Bugis · $$</p><span class="tag">Big groups</span></div>
+      <button class="tg on pulse" type="button" aria-pressed="true" aria-label="Remove Long Table Hotpot from Targets"><svg class="i"><use href="#i-cross"/></svg></button></article>
+    <article class="row"><span class="tile" aria-hidden="true">☕</span>
+      <div class="info"><h3>Kopi &amp; Kin</h3><p class="meta">Tiong Bahru · $</p><span class="tag">Small groups</span></div>
+      <button class="tg on" type="button" aria-pressed="true" aria-label="Remove Kopi &amp; Kin from Targets"><svg class="i"><use href="#i-cross"/></svg></button></article>
+    <article class="row"><span class="tile" aria-hidden="true">🍣</span>
+      <div class="info"><h3>Sakura Counter</h3><p class="meta">Orchard · $$$</p><span class="tag">Date night</span></div>
+      <button class="tg won" type="button" aria-label="Move Sakura Counter back to Targets"><svg class="i"><use href="#i-flag"/></svg></button></article>
+    <article class="row"><span class="tile" aria-hidden="true">🍝</span>
+      <div class="info"><h3>Oven &amp; Ember</h3><p class="meta">Holland Village · $$</p><span class="tag">Big groups</span></div>
+      <button class="tg" type="button" aria-label="Target Oven &amp; Ember"><svg class="i"><use href="#i-cross"/></svg></button></article>
+  </div>
+</div>
+<nav class="tabbar" aria-label="Main">
+  <a class="tab" aria-current="page"><svg class="i"><use href="#i-compass"/></svg>Explore</a>
+  <a class="tab"><svg class="i"><use href="#i-map"/></svg>Map</a>
+  <a class="tab"><svg class="i"><use href="#i-grid"/></svg>Spots</a>
+  <a class="tab"><svg class="i"><use href="#i-user"/></svg>Profile</a>
+</nav></div>
+<p class="cap"><b>Explore.</b> Row 1 is mid-press (card at 97.5%, crosshair locks on with one ring pulse, 320 ms). Row 2 Targeted, row 3 Conquered, row 4 untouched. Cherry appears once as a fill: Start a vote.</p>
+</div>
+
+<!-- ============ SPOTS ============ -->
+<div class="col">
+<div class="phone"><div class="screen">
+  <div class="top"><h1 class="t1">Spots</h1>
+    <button class="cta" type="button" aria-label="Add a spot"><svg class="i"><use href="#i-plus"/></svg>Add</button></div>
+  <section class="panel" aria-label="Progress">
+    <div class="ring" style="--c:314.2;--o:276.5" role="img" aria-label="Conquered 3 of 25">
+      <svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="50" fill="none" stroke-width="11"/><circle class="arc" cx="60" cy="60" r="50" fill="none" stroke-width="11" stroke-linecap="round"/></svg>
+      <div class="mid"><b>3</b><small>of 25</small></div></div>
+    <div><h2>Conquered 3 of 25</h2><p>22 to go. Next up is Kopi &amp; Kin.</p></div>
+  </section>
+  <div class="seg" role="tablist" aria-label="Spots">
+    <button type="button" role="tab" id="tab-t" aria-selected="true"><svg class="i"><use href="#i-cross"/></svg>Targets <span class="n">3</span></button>
+    <button type="button" role="tab" id="tab-c" aria-selected="false"><svg class="i"><use href="#i-flag"/></svg>Conquered <span class="n">3</span></button>
+  </div>
+
+  <div class="pane" id="p-t"><div class="list">
+    <article class="row"><span class="tile" aria-hidden="true">☕</span><div class="info"><h3>Kopi &amp; Kin</h3><p class="meta">Tiong Bahru · $</p></div>
+      <button class="tg" type="button" aria-label="Conquer Kopi &amp; Kin"><svg class="i"><use href="#i-flag"/></svg></button></article>
+    <article class="row"><span class="tile" aria-hidden="true">🍛</span><div class="info"><h3>Spice Route</h3><p class="meta">Little India · $$</p></div>
+      <button class="tg" type="button" aria-label="Conquer Spice Route"><svg class="i"><use href="#i-flag"/></svg></button></article>
+    <article class="row"><span class="tile" aria-hidden="true">🍝</span><div class="info"><h3>Oven &amp; Ember</h3><p class="meta">Holland Village · $$</p></div>
+      <button class="tg" type="button" aria-label="Conquer Oven &amp; Ember"><svg class="i"><use href="#i-flag"/></svg></button></article>
+  </div></div>
+
+  <div class="pane" id="p-c" hidden><div class="list">
+    <article class="row"><span class="tile" aria-hidden="true">🍣</span><div class="info"><h3>Sakura Counter</h3><p class="meta">Orchard · 12 Nov 2026</p></div>
+      <button class="tg won" type="button" aria-label="Move Sakura Counter back to Targets"><svg class="i"><use href="#i-flag"/></svg></button></article>
+    <article class="row"><span class="tile" aria-hidden="true">🥟</span><div class="info"><h3>Long Table Hotpot</h3><p class="meta">Bugis · 2 Nov 2026</p></div>
+      <button class="tg won" type="button" aria-label="Move Long Table Hotpot back to Targets"><svg class="i"><use href="#i-flag"/></svg></button></article>
+    <article class="row"><span class="tile" aria-hidden="true">🍝</span><div class="info"><h3>Candlelight Bistro</h3><p class="meta">Tanjong Pagar · 24 Oct 2026</p></div>
+      <button class="tg won" type="button" aria-label="Move Candlelight Bistro back to Targets"><svg class="i"><use href="#i-flag"/></svg></button></article>
+  </div></div>
+
+  <div class="pane" id="p-e" hidden><div class="empty">
+    <svg class="art2" viewBox="0 0 176 150" role="img" aria-label="A crosshair with a flag">
+      <circle cx="88" cy="78" r="58" fill="var(--surface)"/>
+      <circle cx="88" cy="78" r="58" fill="none" stroke="var(--raise)" stroke-width="8"/>
+      <circle cx="88" cy="78" r="36" fill="none" stroke="var(--raise)" stroke-width="8"/>
+      <circle cx="88" cy="78" r="14" fill="var(--raise)"/>
+      <path d="M88 8v26M88 122v26M18 78h26M132 78h26" stroke="var(--text)" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+      <path d="M88 78V38" stroke="var(--text)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M88 38h30l-7 10 7 10H88z" fill="var(--cherry)"/>
+    </svg>
+    <h3>No Targets yet</h3><p>Tap the crosshair on a place to aim at it.</p>
+    <button class="quiet" type="button"><svg class="i"><use href="#i-compass"/></svg>Explore places</button>
+  </div></div>
+</div>
+<nav class="tabbar" aria-label="Main">
+  <a class="tab"><svg class="i"><use href="#i-compass"/></svg>Explore</a>
+  <a class="tab"><svg class="i"><use href="#i-map"/></svg>Map</a>
+  <a class="tab" aria-current="page"><svg class="i"><use href="#i-grid"/></svg>Spots</a>
+  <a class="tab"><svg class="i"><use href="#i-user"/></svg>Profile</a>
+</nav></div>
+<p class="cap"><b>Spots.</b> One hero: the progress ring. Targets use a quiet flag tile to conquer; Conquered shows the cherry flag. The ring draws in once on load.</p>
+<div class="ctl" role="group" aria-label="Mockup view">
+  <button type="button" data-p="t" aria-pressed="true">Targets</button>
+  <button type="button" data-p="c" aria-pressed="false">Conquered</button>
+  <button type="button" data-p="e" aria-pressed="false">Empty state</button>
+</div>
+</div>
+
+<!-- ============ PROFILE ============ -->
+<div class="col">
+<div class="phone"><div class="screen">
+  <div class="top"><h1 class="t1">Profile</h1></div>
+  <section class="panel" aria-label="Level">
+    <div class="ring" style="--c:326.7;--o:141.5" role="img" aria-label="Level 2, 85 of 150 points">
+      <svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="52" fill="none" stroke-width="9"/><circle class="arc" cx="60" cy="60" r="52" fill="none" stroke-width="9" stroke-linecap="round"/></svg>
+      <div class="badge"><b>2</b><small>LEVEL</small></div></div>
+    <div><h2>Food Explorer</h2><p>85 of 150 points to Regular.<br>sam@example.com</p></div>
+  </section>
+  <div class="stats">
+    <div class="stat"><b>4</b><span>Targets</span></div>
+    <div class="stat"><b>3</b><span>Conquered</span></div>
+  </div>
+  <div class="menu">
+    <button type="button"><svg class="i"><use href="#i-import"/></svg>Import from Google Maps<span class="sp"></span><svg class="i mu"><use href="#i-chev"/></svg></button>
+    <button type="button" role="switch" aria-checked="true"><svg class="i"><use href="#i-moon"/></svg>Dark mode<span class="sp"></span><span class="sw"></span></button>
+    <button type="button" class="mu">Sign out</button>
+  </div>
+  <p class="foot">Privacy policy · Terms of service</p>
+</div>
+<nav class="tabbar" aria-label="Main">
+  <a class="tab"><svg class="i"><use href="#i-compass"/></svg>Explore</a>
+  <a class="tab"><svg class="i"><use href="#i-map"/></svg>Map</a>
+  <a class="tab"><svg class="i"><use href="#i-grid"/></svg>Spots</a>
+  <a class="tab" aria-current="page"><svg class="i"><use href="#i-user"/></svg>Profile</a>
+</nav></div>
+<p class="cap"><b>Profile.</b> The same ring, now around the level badge. No cherry button here: signed in, there is nothing that needs to shout.</p>
+</div>
+
+<!-- ============ EXPLORE, LOADING ============ -->
+<div class="col">
+<div class="phone"><div class="screen" aria-busy="true">
+  <div class="top"><h1 class="t1">What We Eat</h1>
+    <button class="cta" type="button"><svg class="i"><use href="#i-vote"/></svg>Start a vote</button></div>
+  <label class="search"><svg class="i"><use href="#i-search"/></svg><input placeholder="Search places or cuisine" aria-label="Search places or cuisine"></label>
+  <div class="chips" aria-hidden="true">
+    <span class="chip sk" style="width:104px"></span><span class="chip sk" style="width:96px"></span><span class="chip sk" style="width:64px"></span><span class="chip sk" style="width:76px"></span>
+  </div>
+  <p class="eyebrow" style="visibility:hidden">Nearest to you</p>
+  <article class="hero sk-hero" aria-hidden="true">
+    <div class="art"><span class="tile"></span></div>
+    <div class="hero-body"><div class="info"><div class="sk sk-line" style="width:70%;height:20px"></div><div class="sk sk-line" style="width:45%"></div></div><div class="sk sk-btn" style="width:56px;height:56px;border-radius:18px"></div></div>
+  </article>
+  <div class="list" aria-hidden="true">
+    <article class="row"><span class="tile sk"></span><div class="info"><div class="sk sk-line" style="width:60%"></div><div class="sk sk-line" style="width:40%"></div><div class="sk sk-line" style="width:30%;height:16px"></div></div><div class="sk sk-btn"></div></article>
+    <article class="row"><span class="tile sk"></span><div class="info"><div class="sk sk-line" style="width:70%"></div><div class="sk sk-line" style="width:35%"></div><div class="sk sk-line" style="width:34%;height:16px"></div></div><div class="sk sk-btn"></div></article>
+    <article class="row"><span class="tile sk"></span><div class="info"><div class="sk sk-line" style="width:55%"></div><div class="sk sk-line" style="width:45%"></div><div class="sk sk-line" style="width:28%;height:16px"></div></div><div class="sk sk-btn"></div></article>
+    <article class="row"><span class="tile sk"></span><div class="info"><div class="sk sk-line" style="width:65%"></div><div class="sk sk-line" style="width:38%"></div><div class="sk sk-line" style="width:32%;height:16px"></div></div><div class="sk sk-btn"></div></article>
+  </div>
+</div>
+<nav class="tabbar" aria-label="Main">
+  <a class="tab" aria-current="page"><svg class="i"><use href="#i-compass"/></svg>Explore</a>
+  <a class="tab"><svg class="i"><use href="#i-map"/></svg>Map</a>
+  <a class="tab"><svg class="i"><use href="#i-grid"/></svg>Spots</a>
+  <a class="tab"><svg class="i"><use href="#i-user"/></svg>Profile</a>
+</nav></div>
+<p class="cap"><b>Explore, loading.</b> Same shapes as the real screen, so nothing jumps when data arrives. One soft shimmer; static when the phone asks for reduced motion.</p>
+</div>
+
+</main>
+
+<script>
+const root=document.documentElement,tb=document.getElementById('theme');
+tb.onclick=()=>{const d=root.dataset.theme!=='dark';root.dataset.theme=d?'dark':'light';tb.setAttribute('aria-pressed',d);tb.textContent='Dark mode: '+(d?'on':'off');
+  const sw=document.querySelector('[role=switch]');if(sw)sw.setAttribute('aria-checked',d)};
+const tabs={t:document.getElementById('tab-t'),c:document.getElementById('tab-c')};
+function show(p){['t','c','e'].forEach(k=>document.getElementById('p-'+k).hidden=k!==p);
+  tabs.t.setAttribute('aria-selected',p!=='c');tabs.c.setAttribute('aria-selected',p==='c');
+  document.querySelectorAll('.ctl button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===p))}
+tabs.t.onclick=()=>show('t');tabs.c.onclick=()=>show('c');
+document.querySelectorAll('.ctl button').forEach(b=>b.onclick=()=>show(b.dataset.p));
+</script>
+</body>
+</html>

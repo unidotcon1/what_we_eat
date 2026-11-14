@@ -42,6 +42,22 @@ Each phase is test-first where there is logic (animation state, progress count, 
 3. **"Pick one for us" is parked** as one of the last options (see `docs/FUTURE_IDEAS.md`). It is not in P2.
 4. **A self-hosted font is fine, with a lean-files rule:** ship only the weights and characters actually used (for example one variable font file, Latin only), and in P1 also audit the project for files nobody uses (source files, images, CSS rules, dependencies, docs) and remove them with the owner's OK. Nothing is deleted without listing it first.
 
+## P0 results (2026-11-14): three dark-first mockups, reviewed
+Files in `docs/mockups/`: `refresh-a-plate.html` (A, Plate list), `refresh-b-hero.html` (B, Hero plus list), `refresh-c-shelves.html` (C, Shelves). Built by the UI Designer agent, judged by the UI Finish-Gate Reviewer (contrast computed from the CSS tokens, not from rendered pixels; light mode only spot-checked).
+
+| | A Plate list | B Hero plus list | C Shelves |
+|---|---|---|---|
+| Decision | **PASS with 3 fixes** | HOLD | HOLD |
+| Places visible at once (812 px tall) | 5 | 3 | 4 cards, only 6 unique places across 3 swipe rows |
+| Card elements | 5 | 5 | 4 |
+| Main problem | none blocking | cherry used on many panels (breaks "cherry is rare"), hero pushes the list down | slow to compare six places, no chip row |
+
+All three pass text contrast (body 14.8 to 1, muted 6.3 to 7.2, cotton on cherry 9.05). In all three a Targeted cherry fill is only about 1.4 to 1 against the card, so the state must not rely on colour alone (A adds a centre dot, which survives greyscale).
+**Recommendation: build A.** Fixes before building: chips and tabs at least 44 px tall; the Conquer control on a Spots row says "Conquer" in text (a bare flag looks the same as the Conquered state); choose one documented ring colour token (A's coral arc is not a palette token). Borrow from C: the text "Conquer" button, a separate "Nothing conquered yet" empty state, a static ring under reduced motion. Borrow from B: the "22 to go. Next up is ..." line (not its cherry panel).
+
+### Motion notes (Whimsy Injector, held to the calm budget)
+Build first: (1) **Target lock-on**, a thin ring closes onto the crosshair, 260 ms ease-out; (2) **Conquer flag-plant**, the flag drops 6 px into place, 340 ms, optional brief border flash. Both use a short-lived `just_changed` class set on a state change and cleared on `animationend`, otherwise all 25 cards animate on load. Later: hold-menu grow-in (150 ms), Spots ring fill (400 ms, with P3), "Link ready" label cross-fade (200 ms, least certain), empty-state rise-in (only if no illustration animates). Every one has an instant reduced-motion fallback. **Refuse:** a hold-progress ring, staggered list entrances, particle or paper-plane effects, any looping idle animation.
+
 ## Not in this plan
 Photos of food (licensing and moderation), a mascot, a raised centre tab button, parked ideas in `FUTURE_IDEAS.md`, and the Conquered rating and note feature (separate task).
 
