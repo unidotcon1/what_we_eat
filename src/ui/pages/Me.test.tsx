@@ -43,7 +43,7 @@ test('signed in: shows points, level progress and counts', async () => {
   mocked.useUser.mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
   setup()
   expect(await screen.findByText('92 / 150 points')).toBeInTheDocument()
-  expect(screen.getByText(/Level 2/)).toBeInTheDocument()
+  expect(screen.getByRole('img', { name: 'Level 2, 92 of 150 points' })).toBeInTheDocument()
   expect(screen.getByText(/Food Explorer/)).toBeInTheDocument()
   expect(screen.getByText('6')).toBeInTheDocument()
 })
@@ -57,11 +57,12 @@ test('at the top level the progress line shows the total only', async () => {
 
 test('toggling dark mode sets data-theme on the page and remembers it', async () => {
   setup()
-  await userEvent.click(screen.getByRole('button', { name: /Dark mode/ }))
-  expect(document.documentElement.dataset.theme).toBe('dark')
-  expect(localStorage.getItem('wwe.theme')).toBe('dark')
+  // dark leads, so the first press switches to light
   await userEvent.click(screen.getByRole('button', { name: /Dark mode/ }))
   expect(document.documentElement.dataset.theme).toBe('light')
+  expect(localStorage.getItem('wwe.theme')).toBe('light')
+  await userEvent.click(screen.getByRole('button', { name: /Dark mode/ }))
+  expect(document.documentElement.dataset.theme).toBe('dark')
 })
 
 test('links to the privacy policy and terms', () => {
@@ -187,5 +188,32 @@ test('the import button sits right under the Target and Conquered counts', () =>
   const counts = document.querySelector('.spot-counts')!
   const link = screen.getByRole('link', { name: /Import from Google Maps/ })
   expect(counts.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  expect(link.compareDocumentPosition(screen.getByRole('button', { name: 'Dark mode: off' })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(link.compareDocumentPosition(screen.getByRole('button', { name: 'Dark mode: on' })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+})
+
+describe('the level ring', () => {
+  const signed_in = () => mocked.useUser.mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
+
+  test('signed in: the level is a ring around the level number, with a spoken label', async () => {
+    signed_in()
+    setup()
+    expect(await screen.findByRole('img', { name: /^Level \d, 92 of 150 points$/ })).toBeInTheDocument()
+  })
+
+  test('at the top level the ring is full and says just the points', async () => {
+    signed_in()
+    mocked.fetchMyStats.mockResolvedValue({ points: 450, saves: 0, reviews: 0 })
+    setup()
+    expect(await screen.findByRole('img', { name: /^Level \d, 450 points$/ })).toBeInTheDocument()
+  })
+
+  test('signed out there is no level ring', () => {
+    setup()
+    expect(screen.queryByRole('img', { name: /Level/ })).not.toBeInTheDocument()
+  })
+
+  test('signing in is the cherry-filled action when signed out', () => {
+    setup()
+    expect(screen.getByRole('button', { name: 'Sign in with Google' })).toHaveClass('cta')
+  })
 })

@@ -2,19 +2,19 @@ export type Theme = 'light' | 'dark'
 
 const KEY = 'wwe.theme'
 
+/** Dark leads: the app is dark unless the person has chosen light. */
 export function applyStoredTheme() {
+  let theme: Theme = 'dark'
   try {
-    const t = localStorage.getItem(KEY)
-    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+    if (localStorage.getItem(KEY) === 'light') theme = 'light'
   } catch {
-    // storage blocked: follow the phone setting
+    // storage blocked: stay with the default
   }
+  document.documentElement.dataset.theme = theme
 }
 
 export function currentTheme(): Theme {
-  const set = document.documentElement.dataset.theme
-  if (set === 'light' || set === 'dark') return set
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
 }
 
 export function setTheme(theme: Theme) {

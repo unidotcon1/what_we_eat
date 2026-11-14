@@ -5,6 +5,7 @@ import { accountsAvailable, delete_my_account, fetchMyStats, signInWithGoogle, s
 import { levelFor } from '../../domain/points'
 import { count_spots } from '../../domain/spots'
 import { use_spots } from '../../local/spots_store'
+import { ProgressRing } from '../components/ProgressRing'
 import { currentTheme, setTheme, type Theme } from '../theme'
 
 export default function Me() {
@@ -71,7 +72,7 @@ export default function Me() {
       ) : !user ? (
         <section>
           <p className="sub">Sign in to review restaurants and earn points.</p>
-          <button type="button" className="apply" onClick={() => void signInWithGoogle().catch((e: Error) => setError(e.message))}>
+          <button type="button" className="cta" onClick={() => void signInWithGoogle().catch((e: Error) => setError(e.message))}>
             Sign in with Google
           </button>
         </section>
@@ -80,15 +81,19 @@ export default function Me() {
           <p className="sub">{user.email}</p>
           {stats && level && (
             <>
-              <p>
-                Level {level.level} · {level.name}
-              </p>
-              <p>{level.nextAt === null ? `${stats.points} points` : `${stats.points} / ${level.nextAt} points`}</p>
-              <div className="bar-track">
-                <span
-                  className="bar-fill"
-                  style={{ width: `${level.nextAt === null ? 100 : Math.min(100, (stats.points / level.nextAt) * 100)}%` }}
-                />
+              <div className="progress-card">
+                <ProgressRing
+                  value={level.nextAt === null ? 1 : stats.points}
+                  max={level.nextAt === null ? 1 : level.nextAt}
+                  label={`Level ${level.level}, ${level.nextAt === null ? `${stats.points} points` : `${stats.points} of ${level.nextAt} points`}`}
+                >
+                  <b>{level.level}</b>
+                  <small>Level</small>
+                </ProgressRing>
+                <div>
+                  <h2>{level.name}</h2>
+                  <p>{level.nextAt === null ? `${stats.points} points` : `${stats.points} / ${level.nextAt} points`}</p>
+                </div>
               </div>
               <div className="stats">
                 <div>

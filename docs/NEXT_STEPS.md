@@ -30,7 +30,7 @@ Still open (cannot be fixed in code): the owner's own logins (above); Supabase r
 Rule of thumb: nothing secret in the repo or the app bundle; `.env` stays on this machine; if the Supabase secret key is ever pasted anywhere, rotate it.
 
 ## Next build tasks (Stage 1 remainder), in order
-0. **UI refresh: the most urgent task.** Make the app appealing like Eatventure but calmer (one hero per screen, five things per card, motion and reward instead of clutter). Full plan, phases and four questions for the owner: `docs/UI_REFRESH_PLAN.md`. Plan only so far.
+0. **UI refresh: the most urgent task. Direction B is chosen and P1 to P3 are built on the branch (not pushed); see the "Owner pick" section of the plan for what is left.** Make the app appealing like Eatventure but calmer (one hero per screen, five things per card, motion and reward instead of clutter). Full plan, phases and four questions for the owner: `docs/UI_REFRESH_PLAN.md`. Plan only so far.
 1. ~~Google Maps import screen~~ built 2026-11-02 (route `/import`, reached from Add a spot). Still to do: test it with a real export from the owner, since fixtures cannot show every real Google file layout.
 2. **Skippable tour of the main features**, built after the UI refresh (P2 and P3) so it points at the new screens.
    - Shows once on first open. Every step has **Skip** (also Escape and a tap outside); finishing or skipping sets `wwe.tour_done` on the device so it never nags.

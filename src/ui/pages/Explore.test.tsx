@@ -126,3 +126,69 @@ test('press and hold on a card, then Conquer, makes it a Conquered Spot', async 
   expect(await screen.findByRole('button', { name: 'Move Kopi & Kin back to Targets' })).toBeInTheDocument()
   expect(screen.getByText('Conquered')).toBeInTheDocument()
 })
+
+describe('the refreshed Explore screen', () => {
+  const chips = () => screen.getByRole('group', { name: 'Quick filters' })
+
+  test('while the places load, a skeleton of the same shape shows, then goes away', async () => {
+    setup()
+    expect(screen.getByLabelText('Loading places')).toHaveAttribute('aria-busy', 'true')
+    await screen.findByText('Long Table Hotpot')
+    expect(screen.queryByLabelText('Loading places')).not.toBeInTheDocument()
+  })
+
+  test('there is one quick-filter row: Date night, Big group, Open now, Halal, then Filters', async () => {
+    setup()
+    await screen.findByText('Long Table Hotpot')
+    const names = within(chips())
+      .getAllByRole('button')
+      .map((b) => b.textContent?.trim())
+    expect(names).toEqual(['Date night', 'Big group', 'Open now', 'Halal', 'Filters'])
+  })
+
+  test('Date night narrows the list to date places and pressing it again restores everything', async () => {
+    setup()
+    await screen.findByText('Long Table Hotpot')
+    const date = within(chips()).getByRole('button', { name: 'Date night' })
+    expect(date).toHaveAttribute('aria-pressed', 'false')
+    await userEvent.click(date)
+    expect(date).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('Candlelight Bistro')).toBeInTheDocument()
+    expect(screen.queryByText('Long Table Hotpot')).not.toBeInTheDocument()
+    await userEvent.click(date)
+    expect(await screen.findByText('Long Table Hotpot')).toBeInTheDocument()
+  })
+
+  test('a quick filter is shown by its chip only: no duplicate removable tag and no count on Filters', async () => {
+    setup()
+    await screen.findByText('Long Table Hotpot')
+    await userEvent.click(within(chips()).getByRole('button', { name: 'Halal' }))
+    expect(screen.queryByRole('button', { name: 'Remove filter Halal' })).not.toBeInTheDocument()
+    expect(within(chips()).getByRole('button', { name: 'Filters' })).toBeInTheDocument()
+  })
+
+  test('the first result is the one hero card and the rest are ordinary rows', async () => {
+    setup()
+    await screen.findByText('Long Table Hotpot')
+    const cards = document.querySelectorAll('article.card')
+    expect(cards.length).toBeGreaterThan(5)
+    expect(document.querySelectorAll('article.card-hero')).toHaveLength(1)
+    expect(cards[0]).toHaveClass('card-hero')
+  })
+
+  test('sort is a quiet text control that says what it does and flips between nearest and cheapest', async () => {
+    setup()
+    await screen.findByText('Long Table Hotpot')
+    const sort = screen.getByRole('button', { name: /^Sort: nearest first/i })
+    await userEvent.click(sort)
+    expect(screen.getByRole('button', { name: /^Sort: cheapest first/i })).toBeInTheDocument()
+    const first = document.querySelector('article.card-hero')!
+    expect(first.textContent).toMatch(/·\s\$(?!\$)/)
+  })
+
+  test('the header has the one cherry-filled action, Start a vote', async () => {
+    setup()
+    await screen.findByText('Long Table Hotpot')
+    expect(screen.getByRole('button', { name: 'Start a vote' })).toHaveClass('cta')
+  })
+})

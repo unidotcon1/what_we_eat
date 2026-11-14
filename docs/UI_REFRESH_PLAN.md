@@ -58,6 +58,15 @@ All three pass text contrast (body 14.8 to 1, muted 6.3 to 7.2, cotton on cherry
 ### Motion notes (Whimsy Injector, held to the calm budget)
 Build first: (1) **Target lock-on**, a thin ring closes onto the crosshair, 260 ms ease-out; (2) **Conquer flag-plant**, the flag drops 6 px into place, 340 ms, optional brief border flash. Both use a short-lived `just_changed` class set on a state change and cleared on `animationend`, otherwise all 25 cards animate on load. Later: hold-menu grow-in (150 ms), Spots ring fill (400 ms, with P3), "Link ready" label cross-fade (200 ms, least certain), empty-state rise-in (only if no illustration animates). Every one has an instant reduced-motion fallback. **Refuse:** a hold-progress ring, staggered list entrances, particle or paper-plane effects, any looping idle animation.
 
+## Owner pick (2026-11-14): direction B, with A's empty-state art
+Built on this branch, not pushed (462 tests pass, production build clean, checked on a 375 px screen in dark and light):
+- **P1 foundations (partly):** dark is the default (a saved light choice is kept); one token set in `theme.css`; cherry is a fill with cotton text and never a thin outline on dark; touch targets are 44 px; the old duplicate and dead CSS rules were removed.
+- **P2 Explore:** one hero card (the first result, larger, same card and behaviour), compact rows with one tag each, a quick-filter chip row (Date night, Big group, Open now, Halal, Filters) built on the real filters, sort as a quiet text control, a loading skeleton, "Start a vote" as the only cherry-filled action.
+- **P3 Spots and Profile:** a progress ring ("Conquered N of 25", counting only places in our list), "N to go" and "Next up", Targets and Conquered tabs, A's plate-and-crosshair empty-state art with an "Explore places" link, a level ring on Profile.
+- **Motion:** Target lock-on and Conquer flag-plant (no animation on first render; none under reduced motion), hold-menu grow-in.
+- **Reviewer's B fixes applied:** no cherry panels, no gradient hero art, no all-caps label, ring colour is a documented token (cotton in dark, cherry in light), the Conquered badge is neutral so cherry appears only on the flag button.
+Not done yet: P4 map bottom card, P5 the owner's drawn icons (waiting for the files), P6 audit (reduced-motion and greyscale pass, Lighthouse before and after), the self-hosted font, the clean-up audit of unused files, the light-mode review of every screen, and the onboarding tour.
+
 ## Not in this plan
 Photos of food (licensing and moderation), a mascot, a raised centre tab button, parked ideas in `FUTURE_IDEAS.md`, and the Conquered rating and note feature (separate task).
 

@@ -39,12 +39,90 @@ test('the name links to the place page', () => {
   expect(screen.getByRole('link', { name: 'Kopi & Kin' })).toHaveAttribute('href', '/r/kopi-kin')
 })
 
-test('shows at most two tags so the card stays tidy', () => {
+test('shows only one tag, so the card holds five things at most: tile, name, area and price, tag, Target button', () => {
   setup()
   expect(screen.getByText('Small groups')).toBeInTheDocument()
-  expect(screen.getByText('Halal')).toBeInTheDocument()
+  expect(screen.queryByText('Halal')).not.toBeInTheDocument()
   expect(screen.queryByText('Quiet')).not.toBeInTheDocument()
   expect(screen.queryByText('Open late')).not.toBeInTheDocument()
+})
+
+test('a Conquered Spot shows the Conquered stamp in the tag slot instead of a tag', () => {
+  setup({ state: 'conquered' })
+  expect(screen.getByText('Conquered')).toBeInTheDocument()
+  expect(screen.queryByText('Small groups')).not.toBeInTheDocument()
+})
+
+test('the hero variant is the same card, only larger: same name, link and one Target button', () => {
+  const { container } = render(
+    <MemoryRouter>
+      <RestaurantCard r={r} variant="hero" state={undefined} on_target={vi.fn()} on_choose={vi.fn()} picking={false} picked={false} on_pick={vi.fn()} />
+    </MemoryRouter>,
+  )
+  expect(container.querySelector('article.card-hero')).not.toBeNull()
+  expect(screen.getByRole('link', { name: 'Kopi & Kin' })).toBeInTheDocument()
+  expect(screen.getAllByRole('button')).toHaveLength(1)
+})
+
+test('a normal card is not a hero', () => {
+  setup()
+  expect(document.querySelector('article.card-hero')).toBeNull()
+})
+
+describe('state-change motion hook', () => {
+  const card = (state: 'targeted' | 'conquered' | undefined) => (
+    <MemoryRouter>
+      <RestaurantCard r={r} state={state} on_target={vi.fn()} on_choose={vi.fn()} picking={false} picked={false} on_pick={vi.fn()} />
+    </MemoryRouter>
+  )
+  const target_button = () => screen.getByRole('button', { name: /Kopi & Kin/ })
+
+  test('nothing animates on first render, even for a place that is already a Target', () => {
+    render(card('targeted'))
+    expect(target_button()).not.toHaveAttribute('data-moved')
+  })
+
+  test('becoming a Target marks the button for the lock-on motion', () => {
+    const { rerender } = render(card(undefined))
+    rerender(card('targeted'))
+    expect(target_button()).toHaveAttribute('data-moved', 'lock')
+  })
+
+  test('becoming Conquered marks it for the flag-plant motion', () => {
+    const { rerender } = render(card('targeted'))
+    rerender(card('conquered'))
+    expect(target_button()).toHaveAttribute('data-moved', 'plant')
+  })
+
+  test('removing a Target does not animate', () => {
+    const { rerender } = render(card('targeted'))
+    rerender(card(undefined))
+    expect(target_button()).not.toHaveAttribute('data-moved')
+  })
+
+  test('the mark also clears on its own, for phones where no animation runs (reduced motion)', () => {
+    vi.useFakeTimers()
+    try {
+      const { rerender } = render(card(undefined))
+      rerender(card('conquered'))
+      expect(target_button()).toHaveAttribute('data-moved', 'plant')
+      act(() => {
+        vi.advanceTimersByTime(700)
+      })
+      expect(target_button()).not.toHaveAttribute('data-moved')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  test('the mark is cleared when the animation ends, so it can play again', () => {
+    const { rerender } = render(card(undefined))
+    rerender(card('targeted'))
+    // jsdom has no AnimationEvent, so React listens for the prefixed name there; browsers use animationend
+    fireEvent.animationEnd(target_button())
+    fireEvent(target_button(), new Event('webkitAnimationEnd', { bubbles: true }))
+    expect(target_button()).not.toHaveAttribute('data-moved')
+  })
 })
 
 test('there is exactly one action button on a normal card: the crosshair Target button', async () => {

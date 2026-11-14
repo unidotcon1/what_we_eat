@@ -125,3 +125,48 @@ test('shows a plain notice when spots could not be saved to the account, and not
   setup()
   expect(screen.getByRole('status')).toHaveTextContent(/still saved on this device/i)
 })
+
+describe('the refreshed Spots screen', () => {
+  test('the one hero is a progress ring: Conquered N of the places in our list', async () => {
+    seed([make({ id: 'r:kopi-kin', place_id: 'kopi-kin', state: 'conquered', conquered_at: '2026-11-01T11:00:00.000Z' })])
+    setup()
+    expect(await screen.findByRole('img', { name: 'Conquered 1 of 25' })).toBeInTheDocument()
+  })
+
+  test('a Conquered Spot that is not in our list does not push the ring past its total', async () => {
+    seed([make({ id: 'm:1', place_id: null, name: 'My Aunt Place', state: 'conquered', conquered_at: '2026-11-01T11:00:00.000Z' })])
+    setup()
+    expect(await screen.findByRole('img', { name: 'Conquered 0 of 25' })).toBeInTheDocument()
+  })
+
+  test('says how many are left and what is next up', async () => {
+    seed([make({})])
+    setup()
+    expect(await screen.findByText('25 to go.')).toBeInTheDocument()
+    expect(screen.getByText('Next up: Kopi & Kin')).toBeInTheDocument()
+  })
+
+  test('with no Targets there is no next-up line', async () => {
+    setup()
+    await screen.findByRole('img', { name: 'Conquered 0 of 25' })
+    expect(screen.queryByText(/Next up/)).not.toBeInTheDocument()
+  })
+
+  test('the empty Targets tab shows the plate-and-crosshair art and one way forward', async () => {
+    const { container } = setup()
+    expect(container.querySelector('svg.empty-art')).not.toBeNull()
+    expect(screen.getByRole('link', { name: 'Explore places' })).toHaveAttribute('href', '/')
+  })
+
+  test('the empty Conquered tab has its own words and the same art', async () => {
+    const { container } = setup()
+    await userEvent.click(screen.getByRole('tab', { name: 'Conquered 0' }))
+    expect(screen.getByText(/Nothing conquered yet/)).toBeInTheDocument()
+    expect(container.querySelector('svg.empty-art')).not.toBeNull()
+  })
+
+  test('the header Add link is the one cherry-filled action', () => {
+    setup()
+    expect(screen.getByRole('link', { name: 'Add a spot' })).toHaveClass('cta')
+  })
+})

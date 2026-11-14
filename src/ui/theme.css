@@ -1,40 +1,54 @@
+/* Palette (owner's): cotton, cherry, maroon, noir. Dark leads; light is the choice on Profile.
+   Cherry is a FILL with cotton text (on noir, cherry text or outlines are only about 1.6 to 1). */
 :root {
   --cotton: #edebdd;
   --cherry: #810100;
   --maroon: #630000;
   --noir: #1b1717;
 
-  /* light mode */
-  --bg: var(--cotton);
-  --text: var(--noir);
-  --accent: var(--cherry);
-  --accent-text: var(--cotton);
-  --surface: #ffffff;
-  --muted: #d8d4c2;
-  --icon: var(--cherry);
-  --radius-control: 8px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --bg: var(--noir);
-    --text: var(--cotton);
-    --accent: var(--cherry);
-    --accent-text: var(--cotton);
-    --surface: #2a2222;
-    --muted: var(--maroon);
-    --icon: var(--cotton);
-  }
-}
-
-:root[data-theme='dark'] {
-  --icon: var(--cotton);
+  /* dark (default) */
   --bg: var(--noir);
+  --surface: #2a2222;
+  --raise: #3a2f2f;
+  --line: rgba(237, 235, 221, 0.09);
   --text: var(--cotton);
+  --muted-text: #aba597;
+  --on-bg: var(--cotton); /* a fill that stands out on the page: chips, tabs, a Targeted button */
+  --on-fg: var(--noir); /* text on that fill */
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+  --hi: rgba(237, 235, 221, 0.08); /* loader shimmer */
+  --ring-arc: var(--cotton);
+  --ring-track: rgba(237, 235, 221, 0.22);
+
+  /* names the older screens still use */
   --accent: var(--cherry);
   --accent-text: var(--cotton);
-  --surface: #2a2222;
-  --muted: var(--maroon);
+  --muted: var(--raise);
+  --icon: var(--cotton);
+
+  --r-card: 20px;
+  --r-ctl: 14px;
+  --radius-control: 8px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --tap: 44px;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: var(--cotton);
+  --surface: #f8f6ee;
+  --raise: #e1ddcb;
+  --line: rgba(27, 23, 23, 0.1);
+  --text: var(--noir);
+  --muted-text: #5a524d;
+  --on-bg: var(--noir);
+  --on-fg: var(--cotton);
+  --shadow: 0 8px 22px rgba(27, 23, 23, 0.12);
+  --hi: rgba(255, 255, 255, 0.6);
+  --ring-arc: var(--cherry);
+  --ring-track: rgba(27, 23, 23, 0.12);
+  --icon: var(--cherry);
+  color-scheme: light;
 }
 
 * {
@@ -45,49 +59,64 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 .app {
   min-height: 100vh;
-  padding: 16px 16px 84px;
+  padding: 18px 16px 96px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
 }
 
 .tabbar {
   position: fixed;
+  z-index: 4; /* above the cards (their Target buttons sit at 1), below the vote bar (5) and the filter sheet (10) */
   left: 0;
   right: 0;
   bottom: 0;
-  display: flex;
-  justify-content: space-around;
-  padding: 8px 0 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 8px 8px 12px;
   background: var(--bg);
-  border-top: 1px solid var(--muted);
+  border-top: 1px solid var(--line);
 }
 
 .tab {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  font-size: 11px;
-  color: var(--text);
+  gap: 3px;
+  padding-top: 8px;
+  min-height: 52px;
+  font-size: 12px;
+  color: var(--muted-text);
   text-decoration: none;
-  opacity: 0.65;
 }
 
 .tab[aria-current='page'] {
-  opacity: 1;
+  color: var(--text);
   font-weight: 600;
-  color: var(--accent);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .tab[aria-current='page'] {
-    color: var(--cotton);
+.tab[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 26px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
-}
-
-:root[data-theme='dark'] .tab[aria-current='page'] {
-  color: var(--cotton);
 }

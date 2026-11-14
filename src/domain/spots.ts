@@ -169,3 +169,10 @@ export function diff_spots(prev: Spot[], next: Spot[]): { upserts: Spot[]; delet
     deletes: prev.filter((s) => !after_ids.has(s.id)).map((s) => s.id),
   }
 }
+
+/** How many of the places in our list the person has conquered. A spot that is not in our list never counts, so the ring cannot pass its total. */
+export function conquered_progress(spots: Spot[], place_ids: string[]): { done: number; total: number } {
+  const in_list = new Set(place_ids)
+  const done = new Set(spots.filter((s) => s.state === 'conquered' && s.place_id !== null && in_list.has(s.place_id)).map((s) => s.place_id)).size
+  return { done, total: in_list.size }
+}

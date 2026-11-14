@@ -17,14 +17,17 @@ const TAG_LABEL: Record<string, string> = {
 
 export const tagLabel = (t: string) => TAG_LABEL[t] ?? t[0].toUpperCase() + t.slice(1)
 
-const MAX_TAGS = 2
+const MAX_TAGS = 1
 const HOLD_MS = 500
+const MOVED_MS = 600
 const MOVE_PX = 10
 
 export type CardChoice = SpotState | 'none'
 
 type Props = {
   r: Restaurant
+  /** The first result on Explore is shown larger. Same card, same behaviour. */
+  variant?: 'row' | 'hero'
   state: SpotState | undefined
   /** A quick tap on the crosshair: adds or removes a Target. */
   on_target(): void
@@ -36,8 +39,20 @@ type Props = {
   on_pick(): void
 }
 
-export function RestaurantCard({ r, state, on_target, on_choose, picking, picked, on_pick }: Props) {
+export function RestaurantCard({ r, variant = 'row', state, on_target, on_choose, picking, picked, on_pick }: Props) {
   const [menu_open, set_menu_open] = useState(false)
+  // marks the button for a short motion after a change the person just made; never on first render
+  const [moved, set_moved] = useState<'lock' | 'plant' | null>(null)
+  const previous_state = useRef(state)
+  useEffect(() => {
+    const was = previous_state.current
+    previous_state.current = state
+    if (was === state) return
+    set_moved(state === 'targeted' ? 'lock' : state === 'conquered' ? 'plant' : null)
+    // animationend never comes when animation is off (reduced motion), so the mark also clears on a timer
+    const timer_id = setTimeout(() => set_moved(null), MOVED_MS)
+    return () => clearTimeout(timer_id)
+  }, [state])
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const held = useRef(false)
   const start = useRef<{ x: number; y: number } | null>(null)
@@ -87,7 +102,7 @@ export function RestaurantCard({ r, state, on_target, on_choose, picking, picked
   }
 
   return (
-    <article className={`card${state ? ` is-${state}` : ''}`}>
+    <article className={`card${variant === 'hero' ? ' card-hero' : ''}${state ? ` is-${state}` : ''}`}>
       <span className="card-icon" aria-hidden="true">
         {cuisineIcon(r.cuisine)}
       </span>
@@ -97,19 +112,20 @@ export function RestaurantCard({ r, state, on_target, on_choose, picking, picked
         </h3>
         <p className="card-meta">
           <MapPin size={11} aria-hidden="true" /> {r.area} · {'$'.repeat(r.priceBand)}
-          {state === 'conquered' && (
+        </p>
+        <div className="card-tags">
+          {state === 'conquered' ? (
             <span className="conquered-badge">
               <Flag size={11} aria-hidden="true" />
               Conquered
             </span>
+          ) : (
+            r.tags.slice(0, MAX_TAGS).map((t) => (
+              <span key={t} className="tag">
+                {tagLabel(t)}
+              </span>
+            ))
           )}
-        </p>
-        <div className="card-tags">
-          {r.tags.slice(0, MAX_TAGS).map((t) => (
-            <span key={t} className="tag">
-              {tagLabel(t)}
-            </span>
-          ))}
         </div>
       </div>
       {picking ? (
@@ -132,6 +148,8 @@ export function RestaurantCard({ r, state, on_target, on_choose, picking, picked
           aria-pressed={state === 'targeted'}
           aria-haspopup="menu"
           aria-expanded={menu_open}
+          data-moved={moved ?? undefined}
+          onAnimationEnd={() => set_moved(null)}
           onPointerDown={on_pointer_down}
           onPointerMove={on_pointer_move}
           onPointerUp={clear_timer}

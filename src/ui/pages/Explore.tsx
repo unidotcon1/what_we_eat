@@ -6,6 +6,7 @@ import type { Filters, Restaurant } from '../../domain/types'
 import { get_catalog } from '../../data/catalog'
 import { useShortlist } from '../../local/store'
 import { FilterBar } from '../components/FilterBar'
+import { ExploreSkeleton } from '../components/ExploreSkeleton'
 import { FilterSheet } from '../components/FilterSheet'
 import { RestaurantCard } from '../components/RestaurantCard'
 import { emptyFilters } from '../components/filterTags'
@@ -37,7 +38,16 @@ export default function Explore() {
   const cuisines = useMemo(() => [...new Set((all ?? []).map((r) => r.cuisine))].sort(), [all])
 
   if (error) return <p role="alert">{error}</p>
-  if (!all) return <p>Loading…</p>
+  if (!all) {
+    return (
+      <>
+        <header className="page-head">
+          <h1>What We Eat</h1>
+        </header>
+        <ExploreSkeleton />
+      </>
+    )
+  }
 
   function cancel_vote() {
     shortlist.clear()
@@ -51,11 +61,11 @@ export default function Explore() {
       <header className="page-head">
         <h1>What We Eat</h1>
         {picking ? (
-          <button type="button" className="head-action" onClick={cancel_vote}>
+          <button type="button" className="quiet" onClick={cancel_vote}>
             <X size={16} aria-hidden="true" /> Cancel vote
           </button>
         ) : (
-          <button type="button" className="head-action" onClick={() => setPicking(true)}>
+          <button type="button" className="cta" onClick={() => setPicking(true)}>
             <Vote size={16} aria-hidden="true" /> Start a vote
           </button>
         )}
@@ -75,10 +85,11 @@ export default function Explore() {
           </button>
         </div>
       ) : (
-        results.map((r) => (
+        results.map((r, i) => (
           <RestaurantCard
             key={r.id}
             r={r}
+            variant={i === 0 ? 'hero' : 'row'}
             state={state_of(r.id)}
             on_target={() => toggle_target(r)}
             on_choose={(choice) => (choice === 'none' ? remove_place(r) : set_state(r, choice))}

@@ -1,5 +1,6 @@
 import {
   LEGACY_SAVE_STATE,
+  conquered_progress,
   count_spots,
   diff_spots,
   find_spot,
@@ -197,5 +198,19 @@ describe('legacy saves', () => {
 
   test('spot_input_from_restaurant carries over the facts', () => {
     expect(spot_input_from_restaurant(catalog[0])).toEqual(kopi)
+  })
+})
+
+describe('conquered_progress', () => {
+  const spot = (id: string, place_id: string | null, state: 'targeted' | 'conquered') =>
+    ({ id, place_id, name: id, address: '', lat: 1, lng: 103, state, source: 'catalog', created_at: 't', updated_at: 't', conquered_at: state === 'conquered' ? 't' : null }) as Spot
+
+  test('counts only Conquered Spots that are places in our list, out of the whole list', () => {
+    const spots = [spot('a', 'a', 'conquered'), spot('b', 'b', 'targeted'), spot('c', null, 'conquered'), spot('d', 'gone', 'conquered')]
+    expect(conquered_progress(spots, ['a', 'b', 'c2'])).toEqual({ done: 1, total: 3 })
+  })
+
+  test('an empty list of places never divides by anything and counts nothing', () => {
+    expect(conquered_progress([spot('a', 'a', 'conquered')], [])).toEqual({ done: 0, total: 0 })
   })
 })
