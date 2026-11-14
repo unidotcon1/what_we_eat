@@ -19,10 +19,10 @@ const LEVELS = [
   { at: 400, name: 'Local Legend' },
 ]
 
-export function levelFor(total: number): { level: number; name: string; nextAt: number | null } {
+export function levelFor(total: number): { level: number; name: string; nextAt: number | null; next_name: string | null } {
   let i = 0
   while (i + 1 < LEVELS.length && total >= LEVELS[i + 1].at) i++
-  return { level: i + 1, name: LEVELS[i].name, nextAt: LEVELS[i + 1]?.at ?? null }
+  return { level: i + 1, name: LEVELS[i].name, nextAt: LEVELS[i + 1]?.at ?? null, next_name: LEVELS[i + 1]?.name ?? null }
 }
 
 /** The calendar day (YYYY-MM-DD) in Singapore, used for the daily cap. */

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import Me from './Me'
@@ -27,89 +27,161 @@ const setup = () =>
     </MemoryRouter>,
   )
 
-test('signed out: shows Sign in with Google and the theme toggle', () => {
-  setup()
-  expect(screen.getByRole('button', { name: 'Sign in with Google' })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: /Dark mode/ })).toBeInTheDocument()
-})
+const signed_in = () => mocked.useUser.mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
 
-test('clicking Sign in calls signInWithGoogle', async () => {
-  setup()
-  await userEvent.click(screen.getByRole('button', { name: 'Sign in with Google' }))
-  expect(mocked.signInWithGoogle).toHaveBeenCalledOnce()
-})
-
-test('signed in: shows points, level progress and counts', async () => {
-  mocked.useUser.mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
-  setup()
-  expect(await screen.findByText('92 / 150 points')).toBeInTheDocument()
-  expect(screen.getByRole('img', { name: 'Level 2, 92 of 150 points' })).toBeInTheDocument()
-  expect(screen.getByText(/Food Explorer/)).toBeInTheDocument()
-  expect(screen.getByText('6')).toBeInTheDocument()
-})
-
-test('at the top level the progress line shows the total only', async () => {
-  mocked.fetchMyStats.mockResolvedValue({ points: 450, saves: 0, reviews: 0 })
-  mocked.useUser.mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
-  setup()
-  expect(await screen.findByText('450 points')).toBeInTheDocument()
-})
-
-test('toggling dark mode sets data-theme on the page and remembers it', async () => {
-  setup()
-  // dark leads, so the first press switches to light
-  await userEvent.click(screen.getByRole('button', { name: /Dark mode/ }))
-  expect(document.documentElement.dataset.theme).toBe('light')
-  expect(localStorage.getItem('wwe.theme')).toBe('light')
-  await userEvent.click(screen.getByRole('button', { name: /Dark mode/ }))
-  expect(document.documentElement.dataset.theme).toBe('dark')
-})
-
-test('links to the privacy policy and terms', () => {
-  setup()
-  expect(screen.getByRole('link', { name: 'Privacy policy' })).toHaveAttribute('href', '/privacy')
-  expect(screen.getByRole('link', { name: 'Terms of service' })).toHaveAttribute('href', '/terms')
-})
-
-test('without a database the page explains that accounts are unavailable', () => {
-  mocked.accountsAvailable.mockReturnValue(false)
-  setup()
-  expect(screen.getByText(/Accounts need the online database/)).toBeInTheDocument()
-  expect(screen.queryByRole('button', { name: 'Sign in with Google' })).not.toBeInTheDocument()
-})
+const seed_spots = (spots: { place_id: string | null; state: 'targeted' | 'conquered' }[]) =>
+  localStorage.setItem(
+    'wwe.spots',
+    JSON.stringify(
+      spots.map((s, i) => ({
+        id: `r:${i}`,
+        place_id: s.place_id,
+        name: `Place ${i}`,
+        address: '',
+        lat: 1.3,
+        lng: 103.8,
+        state: s.state,
+        source: 'catalog',
+        created_at: '2026-11-01T10:00:00.000Z',
+        updated_at: '2026-11-01T10:00:00.000Z',
+        conquered_at: s.state === 'conquered' ? '2026-11-01T10:00:00.000Z' : null,
+      })),
+    ),
+  )
 
 test('the page is called Profile', () => {
   setup()
   expect(screen.getByRole('heading', { level: 1, name: 'Profile' })).toBeInTheDocument()
 })
 
-test('shows how many Targets and Conquered Spots there are, even when signed out', () => {
-  const base = { source: 'catalog', created_at: '2026-11-01T10:00:00.000Z', updated_at: '2026-11-01T10:00:00.000Z', address: '', lat: 1.3, lng: 103.8 }
-  localStorage.setItem(
-    'wwe.spots',
-    JSON.stringify([
-      { ...base, id: 'r:a', place_id: 'a', name: 'A', state: 'targeted', conquered_at: null },
-      { ...base, id: 'r:b', place_id: 'b', name: 'B', state: 'targeted', conquered_at: null },
-      { ...base, id: 'r:c', place_id: 'c', name: 'C', state: 'conquered', conquered_at: '2026-11-01T10:00:00.000Z' },
-    ]),
-  )
-  setup()
-  const targets = screen.getByText('Targets').closest('div')!
-  const conquered = screen.getByText('Conquered').closest('div')!
-  expect(targets).toHaveTextContent('2')
-  expect(conquered).toHaveTextContent('1')
+describe('the hero: one big ring of Conquered Spots', () => {
+  test('shows Conquered N of the places in our list, even when signed out', async () => {
+    seed_spots([
+      { place_id: 'kopi-kin', state: 'conquered' },
+      { place_id: 'long-table-hotpot', state: 'targeted' },
+    ])
+    setup()
+    expect(await screen.findByRole('img', { name: 'Conquered 1 of 25' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Conquered 1 of 25' })).toBeInTheDocument()
+  })
+
+  test('a Conquered Spot that is not in our list does not count toward the 25', async () => {
+    seed_spots([{ place_id: null, state: 'conquered' }])
+    setup()
+    expect(await screen.findByRole('img', { name: 'Conquered 0 of 25' })).toBeInTheDocument()
+  })
+
+  test('signed out there is no level pill and no points line', async () => {
+    setup()
+    await screen.findByRole('img', { name: /Conquered/ })
+    expect(screen.queryByText(/^Lv \d/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/points to/)).not.toBeInTheDocument()
+  })
+
+  test('signed in: a level pill and the points still to go to the next level', async () => {
+    signed_in()
+    setup()
+    expect(await screen.findByText('Lv 2')).toBeInTheDocument()
+    expect(screen.getByText('Food Explorer')).toBeInTheDocument()
+    expect(screen.getByText('58 points to Regular')).toBeInTheDocument()
+  })
+
+  test('at the top level there is no next level, so it just shows the points', async () => {
+    signed_in()
+    mocked.fetchMyStats.mockResolvedValue({ points: 450, saves: 0, reviews: 0 })
+    setup()
+    expect(await screen.findByText('450 points')).toBeInTheDocument()
+    expect(screen.getByText('Lv 4')).toBeInTheDocument()
+    expect(screen.queryByText(/points to/)).not.toBeInTheDocument()
+  })
+
+  test('the old counts grid and Reviews count are gone', async () => {
+    signed_in()
+    setup()
+    await screen.findByText('Lv 2')
+    expect(screen.queryByText('Targets')).not.toBeInTheDocument()
+    expect(screen.queryByText('Reviews')).not.toBeInTheDocument()
+    expect(screen.queryByText('Saved places')).not.toBeInTheDocument()
+  })
 })
 
-test('the old "Saved places" count is gone', async () => {
-  mocked.useUser.mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
-  setup()
-  await screen.findByText('92 / 150 points')
-  expect(screen.queryByText('Saved places')).not.toBeInTheDocument()
+describe('the menu card', () => {
+  test('one grouped card holds Import, the Dark mode switch and Sign out, in that order', async () => {
+    signed_in()
+    setup()
+    const card = await screen.findByRole('list', { name: 'Profile menu' })
+    const rows = within(card)
+      .getAllByRole('listitem')
+      .map((li) => li.textContent?.trim())
+    expect(rows).toEqual(['Import from Google Maps', 'Dark mode', 'Sign out'])
+  })
+
+  test('signed out the card has Import and Dark mode, and no Sign out', () => {
+    setup()
+    const card = screen.getByRole('list', { name: 'Profile menu' })
+    const rows = within(card)
+      .getAllByRole('listitem')
+      .map((li) => li.textContent?.trim())
+    expect(rows).toEqual(['Import from Google Maps', 'Dark mode'])
+  })
+
+  test('Import opens the import screen', () => {
+    setup()
+    expect(screen.getByRole('link', { name: /Import from Google Maps/ })).toHaveAttribute('href', '/import')
+  })
+
+  test('Dark mode is a switch: on by default, and pressing it turns it off and remembers light', async () => {
+    setup()
+    const sw = screen.getByRole('switch', { name: 'Dark mode' })
+    expect(sw).toHaveAttribute('aria-checked', 'true')
+    await userEvent.click(sw)
+    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(localStorage.getItem('wwe.theme')).toBe('light')
+    expect(sw).toHaveAttribute('aria-checked', 'false')
+    await userEvent.click(sw)
+    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(sw).toHaveAttribute('aria-checked', 'true')
+  })
+
+  test('Sign out signs out', async () => {
+    signed_in()
+    setup()
+    await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
+    expect(mocked.signOut).toHaveBeenCalledOnce()
+  })
+})
+
+describe('signing in and out', () => {
+  test('signed out: Sign in with Google is the one cherry-filled action, and it calls signInWithGoogle', async () => {
+    setup()
+    const button = screen.getByRole('button', { name: 'Sign in with Google' })
+    expect(button).toHaveClass('cta')
+    await userEvent.click(button)
+    expect(mocked.signInWithGoogle).toHaveBeenCalledOnce()
+  })
+
+  test('signed in: shows which account, and says what signing out does to the Spots on this phone', async () => {
+    signed_in()
+    setup()
+    expect(await screen.findByText('Signed in as a@b.sg')).toBeInTheDocument()
+    expect(screen.getByText(/signing out clears the spots on this phone/i)).toBeInTheDocument()
+  })
+
+  test('without a database the page explains that accounts are unavailable', () => {
+    mocked.accountsAvailable.mockReturnValue(false)
+    setup()
+    expect(screen.getByText(/Accounts need the online database/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Sign in with Google' })).not.toBeInTheDocument()
+  })
+
+  test('links to the privacy policy and terms', () => {
+    setup()
+    expect(screen.getByRole('link', { name: 'Privacy policy' })).toHaveAttribute('href', '/privacy')
+    expect(screen.getByRole('link', { name: 'Terms of service' })).toHaveAttribute('href', '/terms')
+  })
 })
 
 describe('deleting the account', () => {
-  const signed_in = () => mocked.useUser.mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
-
   test('the delete button is only shown when signed in', () => {
     setup()
     expect(screen.queryByRole('button', { name: 'Delete my account' })).not.toBeInTheDocument()
@@ -149,12 +221,6 @@ describe('deleting the account', () => {
     expect(mocked.delete_my_account).not.toHaveBeenCalled()
   })
 
-  test('signing out says that spots stay in the account and come back on the next sign-in', async () => {
-    signed_in()
-    setup()
-    expect(await screen.findByText(/signing out clears the spots on this phone/i)).toBeInTheDocument()
-  })
-
   test('confirming deletes the account and says so', async () => {
     signed_in()
     mocked.delete_my_account.mockResolvedValue(undefined)
@@ -175,45 +241,5 @@ describe('deleting the account', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Yes, delete my account' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not delete your account: boom')
     expect(screen.queryByText(/Your account has been deleted/)).not.toBeInTheDocument()
-  })
-})
-
-test('Profile has an Import from Google Maps button that opens the import screen, signed in or not', () => {
-  setup()
-  expect(screen.getByRole('link', { name: /Import from Google Maps/ })).toHaveAttribute('href', '/import')
-})
-
-test('the import button sits right under the Target and Conquered counts', () => {
-  setup()
-  const counts = document.querySelector('.spot-counts')!
-  const link = screen.getByRole('link', { name: /Import from Google Maps/ })
-  expect(counts.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  expect(link.compareDocumentPosition(screen.getByRole('button', { name: 'Dark mode: on' })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-})
-
-describe('the level ring', () => {
-  const signed_in = () => mocked.useUser.mockReturnValue({ user: { id: 'u', email: 'a@b.sg' }, ready: true })
-
-  test('signed in: the level is a ring around the level number, with a spoken label', async () => {
-    signed_in()
-    setup()
-    expect(await screen.findByRole('img', { name: /^Level \d, 92 of 150 points$/ })).toBeInTheDocument()
-  })
-
-  test('at the top level the ring is full and says just the points', async () => {
-    signed_in()
-    mocked.fetchMyStats.mockResolvedValue({ points: 450, saves: 0, reviews: 0 })
-    setup()
-    expect(await screen.findByRole('img', { name: /^Level \d, 450 points$/ })).toBeInTheDocument()
-  })
-
-  test('signed out there is no level ring', () => {
-    setup()
-    expect(screen.queryByRole('img', { name: /Level/ })).not.toBeInTheDocument()
-  })
-
-  test('signing in is the cherry-filled action when signed out', () => {
-    setup()
-    expect(screen.getByRole('button', { name: 'Sign in with Google' })).toHaveClass('cta')
   })
 })

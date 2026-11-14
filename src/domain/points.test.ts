@@ -43,3 +43,10 @@ test('the daily window rolls over at midnight Singapore time', () => {
   expect(sgDayKey(new Date('2026-10-31T00:00:00+08:00'))).toBe('2026-10-31')
   expect(sgDayKey(new Date('2026-10-30T16:00:00Z'))).toBe('2026-10-31')
 })
+
+test('levelFor also says the name of the next level, or null at the top', () => {
+  expect(levelFor(0).next_name).toBe('Food Explorer')
+  expect(levelFor(92).next_name).toBe('Regular')
+  expect(levelFor(150).next_name).toBe('Local Legend')
+  expect(levelFor(450).next_name).toBeNull()
+})

@@ -46,3 +46,15 @@ test('the Spots tab does not use the flag, which is reserved for Conquered', () 
   expect(container.querySelector('svg.lucide-flag')).toBeNull()
   expect(container.querySelector('svg.lucide-stamp')).toBeNull()
 })
+
+test('every tab icon sits in a pill, and the current tab is the lit one', () => {
+  renderAt('/me')
+  for (const link of screen.getAllByRole('link')) expect(link.querySelector('.tab-pill')).not.toBeNull()
+  expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute('aria-current', 'page')
+})
+
+test('Spots uses a bullseye (a plate that is a target), not a checklist', () => {
+  const { container } = renderAt('/')
+  expect(container.querySelector('svg.lucide-target')).not.toBeNull()
+  expect(container.querySelector('svg.lucide-list-checks')).toBeNull()
+})
