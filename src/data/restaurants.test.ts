@@ -46,3 +46,19 @@ test('falls back to the bundled sample restaurants when there is no database', a
   expect(out.length).toBeGreaterThanOrEqual(20)
   expect(out[0]).toHaveProperty('priceBand')
 })
+
+test('carries an image, a menu link and a menu when the database has them, and ignores unsafe ones', async () => {
+  const good = { ...dbRow, image_url: '/restaurants/kopi-kin.webp', menu_url: 'https://kopikin.example/menu', menu: [{ section: 'Drinks', items: [{ name: 'Kopi', price: '$2' }] }] }
+  const bad = { ...dbRow, id: 'bad', image_url: 'https://evil.example/x.jpg', menu_url: 'javascript:alert(1)', menu: 'nope' }
+  const out = await fetchRestaurants(source({ data: [good, bad], error: null }))
+  expect(out[0]).toMatchObject({ image: '/restaurants/kopi-kin.webp', menu_url: 'https://kopikin.example/menu', menu: [{ section: 'Drinks', items: [{ name: 'Kopi', price: '$2' }] }] })
+  expect(out[1].image).toBeUndefined()
+  expect(out[1].menu_url).toBeUndefined()
+  expect(out[1].menu).toBeUndefined()
+})
+
+test('rows from a database without the media columns still load', async () => {
+  const out = await fetchRestaurants(source({ data: [dbRow], error: null }))
+  expect(out[0].image).toBeUndefined()
+  expect(out[0].menu).toBeUndefined()
+})

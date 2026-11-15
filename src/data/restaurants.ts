@@ -1,5 +1,6 @@
 import sample from './sample-restaurants.json'
 import type { Hours, PriceBand, Restaurant } from '../domain/types'
+import { parse_menu, safe_image_path, safe_menu_url } from '../domain/restaurant_media'
 import { getClient } from './supabase'
 
 /** The slice of the Supabase client this module needs. */
@@ -20,6 +21,9 @@ type DbRestaurant = {
   tags: string[] | null
   hours: Hours | null
   closed: boolean
+  image_url?: string | null
+  menu_url?: string | null
+  menu?: unknown
 }
 
 export async function fetchRestaurants(source: RestaurantSource | null = getClient() as unknown as RestaurantSource | null): Promise<Restaurant[]> {
@@ -37,5 +41,8 @@ export async function fetchRestaurants(source: RestaurantSource | null = getClie
     tags: r.tags ?? [],
     hours: r.hours ?? undefined,
     closed: r.closed,
+    image: safe_image_path(r.image_url),
+    menu_url: safe_menu_url(r.menu_url),
+    menu: parse_menu(r.menu),
   }))
 }

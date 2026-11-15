@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, FileUp, LogOut, Moon } from 'lucide-react'
+import { ChevronRight, FileUp, LayoutGrid, LogOut, Moon } from 'lucide-react'
 import { accountsAvailable, delete_my_account, fetchMyStats, signInWithGoogle, signOut, useUser, type MyStats } from '../../data/auth'
 import { get_catalog } from '../../data/catalog'
 import { levelFor } from '../../domain/points'
 import { conquered_progress } from '../../domain/spots'
+import { set_explore_view, use_explore_view } from '../../local/explore_view'
 import { use_spots } from '../../local/spots_store'
 import { ProgressRing } from '../components/ProgressRing'
 import { currentTheme, setTheme, type Theme } from '../theme'
@@ -12,6 +13,7 @@ import { currentTheme, setTheme, type Theme } from '../theme'
 export default function Me() {
   const { user } = useUser()
   const spots = use_spots()
+  const explore_view = use_explore_view()
   const [stats, setStats] = useState<MyStats | null>(null)
   const [place_ids, set_place_ids] = useState<string[]>([])
   const [theme, setThemeState] = useState<Theme>(currentTheme)
@@ -101,6 +103,18 @@ export default function Me() {
             <span className="grow">Import from Google Maps</span>
             <ChevronRight size={18} className="chev" aria-hidden="true" />
           </Link>
+        </li>
+        <li className="row row-static">
+          <LayoutGrid size={20} aria-hidden="true" />
+          <span className="grow">Explore view</span>
+          <div className="mini-seg" role="radiogroup" aria-label="Explore view">
+            <button type="button" role="radio" aria-checked={explore_view === 'details'} onClick={() => set_explore_view('details')}>
+              Details
+            </button>
+            <button type="button" role="radio" aria-checked={explore_view === 'images'} onClick={() => set_explore_view('images')}>
+              Images
+            </button>
+          </div>
         </li>
         <li>
           <button type="button" className="row" role="switch" aria-checked={theme === 'dark'} onClick={toggleTheme}>

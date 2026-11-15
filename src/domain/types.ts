@@ -7,6 +7,8 @@ export type Hours = Record<Day, [string, string][]>
 
 export type LatLng = { lat: number; lng: number }
 
+export type MenuSection = { section: string; items: { name: string; price?: string }[] }
+
 export type Restaurant = {
   id: string
   name: string
@@ -18,6 +20,11 @@ export type Restaurant = {
   tags: string[]
   hours?: Hours
   closed: boolean
+  /** A picture file of ours, under /restaurants/. */
+  image?: string
+  /** The restaurant's own menu page (https). */
+  menu_url?: string
+  menu?: MenuSection[]
 }
 
 export type Audience = 'group' | 'date' | 'small'

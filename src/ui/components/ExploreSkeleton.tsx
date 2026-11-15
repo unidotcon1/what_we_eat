@@ -1,5 +1,19 @@
 /** Same shapes as the real Explore screen, so nothing jumps when the places arrive. */
-export function ExploreSkeleton() {
+export function ExploreSkeleton({ variant = 'details' }: { variant?: 'details' | 'images' }) {
+  if (variant === 'images') {
+    return (
+      <div aria-label="Loading places" aria-busy="true" className="skeleton">
+        <div className="sk sk-chips" />
+        <div className="sk sk-poster sk-hero" />
+        <span className="sk sk-line" style={{ width: '45%', height: 18 }} />
+        <div className="sk-row">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="sk sk-poster" />
+          ))}
+        </div>
+      </div>
+    )
+  }
   return (
     <div aria-label="Loading places" aria-busy="true" className="skeleton">
       <div className="sk sk-chips" />

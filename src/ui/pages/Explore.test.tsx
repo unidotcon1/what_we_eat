@@ -4,11 +4,13 @@ import { MemoryRouter } from 'react-router-dom'
 import Explore from './Explore'
 import { resetStoresForTest } from '../../local/store'
 import { reset_spots_store_for_test } from '../../local/spots_store'
+import { reset_explore_view_for_test } from '../../local/explore_view'
 
 beforeEach(() => {
   localStorage.clear()
   resetStoresForTest()
   reset_spots_store_for_test()
+  reset_explore_view_for_test()
 })
 
 function setup() {
@@ -191,4 +193,73 @@ describe('the refreshed Explore screen', () => {
     await screen.findByText('Long Table Hotpot')
     expect(screen.getByRole('button', { name: 'Start a vote' })).toHaveClass('cta')
   })
+})
+
+describe('the image version of Explore', () => {
+  beforeEach(() => localStorage.setItem('wwe.explore_view', 'images'))
+  afterEach(() => localStorage.removeItem('wwe.explore_view'))
+  beforeEach(() => reset_explore_view_for_test())
+
+  test('one hero poster on top, then titled rows of identical posters', async () => {
+    setup()
+    await screen.findAllByRole('region')
+    expect(document.querySelectorAll('article.poster-hero')).toHaveLength(1)
+    expect(document.querySelector('article.card')).toBeNull() // no list cards in this layout
+    const rows = screen.getAllByRole('region').map((s) => s.getAttribute('aria-label'))
+    expect(rows[0]).toBe('Near you')
+    expect(rows).toContain('Date night')
+    expect(rows.length).toBeLessThanOrEqual(5)
+  })
+
+  test('a row is only shown when it has at least three places', async () => {
+    setup()
+    await screen.findAllByRole('region')
+    for (const region of screen.getAllByRole('region')) {
+      expect(region.querySelectorAll('article.poster').length).toBeGreaterThanOrEqual(3)
+    }
+  })
+
+  test('View more on Date night turns on that filter and shows a plain poster grid of just those places', async () => {
+    setup()
+    await userEvent.click(await screen.findByRole('button', { name: 'View more Date night' }))
+    expect(within(screen.getByRole('group', { name: 'Quick filters' })).getByRole('button', { name: 'Date night' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.queryAllByRole('region')).toHaveLength(0)
+    expect(document.querySelector('.poster-grid')).not.toBeNull()
+    expect(screen.queryByText('Long Table Hotpot')).not.toBeInTheDocument()
+  })
+
+  test('searching shows the grid too, not rows', async () => {
+    setup()
+    await screen.findAllByRole('region')
+    await userEvent.type(screen.getByPlaceholderText(/Search restaurant/), 'hotpot')
+    await waitFor(() => expect(document.querySelector('.poster-grid')).not.toBeNull())
+    expect(screen.getByText('Long Table Hotpot')).toBeInTheDocument()
+  })
+
+  test('the Target button on a poster makes the place a Target', async () => {
+    setup()
+    await screen.findAllByRole('region')
+    await userEvent.click(screen.getAllByRole('button', { name: /^Target / })[0])
+    expect(screen.getAllByRole('button', { name: /^Remove .* from Targets$/ }).length).toBeGreaterThan(0)
+  })
+
+  test('Start a vote works here too: posters get a pick toggle', async () => {
+    setup()
+    await screen.findAllByRole('region')
+    await userEvent.click(screen.getByRole('button', { name: 'Start a vote' }))
+    expect(screen.getAllByRole('button', { name: /^Pick .* for the vote$/ }).length).toBeGreaterThan(3)
+  })
+
+  test('while loading, the skeleton has the poster shapes, not list rows', () => {
+    setup()
+    const sk = screen.getByLabelText('Loading places')
+    expect(sk.querySelector('.sk-poster')).not.toBeNull()
+  })
+})
+
+test('the detailed list is still the default', async () => {
+  setup()
+  await screen.findByText('Long Table Hotpot')
+  expect(document.querySelector('article.poster')).toBeNull()
+  expect(document.querySelector('article.card')).not.toBeNull()
 })

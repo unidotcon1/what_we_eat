@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import Me from './Me'
 import * as auth from '../../data/auth'
+import { reset_explore_view_for_test } from '../../local/explore_view'
 import { reset_spots_store_for_test } from '../../local/spots_store'
 
 vi.mock('../../data/auth')
@@ -12,6 +13,7 @@ const mocked = vi.mocked(auth)
 beforeEach(() => {
   localStorage.clear()
   reset_spots_store_for_test()
+  reset_explore_view_for_test()
   document.documentElement.removeAttribute('data-theme')
   mocked.accountsAvailable.mockReturnValue(true)
   mocked.useUser.mockReturnValue({ user: null, ready: true })
@@ -106,14 +108,14 @@ describe('the hero: one big ring of Conquered Spots', () => {
 })
 
 describe('the menu card', () => {
-  test('one grouped card holds Import, the Dark mode switch and Sign out, in that order', async () => {
+  test('one grouped card holds Import, the Explore view choice, the Dark mode switch and Sign out, in that order', async () => {
     signed_in()
     setup()
     const card = await screen.findByRole('list', { name: 'Profile menu' })
     const rows = within(card)
       .getAllByRole('listitem')
       .map((li) => li.textContent?.trim())
-    expect(rows).toEqual(['Import from Google Maps', 'Dark mode', 'Sign out'])
+    expect(rows).toEqual(['Import from Google Maps', 'Explore viewDetailsImages', 'Dark mode', 'Sign out'])
   })
 
   test('signed out the card has Import and Dark mode, and no Sign out', () => {
@@ -122,7 +124,7 @@ describe('the menu card', () => {
     const rows = within(card)
       .getAllByRole('listitem')
       .map((li) => li.textContent?.trim())
-    expect(rows).toEqual(['Import from Google Maps', 'Dark mode'])
+    expect(rows).toEqual(['Import from Google Maps', 'Explore viewDetailsImages', 'Dark mode'])
   })
 
   test('Import opens the import screen', () => {
@@ -141,6 +143,16 @@ describe('the menu card', () => {
     await userEvent.click(sw)
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(sw).toHaveAttribute('aria-checked', 'true')
+  })
+
+  test('Explore view: Details is chosen by default, and picking Images saves it', async () => {
+    setup()
+    const group = within(screen.getByRole('radiogroup', { name: 'Explore view' }))
+    expect(group.getByRole('radio', { name: 'Details' })).toHaveAttribute('aria-checked', 'true')
+    expect(group.getByRole('radio', { name: 'Images' })).toHaveAttribute('aria-checked', 'false')
+    await userEvent.click(group.getByRole('radio', { name: 'Images' }))
+    expect(group.getByRole('radio', { name: 'Images' })).toHaveAttribute('aria-checked', 'true')
+    expect(localStorage.getItem('wwe.explore_view')).toBe('images')
   })
 
   test('Sign out signs out', async () => {
