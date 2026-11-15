@@ -1627,3 +1627,127 @@ textarea {
 .menu-section .quiet {
   margin-top: 12px;
 }
+
+/* Profile picture: a shape, a palette colour and an emoji or initials */
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  background: var(--cherry);
+  color: var(--cotton);
+  border-radius: 50%;
+}
+
+.avatar[data-shape='square'] {
+  border-radius: 26%;
+}
+
+.avatar[data-shape='hexagon'] {
+  border-radius: 0;
+  clip-path: polygon(50% 0, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
+}
+
+.avatar[data-colour='maroon'],
+.swatch[data-colour='maroon'] {
+  background: var(--maroon);
+}
+
+/* noir and cotton each match one theme's page, so they sit a step off it to stay visible */
+.avatar[data-colour='noir'],
+.swatch[data-colour='noir'] {
+  background: #0d0b0b;
+}
+
+.avatar[data-colour='cotton'],
+.swatch[data-colour='cotton'] {
+  background: #fffdf2;
+  color: var(--noir);
+}
+
+.swatch[data-colour='cherry'] {
+  background: var(--cherry);
+}
+
+.avatar-head,
+.avatar-designer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.avatar-designer {
+  padding: 22px 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: var(--surface);
+}
+
+.swatches {
+  display: flex;
+  gap: 12px;
+}
+
+.swatch {
+  width: var(--tap);
+  height: var(--tap);
+  border: 2px solid var(--line);
+  border-radius: 50%;
+}
+
+.swatch[aria-checked='true'] {
+  outline: 3px solid var(--text);
+  outline-offset: 3px;
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(6, var(--tap));
+  gap: 6px;
+}
+
+.emoji-grid button {
+  height: var(--tap);
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 24px;
+}
+
+.emoji-grid button[aria-checked='true'] {
+  background: var(--raise);
+  box-shadow: inset 0 0 0 2px var(--text);
+}
+
+.initials-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted-text);
+}
+
+.initials-field input {
+  width: 96px;
+  min-height: var(--tap);
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  background: var(--raise);
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.designer-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

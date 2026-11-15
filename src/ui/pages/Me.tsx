@@ -5,8 +5,11 @@ import { accountsAvailable, delete_my_account, fetchMyStats, signInWithGoogle, s
 import { get_catalog } from '../../data/catalog'
 import { levelFor } from '../../domain/points'
 import { conquered_progress } from '../../domain/spots'
+import { set_avatar, use_avatar } from '../../local/avatar'
 import { set_explore_view, use_explore_view } from '../../local/explore_view'
 import { use_spots } from '../../local/spots_store'
+import { AvatarBadge } from '../components/AvatarBadge'
+import { AvatarDesigner } from '../components/AvatarDesigner'
 import { ProgressRing } from '../components/ProgressRing'
 import { currentTheme, setTheme, type Theme } from '../theme'
 
@@ -14,6 +17,8 @@ export default function Me() {
   const { user } = useUser()
   const spots = use_spots()
   const explore_view = use_explore_view()
+  const avatar = use_avatar()
+  const [designing, set_designing] = useState(false)
   const [stats, setStats] = useState<MyStats | null>(null)
   const [place_ids, set_place_ids] = useState<string[]>([])
   const [theme, setThemeState] = useState<Theme>(currentTheme)
@@ -63,6 +68,24 @@ export default function Me() {
       <h1>Profile</h1>
 
       {deleted && <p role="status">Your account has been deleted. Spots saved on this phone are still here.</p>}
+
+      {designing ? (
+        <AvatarDesigner
+          start={avatar}
+          on_save={(next) => {
+            set_avatar(next)
+            set_designing(false)
+          }}
+          on_cancel={() => set_designing(false)}
+        />
+      ) : (
+        <section className="avatar-head" aria-label="Profile picture">
+          <AvatarBadge avatar={avatar} />
+          <button type="button" className="chip" onClick={() => set_designing(true)}>
+            Change picture
+          </button>
+        </section>
+      )}
 
       {progress.total > 0 && (
         <section className="hero-card" aria-label="Progress">

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import Me from './Me'
 import * as auth from '../../data/auth'
+import { reset_avatar_for_test } from '../../local/avatar'
 import { reset_explore_view_for_test } from '../../local/explore_view'
 import { reset_spots_store_for_test } from '../../local/spots_store'
 
@@ -14,6 +15,7 @@ beforeEach(() => {
   localStorage.clear()
   reset_spots_store_for_test()
   reset_explore_view_for_test()
+  reset_avatar_for_test()
   document.documentElement.removeAttribute('data-theme')
   mocked.accountsAvailable.mockReturnValue(true)
   mocked.useUser.mockReturnValue({ user: null, ready: true })
@@ -253,5 +255,33 @@ describe('deleting the account', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Yes, delete my account' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not delete your account: boom')
     expect(screen.queryByText(/Your account has been deleted/)).not.toBeInTheDocument()
+  })
+})
+
+describe('the profile picture', () => {
+  test('shows at the top, even when signed out, with a way to change it', () => {
+    setup()
+    expect(screen.getByRole('img', { name: 'Profile picture' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change picture' })).toBeInTheDocument()
+  })
+
+  test('designing one saves it on this phone and closes the designer', async () => {
+    setup()
+    await userEvent.click(screen.getByRole('button', { name: 'Change picture' }))
+    await userEvent.click(screen.getByRole('radio', { name: 'Initials' }))
+    await userEvent.type(screen.getByLabelText('Your initials (up to 2)'), 'lq')
+    await userEvent.click(screen.getByRole('button', { name: 'Save picture' }))
+    expect(screen.getByRole('img', { name: 'Profile picture: LQ' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Save picture' })).not.toBeInTheDocument()
+    expect(JSON.parse(localStorage.getItem('wwe.avatar')!).text).toBe('LQ')
+  })
+
+  test('Cancel keeps the old picture', async () => {
+    setup()
+    await userEvent.click(screen.getByRole('button', { name: 'Change picture' }))
+    await userEvent.click(screen.getByRole('radio', { name: 'Square' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.getByRole('img', { name: 'Profile picture' })).toHaveAttribute('data-shape', 'circle')
+    expect(localStorage.getItem('wwe.avatar')).toBeNull()
   })
 })
